@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extension
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: extension/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # Prime Directive: the extension makes NO network calls. Fail the build
+      # if any network API or runtime HTTP dependency ends up in the bundle.
+      - run: npm run check:no-network
+
+  no-runtime-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert zero runtime dependencies
+        run: |
+          cd extension
+          deps=$(node -e "const p=require('./package.json');console.log(Object.keys(p.dependencies||{}).length)")
+          if [ "$deps" != "0" ]; then
+            echo "Runtime dependencies are not allowed (found $deps). Use the VS Code API / Node built-ins."
+            exit 1
+          fi
+          echo "OK: zero runtime dependencies"

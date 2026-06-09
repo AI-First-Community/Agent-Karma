@@ -1,0 +1,58 @@
+{
+  "name": "agent-karma",
+  "displayName": "Agent Karma",
+  "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
+  "version": "0.0.1",
+  "publisher": "passion4architecture",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Sanjeev Azad",
+    "email": "sanjeev.azad@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Passion4Architecture/agent-karma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Passion4Architecture/agent-karma/issues"
+  },
+  "homepage": "https://github.com/Passion4Architecture/agent-karma#readme",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other",
+    "Education"
+  ],
+  "keywords": [
+    "ai",
+    "validation",
+    "local-first",
+    "privacy",
+    "coding-assistant"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {},
+  "scripts": {
+    "vscode:prepublish": "npm run build -- --minify",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "test": "vitest run",
+    "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.93.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "esbuild": "^0.23.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

@@ -1,0 +1,30 @@
+# --- Local-only files (never commit) ---
+CLAUDE.md
+*.pdf
+Agent Karma — *.pdf
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+
+# --- Node / build ---
+node_modules/
+extension/node_modules/
+extension/out/
+extension/dist/
+extension/*.vsix
+*.tsbuildinfo
+
+# --- Test / coverage ---
+coverage/
+.nyc_output/
+
+# --- Agent Karma local data (created at runtime) ---
+agent-karma-data/
+
+# --- Logs / env ---
+*.log
+.env
+.env.*
