@@ -151,6 +151,22 @@ export class SessionManager {
     return { session, stale: this.isStale(session, idleEndMinutes) };
   }
 
+  /**
+   * Record an event against the active session (no-op if none is active).
+   * Used by the passive collectors (file saves, validation commands).
+   * Returns true if recorded.
+   */
+  recordForActiveSession(
+    type: AgentKarmaEventType,
+    data: Record<string, unknown>
+  ): boolean {
+    if (!this.active) {
+      return false;
+    }
+    this.record(type, this.active.id, data);
+    return true;
+  }
+
   // --- internals ---
 
   /** Replace the stored copy of a session (matched by id). */

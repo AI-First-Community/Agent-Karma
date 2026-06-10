@@ -4,6 +4,8 @@ import { EventBus } from "./core/eventBus";
 import { SessionManager } from "./core/sessionManager";
 import { StatusBarController } from "./statusbar/statusBarItem";
 import { DashboardPanel } from "./dashboard/dashboardProvider";
+import { FileCollector } from "./collectors/fileCollector";
+import { TerminalCollector } from "./collectors/terminalCollector";
 import { AI_TOOLS, TASK_TYPES } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
@@ -28,6 +30,8 @@ export function activate(context: vscode.ExtensionContext): void {
   const manager = new SessionManager(store, bus, context.globalState);
   const statusBar = new StatusBarController(TOGGLE_COMMAND);
   const dashboard = new DashboardPanel(store, manager);
+  const fileCollector = new FileCollector(manager, store, bus);
+  const terminalCollector = new TerminalCollector(manager);
 
   const syncStatusBar = (): void => {
     const active = manager.getActiveSession();
@@ -96,20 +100,57 @@ export function activate(context: vscode.ExtensionContext): void {
     dashboard.refresh();
   };
 
-  const endFlow = (): void => {
-    const ended = manager.endSession();
-    if (!ended) {
+  const addValidationFlow = async (): Promise<void> => {
+    if (!manager.hasActiveSession()) {
+      void vscode.window.showInformationMessage(
+        "Start an Agent Karma session first, then log the validation commands you ran."
+      );
+      return;
+    }
+    const cmd = await vscode.window.showInputBox({
+      title: "Agent Karma — Add Validation Command",
+      prompt: "Which validation command did you run? (e.g. npm test, npm run build, npm run lint)",
+      ignoreFocusOut: true,
+    });
+    if (cmd === undefined || cmd.trim().length === 0) {
+      return;
+    }
+    terminalCollector.logCommand(cmd.trim());
+    dashboard.refresh();
+    void vscode.window.showInformationMessage(`Logged validation: ${cmd.trim()}`);
+  };
+
+  const endFlow = async (): Promise<void> => {
+    if (!manager.hasActiveSession()) {
       void vscode.window.showInformationMessage("No active Agent Karma session to end.");
       return;
     }
+    // End-of-session validation prompt: invite logging the commands you ran (not a yes/no).
+    let addMore = true;
+    while (addMore) {
+      const choice = await vscode.window.showInformationMessage(
+        "Did you run tests / build / lint this session? Add them so they count.",
+        "Add command",
+        "Done"
+      );
+      if (choice === "Add command") {
+        await addValidationFlow();
+      } else {
+        addMore = false;
+      }
+    }
+
+    const ended = manager.endSession();
     syncStatusBar();
     dashboard.refresh();
-    void vscode.window.showInformationMessage(`Agent Karma session ended: ${ended.title}`);
+    void vscode.window.showInformationMessage(
+      `Agent Karma session ended: ${ended?.title ?? ""}`
+    );
   };
 
   const toggleFlow = async (): Promise<void> => {
     if (manager.hasActiveSession()) {
-      endFlow();
+      await endFlow();
     } else {
       await startFlow();
     }
@@ -120,8 +161,11 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand("agentKarma.endSession", endFlow),
     vscode.commands.registerCommand(TOGGLE_COMMAND, toggleFlow),
     vscode.commands.registerCommand("agentKarma.showDashboard", () => dashboard.show()),
+    vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
     statusBar,
-    dashboard
+    dashboard,
+    fileCollector,
+    terminalCollector
   );
 
   // Keep the status bar + dashboard in sync as sessions start/end.

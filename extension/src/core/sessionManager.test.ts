@@ -121,6 +121,19 @@ describe("SessionManager", () => {
     expect(makeManager().endSession()).toBeUndefined();
   });
 
+  it("recordForActiveSession records only while a session is active", () => {
+    const mgr = makeManager();
+    // no active session → no-op
+    expect(mgr.recordForActiveSession("file.saved", { fileName: "a.ts" })).toBe(false);
+
+    mgr.startSession(META);
+    const before = store.loadEvents().events.length;
+    expect(mgr.recordForActiveSession("file.saved", { fileName: "a.ts" })).toBe(true);
+    const after = store.loadEvents().events;
+    expect(after.length).toBe(before + 1);
+    expect(after[after.length - 1].type).toBe("file.saved");
+  });
+
   it("restores an active session after a simulated reload (not stale)", () => {
     const mgr1 = makeManager();
     const started = mgr1.startSession(META);

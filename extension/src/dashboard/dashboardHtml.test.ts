@@ -56,6 +56,18 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("prompt hygiene: Good");
   });
 
+  it("summarizes captured files and validation for the active session", () => {
+    const events = [
+      { id: "1", sessionId: "s1", type: "file.saved" as const, timestamp: "t", data: { fileName: "a.ts", isTestFile: false } },
+      { id: "2", sessionId: "s1", type: "file.saved" as const, timestamp: "t", data: { fileName: "a.spec.ts", isTestFile: true } },
+      { id: "3", sessionId: "s1", type: "validation.command" as const, timestamp: "t", data: { commandType: "Test", result: "passed" } },
+    ];
+    const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: base, activeEvents: events, recent: [] });
+    expect(html).toContain("Files changed");
+    expect(html).toContain("2 files (1 test)");
+    expect(html).toContain("Test (passed)");
+  });
+
   it("escapes HTML in user-provided fields (no injection)", () => {
     const evil: AgentKarmaSession = { ...base, title: "<img src=x onerror=alert(1)>" };
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: evil, recent: [] });

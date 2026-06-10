@@ -47,10 +47,15 @@ export class DashboardPanel {
       .filter((s) => s.status === "completed")
       .slice(-10)
       .reverse();
+    const active = this.sessions.getActiveSession();
+    const activeEvents = active
+      ? this.store.loadEvents().events.filter((e) => e.sessionId === active.id)
+      : [];
     this.panel.webview.html = renderDashboardHtml({
       nonce: randomUUID().replace(/-/g, ""),
       cspSource: this.panel.webview.cspSource,
-      active: this.sessions.getActiveSession(),
+      active,
+      activeEvents,
       recent,
     });
   }

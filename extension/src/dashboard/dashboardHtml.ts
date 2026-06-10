@@ -1,9 +1,11 @@
-import { AgentKarmaSession } from "../core/types";
+import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 
 export interface DashboardData {
   nonce: string;
   cspSource: string;
   active: AgentKarmaSession | undefined;
+  /** Events for the active session (used to show live file/validation capture). */
+  activeEvents?: AgentKarmaEvent[];
   recent: AgentKarmaSession[];
 }
 
@@ -38,7 +40,32 @@ function dharmaCardHtml(session: AgentKarmaSession): string {
     </div>`;
 }
 
-function activeSection(active: AgentKarmaSession | undefined): string {
+function captureSummary(events: AgentKarmaEvent[]): string {
+  const files = events.filter((e) => e.type === "file.saved");
+  const testFiles = files.filter((e) => e.data.isTestFile === true).length;
+  const validations = events
+    .filter((e) => e.type === "validation.command")
+    .map((e) => `${esc(String(e.data.commandType))} (${esc(String(e.data.result))})`);
+
+  const filesLine = `${files.length} file${files.length === 1 ? "" : "s"}${
+    testFiles > 0 ? ` (${testFiles} test)` : ""
+  }`;
+  const validationLine =
+    validations.length > 0
+      ? validations.join(", ")
+      : `<span class="muted">none logged yet</span>`;
+
+  return `
+    <dl>
+      <dt>Files changed</dt><dd>${filesLine}</dd>
+      <dt>Validation</dt><dd>${validationLine}</dd>
+    </dl>`;
+}
+
+function activeSection(
+  active: AgentKarmaSession | undefined,
+  events: AgentKarmaEvent[]
+): string {
   if (!active) {
     return `<p class="muted">No active session. Click <b>▶ Agent Karma: Start</b> in the status bar to begin.</p>`;
   }
@@ -52,6 +79,7 @@ function activeSection(active: AgentKarmaSession | undefined): string {
         <dt>Started</dt><dd>${esc(active.startedAt)}</dd>
         <dt>Intent</dt><dd>${esc(active.intent) || "<span class='muted'>—</span>"}</dd>
       </dl>
+      ${captureSummary(events)}
       ${dharmaCardHtml(active)}
     </div>`;
 }
@@ -119,7 +147,7 @@ export function renderDashboardHtml(data: DashboardData): string {
   <p class="tagline">Make every agent action count.</p>
 
   <h2>Active session</h2>
-  ${activeSection(data.active)}
+  ${activeSection(data.active, data.activeEvents ?? [])}
 
   <h2>Recent sessions</h2>
   ${recentSection(data.recent)}

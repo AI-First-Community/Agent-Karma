@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.0.1",
+  "version": "0.3.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -40,6 +40,7 @@
       { "command": "agentKarma.startSession", "title": "Agent Karma: Start Session" },
       { "command": "agentKarma.endSession", "title": "Agent Karma: End Session" },
       { "command": "agentKarma.showDashboard", "title": "Agent Karma: Show Dashboard" },
+      { "command": "agentKarma.addValidationCommand", "title": "Agent Karma: Add Validation Command" },
       { "command": "agentKarma.toggleSession", "title": "Agent Karma: Toggle Session" }
     ],
     "menus": {
@@ -55,11 +56,13 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test": "vitest run --passWithNoTests",
-    "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\""
+    "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\"",
+    "package": "vsce package --no-dependencies -o agent-karma.vsix"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
-    "@types/vscode": "^1.74.0",
+    "@types/vscode": "~1.74.0",
+    "@vscode/vsce": "^3.2.0",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "esbuild": "^0.23.0",
