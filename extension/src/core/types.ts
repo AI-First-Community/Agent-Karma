@@ -205,4 +205,34 @@ export const KARMA_EMA_ALPHA = 0.3;
 /** globalState key holding the active-session pointer for crash recovery (architecture §6). */
 export const ACTIVE_SESSION_POINTER_KEY = "agentKarma.activeSessionId";
 
+/** Supported AI tools (specification §3) — a reflection label, not a scored input. */
+export const AI_TOOLS = [
+  "GitHub Copilot",
+  "Claude Code",
+  "Cursor",
+  "ChatGPT",
+  "Windsurf",
+  "Antigravity",
+  "Devin",
+  "Gemini CLI",
+  "Codex CLI",
+  "Other",
+  "Unknown",
+] as const;
+
+/** Task types (specification §4) — exact literals, never abbreviated. */
+export const TASK_TYPES = [
+  "Bug Fix",
+  "Test Generation",
+  "Refactoring",
+  "Documentation",
+  "Explanation",
+  "Performance Improvement",
+  "Security Fix",
+  "Migration",
+  "Architecture",
+  "DevOps",
+  "Other",
+] as const;
+
 export const SCHEMA_VERSION = 1;

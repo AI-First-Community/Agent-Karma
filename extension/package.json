@@ -35,7 +35,19 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "contributes": {},
+  "contributes": {
+    "commands": [
+      { "command": "agentKarma.startSession", "title": "Agent Karma: Start Session" },
+      { "command": "agentKarma.endSession", "title": "Agent Karma: End Session" },
+      { "command": "agentKarma.showDashboard", "title": "Agent Karma: Show Dashboard" },
+      { "command": "agentKarma.toggleSession", "title": "Agent Karma: Toggle Session" }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "agentKarma.toggleSession", "when": "false" }
+      ]
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run build -- --minify",
     "build": "node esbuild.js",
