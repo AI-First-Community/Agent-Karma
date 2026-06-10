@@ -3,12 +3,16 @@ import {
   AgentKarmaSession,
   AgentKarmaEvent,
   AgentKarmaEventType,
+  GitDiffSummary,
+  ReflectionNote,
   ACTIVE_SESSION_POINTER_KEY,
 } from "./types";
 import { EventBus } from "./eventBus";
 import { LocalStore } from "../storage/localStore";
 import { scorePrompt } from "../scoring/promptScorer";
 import { generateDharmaCard } from "../cards/dharmaCard";
+import { generatePhalCard } from "../cards/phalCard";
+import { asEventData } from "../privacy/privacyRules";
 
 /** Metadata captured when a session starts. */
 export interface SessionMeta {
@@ -165,6 +169,37 @@ export class SessionManager {
     }
     this.record(type, this.active.id, data);
     return true;
+  }
+
+  /**
+   * On session end: attach the git diff summary, generate the (provisional) Phal
+   * Card from the session's events, and record the corresponding events.
+   * Call BEFORE endSession() so the active session still exists.
+   */
+  attachGitAndPhal(gitSummary: GitDiffSummary): void {
+    if (!this.active) {
+      return;
+    }
+    this.active.gitDiffSummary = gitSummary;
+    this.record("git.diff.summary", this.active.id, asEventData(gitSummary));
+
+    const events = this.store.loadEvents().events.filter((e) => e.sessionId === this.active!.id);
+    this.active.phalCard = generatePhalCard({
+      dharmaCard: this.active.dharmaCard,
+      events,
+    });
+    this.record("phal.generated", this.active.id, {});
+    this.persistSession(this.active);
+  }
+
+  /** Store an optional, UNSCORED reflection note for the active session. */
+  setReflectionForActiveSession(reflection: ReflectionNote): void {
+    if (!this.active) {
+      return;
+    }
+    this.active.reflection = reflection;
+    this.record("outcome.reported", this.active.id, asEventData(reflection));
+    this.persistSession(this.active);
   }
 
   // --- internals ---

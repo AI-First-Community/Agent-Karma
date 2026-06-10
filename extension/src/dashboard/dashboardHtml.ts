@@ -1,4 +1,5 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
+import { buildKarmaTrace } from "../cards/karmaTrace";
 
 export interface DashboardData {
   nonce: string;
@@ -6,6 +7,9 @@ export interface DashboardData {
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
+  /** Most recent completed session (shows its Phal card + trace). */
+  lastCompleted?: AgentKarmaSession;
+  lastCompletedEvents?: AgentKarmaEvent[];
   recent: AgentKarmaSession[];
 }
 
@@ -84,6 +88,45 @@ function activeSection(
     </div>`;
 }
 
+function lastSessionSection(
+  session: AgentKarmaSession | undefined,
+  events: AgentKarmaEvent[]
+): string {
+  if (!session || !session.phalCard) {
+    return `<p class="muted">No completed session yet.</p>`;
+  }
+  const p = session.phalCard;
+  const git = session.gitDiffSummary;
+  const gitLine =
+    git && git.captured
+      ? `${git.filesChanged} files, +${git.linesAdded} / -${git.linesDeleted}`
+      : `<span class="muted">not captured</span>`;
+  const validation = p.validationDetected
+    ? p.commandsDetected.map((c) => esc(`${c.type} (${c.result})`)).join(", ")
+    : `<span class="muted">none</span>`;
+  const recs = p.recommendations.length
+    ? `<ul>${p.recommendations.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>`
+    : `<span class="muted">none</span>`;
+  const trace = buildKarmaTrace(events);
+  const traceHtml = trace.length
+    ? `<pre class="trace">${trace.map(esc).join("\n")}</pre>`
+    : "";
+
+  return `
+    <div class="card">
+      <div class="outcome outcome-${esc(p.outcome.replace(/\s+/g, "-").toLowerCase())}">🍃 ${esc(p.outcome)}</div>
+      <h3>${esc(session.title)}</h3>
+      <dl>
+        <dt>Files changed</dt><dd>${p.filesChanged} (${p.testFilesChanged} test)</dd>
+        <dt>Validation</dt><dd>${validation}</dd>
+        <dt>Git diff</dt><dd>${gitLine}</dd>
+      </dl>
+      <div class="recs"><b>Recommendations</b>${recs}</div>
+      <div class="dharma-head" style="margin-top:0.75rem;">Karma Trace</div>
+      ${traceHtml}
+    </div>`;
+}
+
 function recentSection(recent: AgentKarmaSession[]): string {
   if (recent.length === 0) {
     return `<p class="muted">No completed sessions yet.</p>`;
@@ -138,6 +181,13 @@ export function renderDashboardHtml(data: DashboardData): string {
     .dharma { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px dashed var(--vscode-panel-border); }
     .dharma-head { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
     .hint { font-weight: 400; font-size: 0.8rem; color: var(--vscode-descriptionForeground); font-style: italic; margin-left: 0.5rem; }
+    .outcome { display: inline-block; font-weight: 600; font-size: 0.8rem; padding: 0.1rem 0.5rem; border-radius: 4px; margin-bottom: 0.25rem; }
+    .outcome-ready-for-review { color: var(--vscode-charts-green, #388a34); }
+    .outcome-needs-review { color: var(--vscode-charts-yellow, #b89500); }
+    .outcome-high-risk { color: var(--vscode-charts-red, #e51400); }
+    .outcome-informational { color: var(--vscode-descriptionForeground); }
+    .recs ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
+    .trace { background: var(--vscode-textCodeBlock-background); padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.82rem; white-space: pre-wrap; overflow-x: auto; }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>
@@ -148,6 +198,9 @@ export function renderDashboardHtml(data: DashboardData): string {
 
   <h2>Active session</h2>
   ${activeSection(data.active, data.activeEvents ?? [])}
+
+  <h2>Last session</h2>
+  ${lastSessionSection(data.lastCompleted, data.lastCompletedEvents ?? [])}
 
   <h2>Recent sessions</h2>
   ${recentSection(data.recent)}

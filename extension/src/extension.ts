@@ -6,6 +6,7 @@ import { StatusBarController } from "./statusbar/statusBarItem";
 import { DashboardPanel } from "./dashboard/dashboardProvider";
 import { FileCollector } from "./collectors/fileCollector";
 import { TerminalCollector } from "./collectors/terminalCollector";
+import { getGitDiffSummary } from "./collectors/gitCollector";
 import { AI_TOOLS, TASK_TYPES } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
@@ -138,6 +139,22 @@ export function activate(context: vscode.ExtensionContext): void {
       } else {
         addMore = false;
       }
+    }
+
+    // Git diff summary (counts only) + Phal Card, computed while the session is still active.
+    const cwds = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
+    const gitSummary = await getGitDiffSummary(cwds);
+    manager.attachGitAndPhal(gitSummary);
+
+    // Optional, UNSCORED reflection.
+    const outcome = await vscode.window.showQuickPick(
+      ["Yes", "Partly", "No", "Skip"],
+      { title: "Did the outcome match your intent? (optional — not scored)", ignoreFocusOut: true }
+    );
+    if (outcome && outcome !== "Skip") {
+      manager.setReflectionForActiveSession({
+        outcomeMatchedIntent: outcome.toLowerCase() as "yes" | "partly" | "no",
+      });
     }
 
     const ended = manager.endSession();

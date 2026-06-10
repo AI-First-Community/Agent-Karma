@@ -48,14 +48,21 @@ export class DashboardPanel {
       .slice(-10)
       .reverse();
     const active = this.sessions.getActiveSession();
+    const allEvents = this.store.loadEvents().events;
     const activeEvents = active
-      ? this.store.loadEvents().events.filter((e) => e.sessionId === active.id)
+      ? allEvents.filter((e) => e.sessionId === active.id)
+      : [];
+    const lastCompleted = recent[0];
+    const lastCompletedEvents = lastCompleted
+      ? allEvents.filter((e) => e.sessionId === lastCompleted.id)
       : [];
     this.panel.webview.html = renderDashboardHtml({
       nonce: randomUUID().replace(/-/g, ""),
       cspSource: this.panel.webview.cspSource,
       active,
       activeEvents,
+      lastCompleted,
+      lastCompletedEvents,
       recent,
     });
   }
