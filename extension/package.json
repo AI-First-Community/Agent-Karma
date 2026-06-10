@@ -42,7 +42,7 @@
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\""
   },
   "devDependencies": {

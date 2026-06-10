@@ -26,6 +26,10 @@ export interface AgentKarmaSession {
   /** 0–100, OBJECTIVE (validation-weighted, action-based). */
   karmaScore?: number;
   karmaScoreLabel?: KarmaScoreLabel;
+  /** Persisted "why this score" breakdown so the dashboard survives a reload. */
+  karmaReasons?: string[];
+  /** Self-comparative trend vs. the user's own EMA at the time of scoring. */
+  karmaTrend?: "up" | "down" | "flat";
   gitDiffSummary?: GitDiffSummary;
   /** OPTIONAL, UNSCORED — journaling only; never used in karmaScore. */
   reflection?: ReflectionNote;
@@ -88,9 +92,11 @@ export type ValidationCommandType =
   | "Security"
   | "Other";
 
+export type ValidationResult = "passed" | "failed" | "unknown";
+
 export interface ValidationCommandEventData {
   commandType: ValidationCommandType;
-  result: "passed" | "failed" | "unknown";
+  result: ValidationResult;
   /** Only "observed" results grant the tests-passed bonus. */
   source: "observed" | "logged";
   // NOTE: the raw command string is used transiently for classification then
@@ -112,16 +118,91 @@ export interface PhalCard {
   testFilesChanged: number;
   validationDetected: boolean;
   /** Command TYPES + results — never raw strings. */
-  commandsDetected: { type: ValidationCommandType; result: string }[];
+  commandsDetected: { type: ValidationCommandType; result: ValidationResult }[];
   recommendations: string[];
 }
 
-/** Root of the persisted store (sessions.json). */
+/** Root of the persisted session store (sessions.json). */
 export interface AgentKarmaStore {
   schemaVersion: number;
   sessions: AgentKarmaSession[];
   /** Exponential moving average of recent Karma Scores (self-comparative trend). */
   karmaEma?: number;
 }
+
+/** Root of the persisted event store (events.json). */
+export interface AgentKarmaEventStore {
+  schemaVersion: number;
+  events: AgentKarmaEvent[];
+}
+
+/**
+ * User settings (mirrors contributes.configuration / settings.json).
+ * Single typed source of truth — consumers read this, not stringly-typed keys.
+ * Hardcoded-off rules (captureTerminalOutput) are enforced regardless of value.
+ */
+export interface AgentKarmaSettings {
+  enabled: boolean;
+  storeFullFilePath: boolean;
+  captureTerminalCommands: boolean;
+  /** Hardcoded off — never enabled, even if set true. */
+  captureTerminalOutput: false;
+  capturePromptText: boolean;
+  enableGitDiffSummary: boolean;
+  enablePreCommitNudge: boolean;
+  forgotToStartThreshold: number;
+  idleEndMinutes: number;
+}
+
+export const DEFAULT_SETTINGS: AgentKarmaSettings = {
+  enabled: true,
+  storeFullFilePath: false,
+  captureTerminalCommands: true,
+  captureTerminalOutput: false,
+  capturePromptText: true,
+  enableGitDiffSummary: true,
+  enablePreCommitNudge: false,
+  forgotToStartThreshold: 5,
+  idleEndMinutes: 30,
+};
+
+/** Return shape of the pure prompt hygiene scorer (scoring-model.md §2). */
+export interface PromptHintResult {
+  score: number; // 0–100
+  label: PromptHintLabel;
+  reasons: string[];
+}
+
+/** Return shape of the pure objective Karma scorer (scoring-model.md §3). */
+export interface ScoreResult {
+  score: number; // 0–100, Math.round
+  label: KarmaScoreLabel;
+  reasons: string[];
+}
+
+/**
+ * Karma Score label bands (scoring-model.md §3 is normative).
+ * Pinned here so no module re-derives the thresholds.
+ */
+export const KARMA_SCORE_BANDS: { min: number; label: KarmaScoreLabel }[] = [
+  { min: 80, label: "Strong" },
+  { min: 60, label: "Good" },
+  { min: 40, label: "Improving" },
+  { min: 0, label: "Needs Attention" },
+];
+
+/** Prompt hygiene hint label bands (scoring-model.md §2). */
+export const PROMPT_HINT_BANDS: { min: number; label: PromptHintLabel }[] = [
+  { min: 90, label: "Excellent" },
+  { min: 70, label: "Good" },
+  { min: 40, label: "Decent" },
+  { min: 0, label: "Needs Clarity" },
+];
+
+/** EMA smoothing factor for the self-comparative Karma trend (scoring-model.md §3.3). */
+export const KARMA_EMA_ALPHA = 0.3;
+
+/** globalState key holding the active-session pointer for crash recovery (architecture §6). */
+export const ACTIVE_SESSION_POINTER_KEY = "agentKarma.activeSessionId";
 
 export const SCHEMA_VERSION = 1;

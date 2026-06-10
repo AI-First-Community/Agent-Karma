@@ -74,8 +74,8 @@ VS Code Extension Host
 1. **Activate** (`onStartupFinished`) → keep cheap: create status bar, register the always-on save listener (for forgot-to-start), load the small active-session pointer. **Reactivation:** if a session has `status:"active"`, restore it, recompute elapsed from `startedAt`, re-arm collectors; if its last event is older than `idleEndMinutes`, prompt resume-or-finalize.
 2. **Start** → `sessionManager` creates a session, persists it (atomic), emits `session.started`; `dharmaCard` generates; status bar flips to recording.
 3. **During** → collectors observe events, run metadata through `privacyRules` sanitizers, append `AgentKarmaEvent`s via `eventBus`; `localStore` **flushes on each event** (survive-reload — never deferred to `deactivate`).
-4. **End** → `gitCollector` runs; the validation prompt invites logging commands; **`karmaScore` computes first**, then `phalCard` (depends on the score); everything persists; dashboard shows the summary.
-5. **Pre-commit (opt-in)** → `preCommitNudge` consults the latest session's validation state and surfaces a non-blocking reminder; never touches the network.
+4. **End** → `gitCollector` runs; the validation prompt invites logging commands; **`karmaScore` computes first** (a pure function that also derives the new EMA from the prior `store.karmaEma` and the trend), then `phalCard` (depends on the score); `sessionManager` persists the session, its `karmaReasons`, and the updated `store.karmaEma` via `localStore`; dashboard shows the summary. (EMA: computed pure in `karmaScore.ts`, persisted by `sessionManager`/`localStore` — not by the pure scorer.)
+5. **Pre-commit (opt-in)** → the installed hook is a **standalone script that reads the on-disk JSON store directly** (`agent-karma-data/`), because the extension host is not running at `git commit` time. It checks the most-recent session's validation state and surfaces a non-blocking reminder; never touches the network.
 6. **Export/Delete** → operate on the local store only.
 
 ---
@@ -192,11 +192,12 @@ export interface PhalCard {
 
 ## 6. Storage, persistence & recovery
 
-- **Location:** `context.globalStorageUri` → `agent-karma-data/` with `sessions.json`, `events.json`, `settings.json`, `exports/`. Plain JSON, human-readable, `schemaVersion` for migration.
+- **Location:** `context.globalStorageUri` → `agent-karma-data/` with `sessions.json`, `events.json`, `settings.json`, `exports/`. Plain JSON, human-readable, `schemaVersion` for migration. Typed shapes (in `core/types.ts`): `sessions.json` → `AgentKarmaStore`, `events.json` → `AgentKarmaEventStore`, `settings.json` → `AgentKarmaSettings` (+ `DEFAULT_SETTINGS`). The score `reasons[]` are persisted on the session (`karmaReasons`) so the dashboard breakdown survives reload.
 - **Active-session pointer:** keep a tiny pointer in `context.globalState` (Memento, VS Code-managed, atomic) alongside the full record in JSON; reconcile on startup. This is the load-bearing survive-reload mechanism.
 - **Atomic writes:** write to a temp file then rename, so `sessions.json` and `events.json` never tear under a crash mid-flush.
 - **Flush-on-event:** persist promptly after every state change. **Never** rely on `deactivate()` (VS Code gives no flush guarantee on crash/kill).
-- **Recovery:** on activate, restore any `active` session, recompute elapsed from `startedAt`, re-arm collectors, and run the stale-session check.
+- **Recovery:** on activate, read the `ACTIVE_SESSION_POINTER_KEY` from `globalState`, restore any `active` session, recompute elapsed from `startedAt`, re-arm collectors, and run the stale-session check.
+- **Delete-all** wipes `agent-karma-data/` **and** clears the `globalState` active-session pointer (and `karmaEma`), leaving no trace.
 - All reads/writes wrapped in try/catch; on failure show a friendly message, keep the in-memory session, retry on next event.
 
 ## 7. Configuration (`contributes.configuration`)

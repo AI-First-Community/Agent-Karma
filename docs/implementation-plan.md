@@ -35,7 +35,7 @@ Goal: a runnable, empty extension with tooling and guardrails in place, so every
 |---|---|---|---|
 | **T0.0.1** | Scaffold the extension project | `extension/package.json`, `tsconfig.json`, `esbuild.js`, `.vscodeignore` | `npm install` + build produce a `.vsix`-able bundle; `package.json` declares `engines.vscode`, `main`, empty `contributes` |
 | **T0.0.2** | Activation + a no-op `activate/deactivate` | `src/extension.ts` | Extension activates on `onStartupFinished` in the Dev Host with no errors |
-| **T0.0.3** | Create the empty module skeleton + `types.ts` | all dirs in architecture §4 (empty stubs), `src/core/types.ts` (full data model from architecture §5) | Project compiles; all interfaces from architecture §5 exist and are exported |
+| **T0.0.3** | Establish the data-model contract + entrypoint | `src/core/types.ts` (full data model + settings + store/event-store + score-result shapes + pinned bands), `src/extension.ts` (no-op activate). Module dirs (`storage/`, `collectors/`, …) are created by their own tasks, not pre-stubbed. | Project compiles; all interfaces from architecture §5 + settings/event-store exist and are exported |
 | **T0.0.4** | Dev tooling | eslint + prettier config, a unit test runner (vitest or `@vscode/test-electron`) | `npm run lint` and `npm test` run (even with zero tests) |
 | **T0.0.5** | **CI no-network invariant** | `.github/workflows/ci.yml` (or script) | CI builds, lints, tests, and **greps the bundle for `http`/`https`/`fetch`/`net`/runtime deps — fails on any hit** |
 | **T0.0.6** | Repo hygiene files | `LICENSE` (Apache-2.0), `SECURITY.md`, `.gitignore` (ignores `agent-karma-data/`, build output, local notes) | Files present; README/PRIVACY/CONTRIBUTING already exist |
@@ -89,7 +89,7 @@ Goal: passively capture saved files (metadata) and validation commands (type+res
 | **T0.3.2** | File collector | `collectors/fileCollector.ts`, `privacy/privacyRules.ts` | T0.3.1, 0.1 | `onDidSaveTextDocument` → metadata only, **deduped per session**, active-session-only; **never stores content**; routed through `privacyRules` |
 | **T0.3.3** | Command classifier (pure) | `utils/commandClassifier.ts` | T0.0.3 | string → type per spec §7 table; **then the raw string is discarded by callers**; unit-tested |
 | **T0.3.4** | Manual validation command | `extension.ts`, `collectors/terminalCollector.ts` | T0.3.3 | `agentKarma.addValidationCommand` logs `{type,result:unknown,source:'logged'}`; **raw string never persisted** |
-| **T0.3.5** | Auto terminal capture (best-effort) | `collectors/terminalCollector.ts` | T0.3.3, Spike B | `onDidEndTerminalShellExecution` → `{type,result,source:'observed'}`; **absent exit code → `unknown` (never `failed`)`; degrades silently if unavailable |
+| **T0.3.5** | Auto terminal capture (best-effort) | `collectors/terminalCollector.ts` | T0.3.3, Spike B | `onDidEndTerminalShellExecution` → `{type,result,source:'observed'}`; **absent exit code → `unknown` (never `failed`)**; degrades silently if unavailable |
 | **T0.3.6** | End-of-session validation prompt | `core/sessionManager.ts` | T0.3.4 | On end, prompt **invites logging commands** (not yes/no); logged items count |
 
 **Verify:** spec §15 **File tracking** + **Validation** checklists; confirm raw command strings never hit `sessions.json`/`events.json`.

@@ -80,7 +80,7 @@ Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 
 ## Project status
 
-🚧 **Pre-release.** Building incrementally, one release at a time (0.1 → 0.6). See [`docs/roadmap.md`](docs/roadmap.md).
+🚧 **Pre-release.** Building incrementally, one release at a time (0.1 → 0.6, plus the opt-in pre-commit nudge in 0.7). See [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Documentation
 
@@ -88,15 +88,17 @@ Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 |---|---|
 | [`docs/product-strategy.md`](docs/product-strategy.md) | Positioning, philosophy, locked decisions, non-goals |
 | [`docs/differentiation.md`](docs/differentiation.md) | USPs and full competitive comparison |
+| [`docs/competitive-coverage.md`](docs/competitive-coverage.md) | Per-feature verdict on every competitor capability (Adopt / Adapt / Reject) |
 | [`docs/specification.md`](docs/specification.md) | Functional spec — sessions, cards, commands, capture, testing |
 | [`docs/architecture.md`](docs/architecture.md) | Architecture, folder structure, data model |
 | [`docs/scoring-model.md`](docs/scoring-model.md) | Karma Score, prompt hygiene hint, Dharma/Phal generation |
 | [`docs/roadmap.md`](docs/roadmap.md) | Phase-wise release plan with acceptance criteria |
+| [`docs/implementation-plan.md`](docs/implementation-plan.md) | Task-by-task build sequence (foundation-first) |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Build rules & phase-wise protocol for contributors |
 
 ## License
 
-Open source (license TBD — see `LICENSE`). A purely individual, community contribution. Not affiliated with any employer or vendor.
+Apache-2.0 — see [`LICENSE`](LICENSE). A purely individual, community contribution. Not affiliated with any employer or vendor.
 
 ---
 
