@@ -17,6 +17,27 @@ function esc(text: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function dharmaCardHtml(session: AgentKarmaSession): string {
+  const d = session.dharmaCard;
+  if (!d) {
+    return "";
+  }
+  const hint =
+    session.promptHintLabel !== undefined
+      ? `<span class="hint" title="A soft prompt-hygiene hint — not a score">prompt hygiene: ${esc(session.promptHintLabel)}</span>`
+      : "";
+  return `
+    <div class="dharma">
+      <div class="dharma-head">🪔 Dharma Card ${hint}</div>
+      <dl>
+        <dt>Intent clarity</dt><dd>${esc(d.intentClarity)}</dd>
+        <dt>Context provided</dt><dd>${esc(d.contextProvided)}</dd>
+        <dt>Expected validation</dt><dd>${esc(d.expectedValidation)}</dd>
+        <dt>Risk level</dt><dd>${esc(d.riskLevel)}</dd>
+      </dl>
+    </div>`;
+}
+
 function activeSection(active: AgentKarmaSession | undefined): string {
   if (!active) {
     return `<p class="muted">No active session. Click <b>▶ Agent Karma: Start</b> in the status bar to begin.</p>`;
@@ -31,6 +52,7 @@ function activeSection(active: AgentKarmaSession | undefined): string {
         <dt>Started</dt><dd>${esc(active.startedAt)}</dd>
         <dt>Intent</dt><dd>${esc(active.intent) || "<span class='muted'>—</span>"}</dd>
       </dl>
+      ${dharmaCardHtml(active)}
     </div>`;
 }
 
@@ -45,14 +67,14 @@ function recentSection(recent: AgentKarmaSession[]): string {
         <td>${esc(s.title)}</td>
         <td>${esc(s.aiTool)}</td>
         <td>${esc(s.taskType)}</td>
-        <td>${esc(s.startedAt)}</td>
+        <td>${esc(s.dharmaCard?.riskLevel ?? "")}</td>
         <td>${esc(s.endedAt ?? "")}</td>
       </tr>`
     )
     .join("");
   return `
     <table>
-      <thead><tr><th>Session</th><th>AI tool</th><th>Task</th><th>Started</th><th>Ended</th></tr></thead>
+      <thead><tr><th>Session</th><th>AI tool</th><th>Task</th><th>Risk</th><th>Ended</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
@@ -85,6 +107,9 @@ export function renderDashboardHtml(data: DashboardData): string {
     table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
     th, td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--vscode-panel-border); }
     th { color: var(--vscode-descriptionForeground); font-weight: 600; }
+    .dharma { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px dashed var(--vscode-panel-border); }
+    .dharma-head { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .hint { font-weight: 400; font-size: 0.8rem; color: var(--vscode-descriptionForeground); font-style: italic; margin-left: 0.5rem; }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>

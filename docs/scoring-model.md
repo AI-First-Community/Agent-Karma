@@ -149,8 +149,9 @@ riskLevel:
 ```
 Intent: "Fix the login failure issue and add a regression test."   (task type: Bug Fix, AI tool: Claude Code)
 
-Prompt hint: >5 words(+20), action "fix"(+20), context "issue"(+15), validation "test"+"regression"(+20),
-             length 50–1000(+10) = 85 → "Good"
+Prompt hint: >5 words(+20), action "fix"(+20), validation "test"+"regression"(+20),
+             length 50–1000(+10) = 70 → "Good"
+             (no §2 context word like file/error/module is present, so no +15 there)
 
 Session signals (objective):
 - 3 files saved; one is auth.service.spec.ts (test file) alongside auth.service.ts (code)  → test coverage ✓
@@ -165,10 +166,10 @@ Karma Score:
   Lint clean                 0   ← none ran
   Test coverage of change   15
   Change measured            5
-  Prompt hygiene (85 * 0.10) 8.5
-  raw = 63.5 → Math.round → 64 → label "Good"
+  Prompt hygiene (70 * 0.10) 7
+  raw = 62 → Math.round → 62 → label "Good"
 
-Phal: validationDetected = true, score 64 (50–74) → "Needs Review"
+Phal: validationDetected = true, score 62 (50–74) → "Needs Review"
 Recommendation: "Run lint before committing."   (no lint command detected)
 ```
 

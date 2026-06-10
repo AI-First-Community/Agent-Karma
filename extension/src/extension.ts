@@ -11,6 +11,16 @@ import { AI_TOOLS, TASK_TYPES } from "./core/types";
 // local JSON storage, survive-reload/crash recovery, and a basic dashboard.
 
 const TOGGLE_COMMAND = "agentKarma.toggleSession";
+const LAST_TOOL_KEY = "agentKarma.lastAiTool";
+const LAST_TASK_KEY = "agentKarma.lastTaskType";
+
+/** Put the last-used value first so it is the default selection. */
+function lastFirst(items: readonly string[], last: string | undefined): string[] {
+  if (!last || !items.includes(last)) {
+    return [...items];
+  }
+  return [last, ...items.filter((i) => i !== last)];
+}
 
 export function activate(context: vscode.ExtensionContext): void {
   const store = new LocalStore(context.globalStorageUri.fsPath);
@@ -43,17 +53,17 @@ export function activate(context: vscode.ExtensionContext): void {
     if (title === undefined) {
       return; // cancelled
     }
-    const aiTool = await vscode.window.showQuickPick([...AI_TOOLS], {
-      title: "Which AI tool are you using?",
-      ignoreFocusOut: true,
-    });
+    const aiTool = await vscode.window.showQuickPick(
+      lastFirst(AI_TOOLS, context.globalState.get<string>(LAST_TOOL_KEY)),
+      { title: "Which AI tool are you using?", ignoreFocusOut: true }
+    );
     if (aiTool === undefined) {
       return;
     }
-    const taskType = await vscode.window.showQuickPick([...TASK_TYPES], {
-      title: "What kind of task is this?",
-      ignoreFocusOut: true,
-    });
+    const taskType = await vscode.window.showQuickPick(
+      lastFirst(TASK_TYPES, context.globalState.get<string>(LAST_TASK_KEY)),
+      { title: "What kind of task is this?", ignoreFocusOut: true }
+    );
     if (taskType === undefined) {
       return;
     }
@@ -79,6 +89,9 @@ export function activate(context: vscode.ExtensionContext): void {
       );
       return;
     }
+    // Remember the choices to pre-select them next time.
+    void context.globalState.update(LAST_TOOL_KEY, aiTool);
+    void context.globalState.update(LAST_TASK_KEY, taskType);
     syncStatusBar();
     dashboard.refresh();
   };

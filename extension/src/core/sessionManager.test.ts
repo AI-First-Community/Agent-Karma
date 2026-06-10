@@ -69,14 +69,29 @@ describe("SessionManager", () => {
     expect(mgr.getActiveSession()?.id).toBe(session.id);
     expect(pointer.get(ACTIVE_SESSION_POINTER_KEY)).toBe(session.id);
     expect(store.loadSessions().sessions).toHaveLength(1);
-    expect(events.map((e) => e.type)).toEqual(["session.started", "intent.captured"]);
+    expect(events.map((e) => e.type)).toEqual([
+      "session.started",
+      "intent.captured",
+      "prompt.scored",
+      "dharma.generated",
+    ]);
+    // The Dharma card + prompt hint are generated and persisted on start.
+    expect(session.promptHintLabel).toBeDefined();
+    expect(session.dharmaCard?.intentType).toBe("Bug Fix");
+    expect(session.dharmaCard?.riskLevel).toBe("Medium");
   });
 
-  it("does not emit intent.captured for an empty intent", () => {
+  it("still generates the Dharma card but skips intent.captured for an empty intent", () => {
     const events: AgentKarmaEvent[] = [];
     bus.on((e) => events.push(e));
-    makeManager().startSession({ ...META, intent: "   " });
-    expect(events.map((e) => e.type)).toEqual(["session.started"]);
+    const session = makeManager().startSession({ ...META, intent: "   " });
+    expect(events.map((e) => e.type)).toEqual([
+      "session.started",
+      "prompt.scored",
+      "dharma.generated",
+    ]);
+    expect(session.dharmaCard).toBeDefined();
+    expect(session.promptHintScore).toBe(0);
   });
 
   it("refuses to start a second session while one is active", () => {

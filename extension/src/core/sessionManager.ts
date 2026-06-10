@@ -7,6 +7,8 @@ import {
 } from "./types";
 import { EventBus } from "./eventBus";
 import { LocalStore } from "../storage/localStore";
+import { scorePrompt } from "../scoring/promptScorer";
+import { generateDharmaCard } from "../cards/dharmaCard";
 
 /** Metadata captured when a session starts. */
 export interface SessionMeta {
@@ -72,6 +74,13 @@ export class SessionManager {
     if (this.active) {
       throw new Error("A session is already active. End it before starting a new one.");
     }
+
+    const promptHint = scorePrompt(meta.intent);
+    const dharmaCard = generateDharmaCard(
+      { title: meta.title, aiTool: meta.aiTool, taskType: meta.taskType, intent: meta.intent },
+      promptHint
+    );
+
     const session: AgentKarmaSession = {
       id: this.id(),
       title: meta.title,
@@ -80,6 +89,9 @@ export class SessionManager {
       intent: meta.intent,
       startedAt: this.now().toISOString(),
       status: "active",
+      promptHintScore: promptHint.score,
+      promptHintLabel: promptHint.label,
+      dharmaCard,
     };
 
     const store = this.store.loadSessions();
@@ -93,6 +105,11 @@ export class SessionManager {
     if (meta.intent.trim().length > 0) {
       this.record("intent.captured", session.id, { intent: meta.intent });
     }
+    this.record("prompt.scored", session.id, {
+      score: promptHint.score,
+      label: promptHint.label,
+    });
+    this.record("dharma.generated", session.id, {});
     return session;
   }
 

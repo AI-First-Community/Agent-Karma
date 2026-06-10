@@ -114,7 +114,7 @@ Goal: passively capture saved files (metadata) and validation commands (type+res
 
 | Task | Goal | Files | Depends | DoD |
 |---|---|---|---|---|
-| **T0.5.1** | Objective Karma Score (pure) | `scoring/karmaScore.ts` | 0.3, 0.4 | Implements scoring §3 exactly: components, **vacuous-truth rule**, observed-vs-logged, `Math.round`; returns `{score,label,reasons}`; **unit-tested incl. the §6 worked example = 64** |
+| **T0.5.1** | Objective Karma Score (pure) | `scoring/karmaScore.ts` | 0.3, 0.4 | Implements scoring §3 exactly: components, **vacuous-truth rule**, observed-vs-logged, `Math.round`; returns `{score,label,reasons}`; **unit-tested incl. the §6 worked example = 62** |
 | **T0.5.2** | EMA + self-comparative trend | `scoring/karmaScore.ts`, `storage/localStore.ts` | T0.5.1 | EMA alpha 0.3, **seeded on session 1** (`→`), arrow thresholds ±3; persisted; unit-tested |
 | **T0.5.3** | Finalize Phal outcome (task-aware) | `cards/phalCard.ts` | T0.5.1 | Outcome uses the score (Ready/Needs/High Risk) + **Low-risk-no-validation = Informational**; computed **after** the score; unit-tested |
 | **T0.5.4** | Score in dashboard + "why this score" | `dashboard/dashboardHtml.ts` | T0.5.1 | **Checklist leads, number supports**; every reason visible and matches the number; trend arrow shown; number quiet until ≥5 sessions |

@@ -35,6 +35,27 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("● Recording");
   });
 
+  it("renders the Dharma card and the prompt hint as a soft hint", () => {
+    const withCard: AgentKarmaSession = {
+      ...base,
+      promptHintLabel: "Good",
+      dharmaCard: {
+        task: "Fix login",
+        aiTool: "Claude Code",
+        intentType: "Bug Fix",
+        intentClarity: "Good",
+        contextProvided: "Partial",
+        expectedValidation: "Explicit",
+        riskLevel: "Medium",
+      },
+    };
+    const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: withCard, recent: [] });
+    expect(html).toContain("Dharma Card");
+    expect(html).toContain("Expected validation");
+    expect(html).toContain("Explicit");
+    expect(html).toContain("prompt hygiene: Good");
+  });
+
   it("escapes HTML in user-provided fields (no injection)", () => {
     const evil: AgentKarmaSession = { ...base, title: "<img src=x onerror=alert(1)>" };
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: evil, recent: [] });
