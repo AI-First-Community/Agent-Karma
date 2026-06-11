@@ -10,6 +10,8 @@ import { getGitDiffSummary } from "./collectors/gitCollector";
 import { toJson } from "./export/jsonExporter";
 import { toMarkdown } from "./export/markdownExporter";
 import { installHook, removeHook } from "./hooks/preCommitNudge";
+import { StartSessionPanel } from "./panels/startSessionPanel";
+import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
@@ -18,20 +20,13 @@ import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
 
 const TOGGLE_COMMAND = "agentKarma.toggleSession";
 
-/** Small API returned from activate() for integration tests. */
+/** Small API returned from activate() for integration tests / automation. */
 export interface AgentKarmaApi {
   getStorageDir(): string;
+  startSession(meta: SessionMeta): void;
 }
 const LAST_TOOL_KEY = "agentKarma.lastAiTool";
 const LAST_TASK_KEY = "agentKarma.lastTaskType";
-
-/** Put the last-used value first so it is the default selection. */
-function lastFirst(items: readonly string[], last: string | undefined): string[] {
-  if (!last || !items.includes(last)) {
-    return [...items];
-  }
-  return [last, ...items.filter((i) => i !== last)];
-}
 
 export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const store = new LocalStore(context.globalStorageUri.fsPath);
@@ -51,50 +46,18 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
-  const startFlow = async (): Promise<void> => {
+  // Actually start a session from the form's values (also the test/automation entry point).
+  const doStart = (meta: SessionMeta): void => {
     if (manager.hasActiveSession()) {
-      void vscode.window.showInformationMessage(
-        "Agent Karma is already recording a session. End it before starting a new one."
-      );
+      void vscode.window.showInformationMessage("Agent Karma is already recording a session.");
       return;
     }
-    const title = await vscode.window.showInputBox({
-      title: "Agent Karma — Start Session",
-      prompt: "What are you working on?",
-      ignoreFocusOut: true,
-    });
-    if (title === undefined) {
-      return; // cancelled
-    }
-    const aiTool = await vscode.window.showQuickPick(
-      lastFirst(AI_TOOLS, context.globalState.get<string>(LAST_TOOL_KEY)),
-      { title: "Which AI tool are you using?", ignoreFocusOut: true }
-    );
-    if (aiTool === undefined) {
-      return;
-    }
-    const taskType = await vscode.window.showQuickPick(
-      lastFirst(TASK_TYPES, context.globalState.get<string>(LAST_TASK_KEY)),
-      { title: "What kind of task is this?", ignoreFocusOut: true }
-    );
-    if (taskType === undefined) {
-      return;
-    }
-    const intent = await vscode.window.showInputBox({
-      title: "Intent (optional)",
-      prompt: "What are you trying to accomplish? (optional — press Enter to skip)",
-      ignoreFocusOut: true,
-    });
-    if (intent === undefined) {
-      return; // cancelled (empty string is allowed and means "skipped")
-    }
-
     try {
       manager.startSession({
-        title: title.trim() || "Untitled session",
-        aiTool,
-        taskType,
-        intent: intent.trim(),
+        title: meta.title.trim() || "Untitled session",
+        aiTool: meta.aiTool,
+        taskType: meta.taskType,
+        intent: meta.intent.trim(),
       });
     } catch (err) {
       void vscode.window.showWarningMessage(
@@ -103,10 +66,29 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       return;
     }
     // Remember the choices to pre-select them next time.
-    void context.globalState.update(LAST_TOOL_KEY, aiTool);
-    void context.globalState.update(LAST_TASK_KEY, taskType);
+    void context.globalState.update(LAST_TOOL_KEY, meta.aiTool);
+    void context.globalState.update(LAST_TASK_KEY, meta.taskType);
     syncStatusBar();
     dashboard.refresh();
+    void vscode.window.showInformationMessage(`Agent Karma session started: ${meta.title}`);
+  };
+
+  const startPanel = new StartSessionPanel(doStart);
+
+  // Opens the Start Session form (the config UI). The form posts back to doStart.
+  const startFlow = (): void => {
+    if (manager.hasActiveSession()) {
+      void vscode.window.showInformationMessage(
+        "Agent Karma is already recording a session. End it before starting a new one."
+      );
+      return;
+    }
+    startPanel.show(
+      AI_TOOLS,
+      TASK_TYPES,
+      context.globalState.get<string>(LAST_TOOL_KEY),
+      context.globalState.get<string>(LAST_TASK_KEY)
+    );
   };
 
   const addValidationFlow = async (): Promise<void> => {
@@ -177,7 +159,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     if (manager.hasActiveSession()) {
       await endFlow();
     } else {
-      await startFlow();
+      startFlow();
     }
   };
 
@@ -266,6 +248,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     statusBar,
     dashboard,
+    startPanel,
     fileCollector,
     terminalCollector
   );
@@ -297,7 +280,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       });
   }
 
-  return { getStorageDir: () => store.dir };
+  return { getStorageDir: () => store.dir, startSession: (meta) => doStart(meta) };
 }
 
 export function deactivate(): void {

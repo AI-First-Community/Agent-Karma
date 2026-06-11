@@ -14,11 +14,15 @@ const COMMANDS = [
 
 suite("Agent Karma — integration", () => {
   let storageDir: string;
+  let api: {
+    getStorageDir(): string;
+    startSession(meta: { title: string; aiTool: string; taskType: string; intent: string }): void;
+  };
 
   suiteSetup(async () => {
     const ext = vscode.extensions.getExtension(EXTENSION_ID);
     assert.ok(ext, `extension ${EXTENSION_ID} not found`);
-    const api = (await ext!.activate()) as { getStorageDir(): string };
+    api = (await ext!.activate()) as typeof api;
     assert.ok(api && typeof api.getStorageDir === "function", "activate() did not return the test API");
     storageDir = api.getStorageDir();
   });
@@ -35,15 +39,15 @@ suite("Agent Karma — integration", () => {
   });
 
   test("start → end writes a finalized session (with Phal + score) to local JSON", async () => {
-    // Stub the interactive prompts so the flows run unattended.
+    // Stub the end-flow prompts so they run unattended.
     const w = vscode.window as unknown as Record<string, unknown>;
-    w.showInputBox = async () => "E2E session";
     w.showQuickPick = async (items: unknown) =>
       Array.isArray(items) ? items[0] : items;
     w.showInformationMessage = async () => "Done";
     w.showWarningMessage = async () => undefined;
 
-    await vscode.commands.executeCommand("agentKarma.startSession");
+    // Start via the automation API (the UI is now a webview form).
+    api.startSession({ title: "E2E session", aiTool: "Claude Code", taskType: "Bug Fix", intent: "fix and test" });
     await vscode.commands.executeCommand("agentKarma.endSession");
 
     const sessionsPath = path.join(storageDir, "sessions.json");

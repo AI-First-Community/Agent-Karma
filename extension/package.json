@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -37,20 +37,53 @@
   ],
   "contributes": {
     "commands": [
-      { "command": "agentKarma.startSession", "title": "Agent Karma: Start Session" },
-      { "command": "agentKarma.endSession", "title": "Agent Karma: End Session" },
-      { "command": "agentKarma.showDashboard", "title": "Agent Karma: Show Dashboard" },
-      { "command": "agentKarma.addValidationCommand", "title": "Agent Karma: Add Validation Command" },
-      { "command": "agentKarma.exportJson", "title": "Agent Karma: Export Current Session as JSON" },
-      { "command": "agentKarma.exportMarkdown", "title": "Agent Karma: Export Current Session as Markdown" },
-      { "command": "agentKarma.deleteAllData", "title": "Agent Karma: Delete All Local Data" },
-      { "command": "agentKarma.installPreCommitNudge", "title": "Agent Karma: Install Pre-Commit Nudge" },
-      { "command": "agentKarma.removePreCommitNudge", "title": "Agent Karma: Remove Pre-Commit Nudge" },
-      { "command": "agentKarma.toggleSession", "title": "Agent Karma: Toggle Session" }
+      {
+        "command": "agentKarma.startSession",
+        "title": "Agent Karma: Start Session"
+      },
+      {
+        "command": "agentKarma.endSession",
+        "title": "Agent Karma: End Session"
+      },
+      {
+        "command": "agentKarma.showDashboard",
+        "title": "Agent Karma: Show Dashboard"
+      },
+      {
+        "command": "agentKarma.addValidationCommand",
+        "title": "Agent Karma: Add Validation Command"
+      },
+      {
+        "command": "agentKarma.exportJson",
+        "title": "Agent Karma: Export Current Session as JSON"
+      },
+      {
+        "command": "agentKarma.exportMarkdown",
+        "title": "Agent Karma: Export Current Session as Markdown"
+      },
+      {
+        "command": "agentKarma.deleteAllData",
+        "title": "Agent Karma: Delete All Local Data"
+      },
+      {
+        "command": "agentKarma.installPreCommitNudge",
+        "title": "Agent Karma: Install Pre-Commit Nudge"
+      },
+      {
+        "command": "agentKarma.removePreCommitNudge",
+        "title": "Agent Karma: Remove Pre-Commit Nudge"
+      },
+      {
+        "command": "agentKarma.toggleSession",
+        "title": "Agent Karma: Toggle Session"
+      }
     ],
     "menus": {
       "commandPalette": [
-        { "command": "agentKarma.toggleSession", "when": "false" }
+        {
+          "command": "agentKarma.toggleSession",
+          "when": "false"
+        }
       ]
     }
   },
