@@ -9,6 +9,7 @@ import { TerminalCollector } from "./collectors/terminalCollector";
 import { getGitDiffSummary } from "./collectors/gitCollector";
 import { toJson } from "./export/jsonExporter";
 import { toMarkdown } from "./export/markdownExporter";
+import { installHook, removeHook } from "./hooks/preCommitNudge";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
@@ -225,6 +226,33 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     void vscode.window.showInformationMessage("All Agent Karma data has been deleted.");
   };
 
+  const installNudgeFlow = (): void => {
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!folder) {
+      void vscode.window.showInformationMessage("Open a git repository folder first.");
+      return;
+    }
+    const res = installHook(folder, store.dir);
+    if (res.ok) {
+      void vscode.window.showInformationMessage(
+        "Agent Karma pre-commit nudge installed (opt-in, non-blocking). Remove it any time with 'Remove Pre-Commit Nudge'."
+      );
+    } else {
+      void vscode.window.showWarningMessage(`Agent Karma: ${res.reason}`);
+    }
+  };
+
+  const removeNudgeFlow = (): void => {
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!folder) {
+      return;
+    }
+    const res = removeHook(folder);
+    void (res.ok
+      ? vscode.window.showInformationMessage("Agent Karma pre-commit nudge removed.")
+      : vscode.window.showWarningMessage(`Agent Karma: ${res.reason}`));
+  };
+
   context.subscriptions.push(
     vscode.commands.registerCommand("agentKarma.startSession", startFlow),
     vscode.commands.registerCommand("agentKarma.endSession", endFlow),
@@ -234,6 +262,8 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
+    vscode.commands.registerCommand("agentKarma.installPreCommitNudge", installNudgeFlow),
+    vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     statusBar,
     dashboard,
     fileCollector,
