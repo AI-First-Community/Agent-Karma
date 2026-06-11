@@ -7,7 +7,9 @@ import { DashboardPanel } from "./dashboard/dashboardProvider";
 import { FileCollector } from "./collectors/fileCollector";
 import { TerminalCollector } from "./collectors/terminalCollector";
 import { getGitDiffSummary } from "./collectors/gitCollector";
-import { AI_TOOLS, TASK_TYPES } from "./core/types";
+import { toJson } from "./export/jsonExporter";
+import { toMarkdown } from "./export/markdownExporter";
+import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
 // Release 0.1 (foundation): manual sessions via a one-click status bar, atomic
@@ -178,12 +180,60 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const exportFlow = async (format: "json" | "markdown"): Promise<void> => {
+    const sessions = store.loadSessions().sessions;
+    const target: AgentKarmaSession | undefined =
+      manager.getActiveSession() ?? sessions[sessions.length - 1];
+    if (!target) {
+      void vscode.window.showInformationMessage("No Agent Karma session to export yet.");
+      return;
+    }
+    const allEvents = store.loadEvents().events;
+    const ext = format === "json" ? "json" : "md";
+    const content =
+      format === "json"
+        ? toJson(target, allEvents, new Date().toISOString())
+        : toMarkdown(target, allEvents);
+
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri;
+    const defaultName = `agent-karma-session-${target.id}.${ext}`;
+    const defaultUri = folder ? vscode.Uri.joinPath(folder, defaultName) : undefined;
+    const uri = await vscode.window.showSaveDialog({
+      defaultUri,
+      filters: format === "json" ? { JSON: ["json"] } : { Markdown: ["md"] },
+    });
+    if (!uri) {
+      return;
+    }
+    await vscode.workspace.fs.writeFile(uri, Buffer.from(content, "utf8"));
+    void vscode.window.showInformationMessage(`Agent Karma: exported to ${uri.fsPath}`);
+  };
+
+  const deleteFlow = async (): Promise<void> => {
+    const confirm = await vscode.window.showWarningMessage(
+      "Delete ALL Agent Karma data? This permanently removes every session, event, and setting stored on this machine. It cannot be undone.",
+      { modal: true },
+      "Delete Everything"
+    );
+    if (confirm !== "Delete Everything") {
+      return;
+    }
+    manager.discardActiveSession();
+    store.deleteAll();
+    syncStatusBar();
+    dashboard.refresh();
+    void vscode.window.showInformationMessage("All Agent Karma data has been deleted.");
+  };
+
   context.subscriptions.push(
     vscode.commands.registerCommand("agentKarma.startSession", startFlow),
     vscode.commands.registerCommand("agentKarma.endSession", endFlow),
     vscode.commands.registerCommand(TOGGLE_COMMAND, toggleFlow),
     vscode.commands.registerCommand("agentKarma.showDashboard", () => dashboard.show()),
     vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
+    vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
+    vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
+    vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
     statusBar,
     dashboard,
     fileCollector,

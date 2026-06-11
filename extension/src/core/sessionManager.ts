@@ -221,6 +221,12 @@ export class SessionManager {
     this.store.saveSessions(sessions);
   }
 
+  /** Forget the active session in memory and clear the pointer (used by delete-all). */
+  discardActiveSession(): void {
+    this.active = undefined;
+    void this.pointer.update(this.pointerKey, undefined);
+  }
+
   /** Store an optional, UNSCORED reflection note for the active session. */
   setReflectionForActiveSession(reflection: ReflectionNote): void {
     if (!this.active) {

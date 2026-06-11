@@ -20,6 +20,9 @@ extension/*.vsix
 # --- Test / coverage ---
 coverage/
 .nyc_output/
+# @vscode/test-electron downloads a full VS Code here (100s of MB)
+.vscode-test/
+.vscode-test.mjs
 
 # --- Agent Karma local data (created at runtime) ---
 agent-karma-data/

@@ -13,8 +13,16 @@ A local-first, privacy-safe VS Code companion that helps you reflect on whether 
 ## Usage
 
 - Click **▶ Agent Karma: Start** in the status bar to begin a session (title, AI tool, task type, intent).
-- Work normally with your AI tool.
-- Click **● Recording … — End** to finish; open **"Agent Karma: Show Dashboard"** to review.
+- Work normally with your AI tool; save files and run tests/build/lint.
+- Click **● Recording … — End** to finish; open the dashboard to review your Karma Score and Phal outcome.
+
+## Commands
+
+- **Agent Karma: Start Session** / **End Session**
+- **Agent Karma: Show Dashboard**
+- **Agent Karma: Add Validation Command** — log a test/build/lint command you ran
+- **Agent Karma: Export Current Session as JSON** / **as Markdown**
+- **Agent Karma: Delete All Local Data** — wipes everything, permanently
 
 All data stays in plain local JSON you can export or delete at any time.
 
