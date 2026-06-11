@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
@@ -57,5 +58,30 @@ suite("Agent Karma — integration", () => {
     const last = completed[completed.length - 1];
     assert.ok(last.phalCard, "completed session has no Phal card");
     assert.strictEqual(typeof last.karmaScore, "number", "completed session has no Karma score");
+  });
+
+  test("exports the latest session as valid JSON (no raw command strings)", async () => {
+    const outPath = path.join(os.tmpdir(), `ak-export-${process.pid}.json`);
+    const w = vscode.window as unknown as Record<string, unknown>;
+    w.showSaveDialog = async () => vscode.Uri.file(outPath);
+
+    await vscode.commands.executeCommand("agentKarma.exportJson");
+
+    assert.ok(fs.existsSync(outPath), "export file not written");
+    const parsed = JSON.parse(fs.readFileSync(outPath, "utf8"));
+    assert.ok(parsed.session && Array.isArray(parsed.events), "export shape is wrong");
+    fs.rmSync(outPath, { force: true });
+  });
+
+  test("Delete All Local Data wipes the store (after confirmation)", async () => {
+    const w = vscode.window as unknown as Record<string, unknown>;
+    w.showWarningMessage = async () => "Delete Everything";
+
+    await vscode.commands.executeCommand("agentKarma.deleteAllData");
+
+    assert.ok(
+      !fs.existsSync(path.join(storageDir, "sessions.json")),
+      "sessions.json should be gone after delete-all"
+    );
   });
 });
