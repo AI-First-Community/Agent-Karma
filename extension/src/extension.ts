@@ -14,6 +14,11 @@ import { AI_TOOLS, TASK_TYPES } from "./core/types";
 // local JSON storage, survive-reload/crash recovery, and a basic dashboard.
 
 const TOGGLE_COMMAND = "agentKarma.toggleSession";
+
+/** Small API returned from activate() for integration tests. */
+export interface AgentKarmaApi {
+  getStorageDir(): string;
+}
 const LAST_TOOL_KEY = "agentKarma.lastAiTool";
 const LAST_TASK_KEY = "agentKarma.lastTaskType";
 
@@ -25,7 +30,7 @@ function lastFirst(items: readonly string[], last: string | undefined): string[]
   return [last, ...items.filter((i) => i !== last)];
 }
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const store = new LocalStore(context.globalStorageUri.fsPath);
   const bus = new EventBus();
   const manager = new SessionManager(store, bus, context.globalState);
@@ -205,12 +210,14 @@ export function activate(context: vscode.ExtensionContext): void {
       )
       .then((choice) => {
         if (choice === "End") {
-          endFlow();
+          void endFlow();
         } else {
           syncStatusBar();
         }
       });
   }
+
+  return { getStorageDir: () => store.dir };
 }
 
 export function deactivate(): void {

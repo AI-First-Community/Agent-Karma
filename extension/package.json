@@ -56,13 +56,18 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test": "vitest run --passWithNoTests",
+    "compile-tests": "tsc -p tsconfig.test.json",
+    "test:integration": "npm run build && npm run compile-tests && node ./out/test/runTest.js",
     "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\"",
     "package": "vsce package --no-dependencies -o agent-karma.vsix"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.7",
     "@types/node": "^20.14.0",
     "@types/vscode": "~1.74.0",
+    "@vscode/test-electron": "^2.4.1",
     "@vscode/vsce": "^3.2.0",
+    "mocha": "^10.7.3",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "esbuild": "^0.23.0",

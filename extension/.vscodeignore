@@ -1,12 +1,15 @@
 # Keep the published .vsix small: ship only the bundle + manifest + license/readme.
 .vscode/**
 src/**
+test/**
 out/**
 node_modules/**
 **/*.ts
 **/*.map
 esbuild.js
 tsconfig.json
+tsconfig.test.json
 .eslintrc.json
 **/*.test.ts
+**/*.itest.ts
 .gitignore
