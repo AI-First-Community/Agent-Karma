@@ -103,6 +103,36 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("Needs Review");
   });
 
+  it("renders the at-a-glance hero stats (Karma, validation rate, trend, outcomes)", () => {
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [],
+      stats: {
+        rollingKarma: 71,
+        lastTrend: "up",
+        sessionCount: 12,
+        recentCount: 10,
+        validationRate: 70,
+        testsRunCount: 6,
+        scoreSeries: [40, 55, 62, 71],
+        outcomes: { ready: 3, needs: 5, highRisk: 2, informational: 0 },
+      },
+    });
+    expect(html).toContain("Karma <b>71</b>");
+    expect(html).toContain("12 sessions");
+    expect(html).toContain("70%");
+    expect(html).toContain("6 / 10");
+    expect(html).toContain("<polyline"); // sparkline
+    expect(html).toContain("seg-ready"); // outcome distribution
+  });
+
+  it("shows a friendly empty hero when there are no sessions", () => {
+    const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: undefined, recent: [] });
+    expect(html).toContain("No sessions yet");
+  });
+
   it("escapes HTML in user-provided fields (no injection)", () => {
     const evil: AgentKarmaSession = { ...base, title: "<img src=x onerror=alert(1)>" };
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: evil, recent: [] });

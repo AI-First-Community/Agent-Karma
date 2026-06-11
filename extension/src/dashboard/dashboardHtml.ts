@@ -1,9 +1,12 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
+import { DashboardStats } from "./dashboardStats";
+import { sparkline, percentBar, outcomeBar } from "./charts";
 
 export interface DashboardData {
   nonce: string;
   cspSource: string;
+  stats?: DashboardStats;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -11,6 +14,50 @@ export interface DashboardData {
   lastCompleted?: AgentKarmaSession;
   lastCompletedEvents?: AgentKarmaEvent[];
   recent: AgentKarmaSession[];
+}
+
+const EMPTY_STATS: DashboardStats = {
+  sessionCount: 0,
+  recentCount: 0,
+  testsRunCount: 0,
+  scoreSeries: [],
+  outcomes: { ready: 0, needs: 0, highRisk: 0, informational: 0 },
+};
+
+function trendArrow(t: "up" | "down" | "flat" | undefined): string {
+  return t === "up" ? "↑" : t === "down" ? "↓" : "→";
+}
+
+/** Hero header + "at a glance" panel — our unique signals, visualized. */
+function glanceSection(stats: DashboardStats): string {
+  if (stats.rollingKarma === undefined) {
+    return `<div class="hero"><div class="hero-karma muted">No sessions yet</div><div class="tagline">Start a session to begin building your Karma.</div></div>`;
+  }
+  return `
+    <div class="hero">
+      <div class="hero-karma">Karma <b>${stats.rollingKarma}</b> <span class="trend">${trendArrow(
+        stats.lastTrend
+      )}</span></div>
+      <div class="tagline">${stats.sessionCount} session${stats.sessionCount === 1 ? "" : "s"} · self-comparative (vs. your own average)</div>
+    </div>
+    <div class="glance">
+      <div class="g-item">
+        <div class="g-label">Validation rate</div>
+        <div class="g-value">${percentBar(stats.validationRate ?? 0)} ${stats.validationRate ?? 0}%</div>
+      </div>
+      <div class="g-item">
+        <div class="g-label">Tests run</div>
+        <div class="g-value">${stats.testsRunCount} / ${stats.recentCount}</div>
+      </div>
+      <div class="g-item">
+        <div class="g-label">Karma trend</div>
+        <div class="g-value spark-wrap">${sparkline(stats.scoreSeries)}</div>
+      </div>
+      <div class="g-item g-wide">
+        <div class="g-label">Outcomes (recent)</div>
+        <div class="g-value">${outcomeBar(stats.outcomes)}</div>
+      </div>
+    </div>`;
 }
 
 /** Escape user-provided text before placing it in HTML. */
@@ -173,7 +220,8 @@ function recentSection(recent: AgentKarmaSession[]): string {
 export function renderDashboardHtml(data: DashboardData): string {
   const csp = [
     `default-src 'none'`,
-    `style-src '${data.cspSource}' 'nonce-${data.nonce}'`,
+    // 'unsafe-inline' covers dynamic style attributes (chart widths); no scripts allowed.
+    `style-src '${data.cspSource}' 'nonce-${data.nonce}' 'unsafe-inline'`,
     `img-src '${data.cspSource}'`,
   ].join("; ");
 
@@ -212,6 +260,24 @@ export function renderDashboardHtml(data: DashboardData): string {
     .scoreline { margin-top: 0.4rem; font-size: 0.95rem; }
     .scoreline b { font-size: 1.15rem; }
     .trend { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin-left: 0.5rem; }
+    /* hero + at-a-glance */
+    .hero { margin: 1rem 0 0.5rem; }
+    .hero-karma { font-size: 1.05rem; }
+    .hero-karma b { font-size: 1.9rem; }
+    .glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem 1rem; margin: 0.5rem 0 0.5rem; }
+    .g-item { border: 1px solid var(--vscode-panel-border); border-radius: 6px; padding: 0.55rem 0.7rem; }
+    .g-wide { grid-column: 1 / -1; }
+    .g-label { color: var(--vscode-descriptionForeground); font-size: 0.78rem; margin-bottom: 0.3rem; }
+    .g-value { font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
+    .spark { color: var(--vscode-charts-blue, #3794ff); display: block; }
+    .bar { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--vscode-panel-border); overflow: hidden; vertical-align: middle; }
+    .bar-fill { display: block; height: 100%; background: var(--vscode-charts-green, #388a34); }
+    .stack { display: flex; width: 100%; height: 12px; border-radius: 4px; overflow: hidden; background: var(--vscode-panel-border); }
+    .seg { display: block; height: 100%; }
+    .seg-ready { background: var(--vscode-charts-green, #388a34); }
+    .seg-needs { background: var(--vscode-charts-yellow, #b89500); }
+    .seg-high { background: var(--vscode-charts-red, #e51400); }
+    .seg-info { background: var(--vscode-descriptionForeground); }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>
@@ -219,6 +285,8 @@ export function renderDashboardHtml(data: DashboardData): string {
 <body>
   <h1>Agent Karma</h1>
   <p class="tagline">Make every agent action count.</p>
+
+  ${glanceSection(data.stats ?? EMPTY_STATS)}
 
   <h2>Active session</h2>
   ${activeSection(data.active, data.activeEvents ?? [])}

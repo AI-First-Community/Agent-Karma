@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { LocalStore } from "../storage/localStore";
 import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
+import { computeStats } from "./dashboardStats";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -43,6 +44,7 @@ export class DashboardPanel {
       return;
     }
     const store = this.store.loadSessions();
+    const stats = computeStats(store.sessions, store.karmaEma);
     const recent = store.sessions
       .filter((s) => s.status === "completed")
       .slice(-10)
@@ -59,6 +61,7 @@ export class DashboardPanel {
     this.panel.webview.html = renderDashboardHtml({
       nonce: randomUUID().replace(/-/g, ""),
       cspSource: this.panel.webview.cspSource,
+      stats,
       active,
       activeEvents,
       lastCompleted,
