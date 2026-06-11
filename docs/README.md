@@ -4,6 +4,7 @@ This folder holds the complete thinking and design for Agent Karma. Read in this
 
 | # | Document | Purpose |
 |---|---|---|
+| 0 | [vision.md](vision.md) | **The broad vision + full Question Map** — every question Agent Karma will answer, mapped to a horizon (Now/Next/Later) and rigor; how we sequence breadth without losing the wedge |
 | 1 | [product-strategy.md](product-strategy.md) | The problem, philosophy (Dharma/Karma/Phal), positioning, **locked decisions**, non-goals |
 | 2 | [differentiation.md](differentiation.md) | **USPs and full competitive comparison** — why Agent Karma is uniquely positioned |
 | 2b | [competitive-coverage.md](competitive-coverage.md) | **Feature-by-feature verdict** on every competitor capability — Adopt / Adapt / Reject (deliberate non-goals) |

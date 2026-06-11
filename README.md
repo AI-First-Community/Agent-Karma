@@ -86,6 +86,7 @@ Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 
 | Doc | What's in it |
 |---|---|
+| [`docs/vision.md`](docs/vision.md) | The broad vision + full Question Map (every question, by horizon and rigor) |
 | [`docs/product-strategy.md`](docs/product-strategy.md) | Positioning, philosophy, locked decisions, non-goals |
 | [`docs/differentiation.md`](docs/differentiation.md) | USPs and full competitive comparison |
 | [`docs/competitive-coverage.md`](docs/competitive-coverage.md) | Per-feature verdict on every competitor capability (Adopt / Adapt / Reject) |

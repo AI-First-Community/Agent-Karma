@@ -24,6 +24,8 @@ Agent Karma is an **open-source, local-first VS Code extension** — a *personal
 
 **Product promise:** *Use any AI coding tool. Agent Karma helps you use it better.*
 
+> **Vision vs. wedge:** the product *vision* is broad — self-awareness across the whole arc of AI-assisted work (intent, action, validation, outcome, effectiveness, growth). The *wedge* (what we lead with and measure rigorously) is narrow — validation. We deliver the broad vision by **sequencing**, not by broadening the MVP. The full breadth, every question, and its horizon are mapped in [`vision.md`](vision.md).
+
 ## 3. Philosophy: Dharma → Karma → Phal
 
 | Concept | Meaning | Captured as |
