@@ -12,6 +12,7 @@ import { LocalStore } from "../storage/localStore";
 import { scorePrompt } from "../scoring/promptScorer";
 import { generateDharmaCard } from "../cards/dharmaCard";
 import { generatePhalCard } from "../cards/phalCard";
+import { calculateKarmaScore, nextEma, computeTrend } from "../scoring/karmaScore";
 import { asEventData } from "../privacy/privacyRules";
 
 /** Metadata captured when a session starts. */
@@ -172,11 +173,12 @@ export class SessionManager {
   }
 
   /**
-   * On session end: attach the git diff summary, generate the (provisional) Phal
-   * Card from the session's events, and record the corresponding events.
-   * Call BEFORE endSession() so the active session still exists.
+   * On session end: attach the git diff summary, compute the OBJECTIVE Karma Score
+   * (+ self-comparative EMA trend), generate the final score-aware Phal Card, and
+   * record the corresponding events. Call BEFORE endSession() so the active session
+   * still exists.
    */
-  attachGitAndPhal(gitSummary: GitDiffSummary): void {
+  finalizeActiveSession(gitSummary: GitDiffSummary): void {
     if (!this.active) {
       return;
     }
@@ -184,12 +186,39 @@ export class SessionManager {
     this.record("git.diff.summary", this.active.id, asEventData(gitSummary));
 
     const events = this.store.loadEvents().events.filter((e) => e.sessionId === this.active!.id);
+    const sessions = this.store.loadSessions();
+    const prevEma = sessions.karmaEma;
+
+    const result = calculateKarmaScore({
+      events,
+      gitCaptured: gitSummary.captured,
+      promptHintScore: this.active.promptHintScore ?? 0,
+    });
+    this.active.karmaScore = result.score;
+    this.active.karmaScoreLabel = result.label;
+    this.active.karmaReasons = result.reasons;
+    this.active.karmaTrend = computeTrend(result.score, prevEma);
+    this.record("karma.score.generated", this.active.id, {
+      score: result.score,
+      label: result.label,
+    });
+
     this.active.phalCard = generatePhalCard({
       dharmaCard: this.active.dharmaCard,
       events,
+      karmaScore: result.score,
     });
     this.record("phal.generated", this.active.id, {});
-    this.persistSession(this.active);
+
+    // Persist the session AND the updated EMA in a single write.
+    const idx = sessions.sessions.findIndex((s) => s.id === this.active!.id);
+    if (idx >= 0) {
+      sessions.sessions[idx] = this.active;
+    } else {
+      sessions.sessions.push(this.active);
+    }
+    sessions.karmaEma = nextEma(prevEma, result.score);
+    this.store.saveSessions(sessions);
   }
 
   /** Store an optional, UNSCORED reflection note for the active session. */

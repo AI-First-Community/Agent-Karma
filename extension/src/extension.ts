@@ -144,7 +144,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Git diff summary (counts only) + Phal Card, computed while the session is still active.
     const cwds = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
     const gitSummary = await getGitDiffSummary(cwds);
-    manager.attachGitAndPhal(gitSummary);
+    manager.finalizeActiveSession(gitSummary);
 
     // Optional, UNSCORED reflection.
     const outcome = await vscode.window.showQuickPick(

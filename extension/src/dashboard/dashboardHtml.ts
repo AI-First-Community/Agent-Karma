@@ -88,6 +88,24 @@ function activeSection(
     </div>`;
 }
 
+function scoreBlock(session: AgentKarmaSession): string {
+  if (session.karmaScore === undefined) {
+    return "";
+  }
+  const arrow =
+    session.karmaTrend === "up" ? "↑" : session.karmaTrend === "down" ? "↓" : "→";
+  const checklist =
+    (session.karmaReasons ?? []).length > 0
+      ? (session.karmaReasons ?? []).map((r) => `<li>✔ ${esc(r)}</li>`).join("")
+      : `<li class="muted">no validation actions recorded</li>`;
+  return `
+    <div class="dharma-head" style="margin-top:0.75rem;">⚖️ Karma Score</div>
+    <ul class="checklist">${checklist}</ul>
+    <div class="scoreline">Karma <b>${session.karmaScore}</b> · ${esc(
+      session.karmaScoreLabel ?? ""
+    )} <span class="trend">${arrow} vs your average</span></div>`;
+}
+
 function lastSessionSection(
   session: AgentKarmaSession | undefined,
   events: AgentKarmaEvent[]
@@ -116,6 +134,7 @@ function lastSessionSection(
     <div class="card">
       <div class="outcome outcome-${esc(p.outcome.replace(/\s+/g, "-").toLowerCase())}">🍃 ${esc(p.outcome)}</div>
       <h3>${esc(session.title)}</h3>
+      ${scoreBlock(session)}
       <dl>
         <dt>Files changed</dt><dd>${p.filesChanged} (${p.testFilesChanged} test)</dd>
         <dt>Validation</dt><dd>${validation}</dd>
@@ -138,14 +157,14 @@ function recentSection(recent: AgentKarmaSession[]): string {
         <td>${esc(s.title)}</td>
         <td>${esc(s.aiTool)}</td>
         <td>${esc(s.taskType)}</td>
+        <td>${s.karmaScore !== undefined ? `${s.karmaScore} · ${esc(s.karmaScoreLabel ?? "")}` : ""}</td>
         <td>${esc(s.dharmaCard?.riskLevel ?? "")}</td>
-        <td>${esc(s.endedAt ?? "")}</td>
       </tr>`
     )
     .join("");
   return `
     <table>
-      <thead><tr><th>Session</th><th>AI tool</th><th>Task</th><th>Risk</th><th>Ended</th></tr></thead>
+      <thead><tr><th>Session</th><th>AI tool</th><th>Task</th><th>Karma</th><th>Risk</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
@@ -188,6 +207,11 @@ export function renderDashboardHtml(data: DashboardData): string {
     .outcome-informational { color: var(--vscode-descriptionForeground); }
     .recs ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
     .trace { background: var(--vscode-textCodeBlock-background); padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.82rem; white-space: pre-wrap; overflow-x: auto; }
+    .checklist { list-style: none; margin: 0.25rem 0 0; padding-left: 0; }
+    .checklist li { font-size: 0.88rem; padding: 0.1rem 0; }
+    .scoreline { margin-top: 0.4rem; font-size: 0.95rem; }
+    .scoreline b { font-size: 1.15rem; }
+    .trend { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin-left: 0.5rem; }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>

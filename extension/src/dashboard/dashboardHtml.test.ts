@@ -68,6 +68,41 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("Test (passed)");
   });
 
+  it("shows the Karma Score checklist, number and trend for the last session", () => {
+    const completed: AgentKarmaSession = {
+      ...base,
+      id: "s9",
+      status: "completed",
+      endedAt: "2026-06-10T10:25:00.000Z",
+      karmaScore: 62,
+      karmaScoreLabel: "Good",
+      karmaReasons: ["Tests run (+25)", "Change measured (+5)"],
+      karmaTrend: "up",
+      phalCard: {
+        outcome: "Needs Review",
+        filesChanged: 2,
+        testFilesChanged: 1,
+        validationDetected: true,
+        commandsDetected: [{ type: "Test", result: "passed" }],
+        recommendations: ["Run lint before committing."],
+      },
+    };
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [completed],
+      lastCompleted: completed,
+      lastCompletedEvents: [],
+    });
+    expect(html).toContain("Karma Score");
+    expect(html).toContain("✔ Tests run (+25)");
+    expect(html).toContain("Karma <b>62</b>");
+    expect(html).toContain("Good");
+    expect(html).toContain("↑ vs your average");
+    expect(html).toContain("Needs Review");
+  });
+
   it("escapes HTML in user-provided fields (no injection)", () => {
     const evil: AgentKarmaSession = { ...base, title: "<img src=x onerror=alert(1)>" };
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: evil, recent: [] });
