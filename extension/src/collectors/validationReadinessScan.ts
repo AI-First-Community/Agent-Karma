@@ -7,6 +7,11 @@ import { ReadinessSignals } from "./validationReadiness";
 // agent guidance file's text (looking for the word "validate"/"test"/"lint"). We
 // never read your source files. Best-effort: any read error degrades to "absent",
 // never throws.
+//
+// Monorepo / subfolder aware: the validation setup often lives BELOW the workspace
+// root (tests in `extension/`, `packages/*`, `apps/*`). We scan the root AND those
+// nested package roots and OR the signals, so a repo isn't falsely reported as
+// "nothing to validate against" just because its package.json isn't at the top.
 
 const TEST_DEPS = [
   "vitest", "jest", "mocha", "ava", "jasmine", "@playwright/test", "playwright",
@@ -42,6 +47,13 @@ const AGENT_GUIDANCE_FILES = [
 ];
 const GUIDANCE_KEYWORDS = ["validate", "test", "lint", "type check", "typecheck", "build"];
 
+// Directories we never descend into when discovering nested packages.
+const SKIP_DIRS = new Set([
+  "node_modules", ".git", "dist", "out", "build", "coverage",
+  ".vscode-test", ".next", ".nuxt", ".turbo", ".cache",
+  "__pycache__", ".pytest_cache", ".mypy_cache", "target", "vendor",
+]);
+
 function exists(root: string, rel: string): boolean {
   try {
     return fs.existsSync(path.join(root, rel));
@@ -75,7 +87,8 @@ function readText(root: string, rel: string): string {
   }
 }
 
-export function scanReadinessSignals(root: string): ReadinessSignals {
+/** Gather signals from ONE folder. */
+function scanOneRoot(root: string): ReadinessSignals {
   const pkg = readJson(root, "package.json") ?? {};
   const scripts = (pkg.scripts as Record<string, string> | undefined) ?? {};
   const deps = Object.keys({
@@ -115,4 +128,67 @@ export function scanReadinessSignals(root: string): ReadinessSignals {
     preCommit,
     agentMentionsValidation,
   };
+}
+
+/**
+ * Discover nested package roots so monorepos / subfolder apps aren't reported as
+ * "can't validate" when the setup lives below the workspace root. Depth-bounded
+ * and best-effort: immediate child directories that contain a package.json, plus
+ * one level under the conventional `packages/` and `apps/` monorepo directories.
+ */
+export function findNestedPackageRoots(root: string): string[] {
+  const found = new Set<string>();
+
+  const childDirs = (dir: string): string[] => {
+    try {
+      return fs
+        .readdirSync(dir, { withFileTypes: true })
+        .filter((e) => e.isDirectory() && !SKIP_DIRS.has(e.name) && !e.name.startsWith("."))
+        .map((e) => path.join(dir, e.name));
+    } catch {
+      return [];
+    }
+  };
+  const addIfPackage = (dir: string): void => {
+    if (exists(dir, "package.json")) {
+      found.add(dir);
+    }
+  };
+
+  // Immediate children (catches an app living in e.g. extension/).
+  childDirs(root).forEach(addIfPackage);
+  // One level under conventional monorepo parents.
+  for (const parent of ["packages", "apps"]) {
+    childDirs(path.join(root, parent)).forEach(addIfPackage);
+  }
+
+  return [...found].slice(0, 50); // hard cap — never walk an unbounded tree
+}
+
+/** OR two readiness signal sets — a repo "can validate" if ANY package can. */
+function orSignals(a: ReadinessSignals, b: ReadinessSignals): ReadinessSignals {
+  return {
+    testScript: a.testScript || b.testScript,
+    testDep: a.testDep || b.testDep,
+    testConfigFile: a.testConfigFile || b.testConfigFile,
+    buildScript: a.buildScript || b.buildScript,
+    tsconfig: a.tsconfig || b.tsconfig,
+    lintScript: a.lintScript || b.lintScript,
+    lintConfig: a.lintConfig || b.lintConfig,
+    lintDep: a.lintDep || b.lintDep,
+    typecheckScript: a.typecheckScript || b.typecheckScript,
+    ci: a.ci || b.ci,
+    preCommit: a.preCommit || b.preCommit,
+    agentMentionsValidation: a.agentMentionsValidation || b.agentMentionsValidation,
+  };
+}
+
+/**
+ * Aggregate readiness signals across the workspace root AND any nested package
+ * roots, so the reported status is honest for subfolder/monorepo layouts (the
+ * app under `extension/`, `packages/*`, `apps/*`) instead of only the top folder.
+ */
+export function scanReadinessSignals(root: string): ReadinessSignals {
+  const roots = [root, ...findNestedPackageRoots(root)];
+  return roots.map(scanOneRoot).reduce(orSignals);
 }

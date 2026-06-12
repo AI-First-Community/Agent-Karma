@@ -38,3 +38,7 @@ agent-karma-data/
 
 # --- Private dogfooding notes (local-only) ---
 DOGFOODING-NOTES.md
+
+# Session exports (generated on demand; not part of the repo)
+agent-karma-session-*.json
+agent-karma-session-*.md

@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.44.0]
+- **Validation-readiness is now monorepo / subfolder aware.** "Check Validation Readiness" / "Can you validate?" previously scanned only the workspace **root**, so repos whose package lives in a subfolder (tests under `extension/`, `packages/*`, `apps/*`) were wrongly reported as having no tests/build/lint — even when they were fully set up. The scan now also inspects nested package roots (immediate subfolders + one level under `packages/`/`apps/`) and reports a repo as able to validate if **any** of its packages can. Dependency/build/cache folders are skipped and discovery is depth-bounded. _(Dogfooding catch: Karma had been misjudging its own repo.)_
+
 ## [0.43.0]
 - **Capture git commits — including CLI/agent commits.** A watcher on `.git/logs/HEAD` (where every commit lands, no matter how it's made) records a `git.commit` event into the active session, so commits driven by an AI agent or the terminal show up in your session — not just commits made through VS Code.
   - **Metadata only**: the short commit hash, never the message, diff, files, or author. Active-session-gated, master-switch-gated, deduped by SHA.
