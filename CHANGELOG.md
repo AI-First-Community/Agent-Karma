@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.33.0]
+- **Karma Card → printable PDF + self-explanatory.** The card can now be exported as a **printable certificate**: choose **Printable PDF**, it opens in your browser, and you ⌘P → *Save as PDF*. The printable version is **self-explanatory** — it states what Agent Karma measures and explains every stat (validation rate, best streak, Karma mood), so the certificate stands on its own. Still fully local, zero dependencies, no network.
+
 ## [0.32.0]
 - **Shareable Karma Card.** New command **Agent Karma: Generate Karma Card** produces a beautiful, self-contained card celebrating your *validation practice* — your Karma mood (chakra-tinted), validation rate, best streak, and a statement like *"I use AI — and I check its work."* Preview it in an editor tab, then **screenshot** it or **Save as SVG** to share. Generated **100% locally** — no network, no auto-posting, no leaderboard, no vanity volume metrics. A motivating way to spread "use AI wisely, and verify it."
 

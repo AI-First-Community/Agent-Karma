@@ -80,3 +80,42 @@ export function renderKarmaCardSvg(i: KarmaCardInput): string {
   <text x="1126" y="610" text-anchor="end" font-size="18" font-weight="600" fill="#8b949e">${esc(date)}</text>
 </svg>`;
 }
+
+/**
+ * A self-explanatory, print-ready HTML page wrapping the card — for "Save as PDF"
+ * from the browser (⌘P). It explains what Agent Karma is and what each stat means,
+ * so the printed certificate stands on its own. Fully self-contained: no network.
+ */
+export function renderKarmaCardPrintHtml(i: KarmaCardInput): string {
+  const svg = renderKarmaCardSvg(i);
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Agent Karma — Karma Card</title>
+<style>
+  @page { size: A4 landscape; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Manrope','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif; color: #1a1f24; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 18px; }
+  .print-hint { text-align: center; font-size: 12px; color: #8a8a8a; margin-bottom: 12px; }
+  .card { border-radius: 16px; overflow: hidden; box-shadow: 0 4px 22px rgba(0,0,0,0.16); }
+  .card svg { width: 100%; height: auto; display: block; }
+  h2 { font-size: 17px; margin: 22px 0 6px; letter-spacing: -0.01em; }
+  p { font-size: 13px; line-height: 1.6; color: #3a4149; margin: 6px 0; }
+  .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+  .legend div { font-size: 12px; color: #3a4149; }
+  .legend b { display: block; color: #0e1117; margin-bottom: 2px; }
+  .foot { margin-top: 18px; padding-top: 9px; border-top: 1px solid #e8e8e8; font-size: 11px; color: #8a8a8a; }
+  @media print { .print-hint { display: none; } }
+</style></head>
+<body><div class="wrap">
+  <div class="print-hint">Press ⌘P (macOS) or Ctrl+P → “Save as PDF”.</div>
+  <div class="card">${svg}</div>
+  <h2>What this is</h2>
+  <p><b>Agent Karma</b> is a local-first VS Code tool that measures one thing: did you verify the AI's output — by running tests, builds, and linters — <i>before</i> trusting it? This card reflects your <b>validation practice</b>, not how much AI you use.</p>
+  <div class="legend">
+    <div><b>Validation rate</b> Share of recent sessions in which you ran a real check (test / build / lint).</div>
+    <div><b>Best streak</b> The most consecutive sessions you validated in a row.</div>
+    <div><b>Karma mood</b> Your self-comparative Karma band — luminous, steady, forming, or on the path.</div>
+  </div>
+  <div class="foot">Generated locally by Agent Karma — no data left this machine. · validate your AI · agent-karma</div>
+</div></body></html>`;
+}

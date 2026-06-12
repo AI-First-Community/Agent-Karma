@@ -3,7 +3,7 @@ import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats, computeValidationHabits, computeValidationHeatmap } from "../dashboard/dashboardStats";
 import { highRiskWatchlist, scoreComposition } from "../dashboard/insights";
-import { renderKarmaCardSvg } from "../cards/karmaCard";
+import { renderKarmaCardSvg, renderKarmaCardPrintHtml } from "../cards/karmaCard";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
@@ -170,3 +170,12 @@ const cardPage = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>
 const cardFile = path.join(outDir, "karma-card-preview.html");
 fs.writeFileSync(cardFile, cardPage, "utf8");
 console.log("Karma Card preview written to", cardFile);
+
+// Printable (PDF) preview — open and ⌘P → Save as PDF to test the certificate.
+const printFile = path.join(outDir, "karma-card-print-preview.html");
+fs.writeFileSync(
+  printFile,
+  renderKarmaCardPrintHtml({ mood: "steady", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24, dateLabel: "2026-06-12" }),
+  "utf8"
+);
+console.log("Karma Card print preview written to", printFile);

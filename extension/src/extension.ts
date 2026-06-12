@@ -21,7 +21,7 @@ import { SummaryData } from "./chat/chatRouter";
 import { findSkills } from "./skills/skillFinder";
 import { computeValidationHabits, computeStats } from "./dashboard/dashboardStats";
 import { karmicMessage } from "./dashboard/karmicMessage";
-import { renderKarmaCardSvg } from "./cards/karmaCard";
+import { renderKarmaCardSvg, renderKarmaCardPrintHtml } from "./cards/karmaCard";
 import { randomUUID } from "crypto";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
@@ -328,35 +328,49 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const generateKarmaCardFlow = async (): Promise<void> => {
     const s = store.loadSessions();
     const stats = computeStats(s.sessions, s.karmaEma);
-    const svg = renderKarmaCardSvg({
+    const cardInput = {
       mood: karmicMessage(stats).mood,
       karma: stats.rollingKarma,
       validationRate: stats.validationRate,
       bestStreak: stats.consistency?.bestRun,
       sessions: stats.sessionCount,
       dateLabel: new Date().toISOString().slice(0, 10),
-    });
+    };
+    const svg = renderKarmaCardSvg(cardInput);
     const panel = vscode.window.createWebviewPanel("agentKarma.card", "Karma Card", vscode.ViewColumn.Active, {
       enableScripts: false,
       retainContextWhenHidden: false,
     });
     panel.webview.html = cardPageHtml(svg, randomUUID().replace(/-/g, ""));
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri;
 
     const choice = await vscode.window.showInformationMessage(
-      "Your Karma Card is ready — screenshot it, or save it as an SVG to share.",
-      "Save as SVG"
+      "Your Karma Card is ready. Save it as an image to share, or as a printable PDF.",
+      "Save as SVG",
+      "Printable PDF"
     );
     if (choice === "Save as SVG") {
-      const folder = vscode.workspace.workspaceFolders?.[0]?.uri;
-      const defaultUri = folder ? vscode.Uri.joinPath(folder, "karma-card.svg") : undefined;
       const uri = await vscode.window.showSaveDialog({
-        defaultUri,
+        defaultUri: folder ? vscode.Uri.joinPath(folder, "karma-card.svg") : undefined,
         filters: { "SVG image": ["svg"] },
         saveLabel: "Save Karma Card",
       });
       if (uri) {
         await vscode.workspace.fs.writeFile(uri, Buffer.from(svg, "utf8"));
         void vscode.window.showInformationMessage(`Karma Card saved to ${uri.fsPath}`);
+      }
+    } else if (choice === "Printable PDF") {
+      const uri = await vscode.window.showSaveDialog({
+        defaultUri: folder ? vscode.Uri.joinPath(folder, "karma-card.html") : undefined,
+        filters: { "Printable HTML": ["html"] },
+        saveLabel: "Save printable card",
+      });
+      if (uri) {
+        await vscode.workspace.fs.writeFile(uri, Buffer.from(renderKarmaCardPrintHtml(cardInput), "utf8"));
+        await vscode.env.openExternal(uri);
+        void vscode.window.showInformationMessage(
+          "Opened your Karma Card in the browser — press ⌘P / Ctrl+P → “Save as PDF”."
+        );
       }
     }
   };

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { renderKarmaCardSvg } from "./karmaCard";
+import { renderKarmaCardSvg, renderKarmaCardPrintHtml } from "./karmaCard";
 
 describe("renderKarmaCardSvg", () => {
   it("produces a 1200x630 self-contained SVG with the brand + stats", () => {
@@ -35,5 +35,19 @@ describe("renderKarmaCardSvg", () => {
     const svg = renderKarmaCardSvg({ mood: "luminous", dateLabel: "<x>" });
     expect(svg).not.toContain("<x>");
     expect(svg).toContain("&lt;x&gt;");
+  });
+});
+
+describe("renderKarmaCardPrintHtml", () => {
+  it("is a self-contained, self-explanatory, print-ready page embedding the card", () => {
+    const html = renderKarmaCardPrintHtml({ mood: "steady", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24 });
+    expect(html).toContain("<!DOCTYPE html>");
+    expect(html).toContain("@page");
+    expect(html).toContain("Save as PDF");
+    expect(html).toContain("What this is"); // self-explanatory section
+    expect(html).toContain("Validation rate"); // legend
+    expect(html).toContain("<svg"); // the card itself
+    expect(html).not.toContain("https://"); // fully local
+    expect(html).not.toContain("<script");
   });
 });
