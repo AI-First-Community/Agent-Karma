@@ -42,3 +42,14 @@ DOGFOODING-NOTES.md
 # Session exports (generated on demand; not part of the repo)
 agent-karma-session-*.json
 agent-karma-session-*.md
+
+# --- Private marketing / launch collateral (NOT for the public repo) ---
+# (the README hero images agent-karma-hero* stay tracked; these stay local)
+docs/assets/flyers/
+docs/assets/launch/
+docs/launch/
+docs/assets/agent-karma-flyers.html
+docs/assets/agent-karma-gita-flyers.html
+docs/assets/agent-karma-mahabharata-flyers.html
+docs/assets/agent-karma-storybook.html
+docs/assets/agent-karma-parallel-storybook.html
