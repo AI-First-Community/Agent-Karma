@@ -52,21 +52,68 @@ export function shouldNudge(
   return { nudge: !validated, title: last.title };
 }
 
-/** The standalone checker script written next to the data dir. Plain JS, no deps. */
+/**
+ * Change-aware decision: nudge based on whether the actual STAGED files were
+ * validated — not just "the last session." Ties the reminder to *this* change,
+ * which also stops ambient mode (one big per-day session) from disarming it.
+ *
+ * - finds the sessions whose file.saved events touched a staged file
+ * - if any of those sessions logged a validation command → no nudge
+ * - if the staged files were worked on but NEVER validated → nudge
+ * - if the staged files can't be tied to any session → stay silent (no false alarm)
+ */
+export function shouldNudgeForStaged(
+  stagedBaseNames: string[],
+  sessions: { id: string; title: string }[],
+  events: { sessionId: string; type: string; data?: { fileName?: unknown } }[]
+): { nudge: boolean; title?: string } {
+  if (stagedBaseNames.length === 0) {
+    return { nudge: false };
+  }
+  const staged = new Set(stagedBaseNames);
+  const touchingSessionIds = new Set(
+    events
+      .filter((e) => e.type === "file.saved" && staged.has(String(e.data?.fileName)))
+      .map((e) => e.sessionId)
+  );
+  if (touchingSessionIds.size === 0) {
+    return { nudge: false }; // no evidence about these files → don't annoy
+  }
+  const validated = events.some(
+    (e) => e.type === "validation.command" && touchingSessionIds.has(e.sessionId)
+  );
+  if (validated) {
+    return { nudge: false };
+  }
+  const title = sessions.filter((s) => touchingSessionIds.has(s.id)).slice(-1)[0]?.title;
+  return { nudge: true, title };
+}
+
+/** The standalone checker script written next to the data dir. Plain JS, no deps.
+ * Change-aware: nudges only when the actually-staged files were never validated. */
 export function buildCheckerScript(): string {
   return `// ${MARKER} checker (auto-generated). Non-blocking reminder; never fails a commit.
-var fs = require("fs"), path = require("path");
+var fs = require("fs"), path = require("path"), cp = require("child_process");
 var dir = process.argv[2];
+function base(p){ var parts = String(p).split(/[\\\\/]/); return parts[parts.length-1] || p; }
 try {
+  var out = cp.execSync("git diff --cached --name-only", { encoding: "utf8" });
+  var staged = {};
+  out.split(/\\r?\\n/).forEach(function (line) { var b = base(line.trim()); if (b) staged[b] = true; });
   var sessions = (JSON.parse(fs.readFileSync(path.join(dir, "sessions.json"), "utf8")).sessions) || [];
   var events = (JSON.parse(fs.readFileSync(path.join(dir, "events.json"), "utf8")).events) || [];
-  var last = sessions[sessions.length - 1];
-  if (last) {
-    var validated = events.some(function (e) { return e.sessionId === last.id && e.type === "validation.command"; });
+  var touching = {};
+  events.forEach(function (e) {
+    if (e.type === "file.saved" && e.data && staged[String(e.data.fileName)]) touching[e.sessionId] = true;
+  });
+  var ids = Object.keys(touching);
+  if (ids.length > 0) {
+    var validated = events.some(function (e) { return e.type === "validation.command" && touching[e.sessionId]; });
     if (!validated) {
+      var s = sessions.filter(function (x) { return touching[x.id]; }).slice(-1)[0];
       console.error("");
-      console.error("Agent Karma reminder: no tests/build/lint were logged in your latest session (" + JSON.stringify(last.title) + ").");
-      console.error("Consider validating AI-assisted changes before committing. (Reminder only - never blocks the commit.)");
+      console.error("Agent Karma: you're committing AI-assisted changes" + (s ? " (\\"" + s.title + "\\")" : "") + " with no tests/build/lint logged.");
+      console.error("Consider validating before you trust them. (Reminder only - never blocks the commit.)");
       console.error("");
     }
   }
@@ -82,6 +129,24 @@ export function buildHookScript(dataDir: string, checkerPath: string): string {
 node "${checkerPath}" "${dataDir}" 2>/dev/null || true
 exit 0
 `;
+}
+
+/** Where we stand on the nudge for a repo — used to decide the first-run offer. */
+export function nudgeInstallState(
+  repoRoot: string
+): "installed" | "installable" | "not-a-repo" {
+  try {
+    if (!fs.existsSync(path.join(repoRoot, ".git"))) {
+      return "not-a-repo";
+    }
+    const hookPath = path.join(repoRoot, ".git", "hooks", "pre-commit");
+    if (fs.existsSync(hookPath) && fs.readFileSync(hookPath, "utf8").includes(MARKER)) {
+      return "installed";
+    }
+    return "installable";
+  } catch {
+    return "not-a-repo";
+  }
 }
 
 export function installHook(repoRoot: string, dataDir: string): InstallResult {

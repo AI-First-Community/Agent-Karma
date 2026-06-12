@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.19.0]
+- The pre-commit nudge is the product's spine now. It's **change-aware** — it reminds you only when the *actually-staged files* were never validated (not just "your last session"), which also fixes it misfiring under ambient mode.
+- Agent Karma **offers to install the nudge on first run** (local, non-blocking, removable) so the one moment that matters — the commit — isn't buried in the command palette.
+
 ## [0.18.0]
 - **Ambient mode** (opt-in): continuous, no-manual-start capture grouped by day. Toggle with "Agent Karma: Toggle Ambient Mode" — it quietly captures saves + validation and rolls over at midnight. Fits long, continuous, mixed AI+manual development.
 

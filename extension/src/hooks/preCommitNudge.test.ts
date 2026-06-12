@@ -5,6 +5,7 @@ import * as path from "path";
 import {
   detectConflict,
   shouldNudge,
+  shouldNudgeForStaged,
   buildHookScript,
   buildCheckerScript,
   installHook,
@@ -38,6 +39,43 @@ describe("shouldNudge", () => {
   });
   it("does not nudge with no sessions", () => {
     expect(shouldNudge([], []).nudge).toBe(false);
+  });
+});
+
+describe("shouldNudgeForStaged (change-aware)", () => {
+  const sessions = [{ id: "s1", title: "Fix auth" }];
+
+  it("nudges when a staged file was worked on but never validated", () => {
+    const events = [{ sessionId: "s1", type: "file.saved", data: { fileName: "auth.ts" } }];
+    const r = shouldNudgeForStaged(["auth.ts"], sessions, events);
+    expect(r.nudge).toBe(true);
+    expect(r.title).toBe("Fix auth");
+  });
+
+  it("does NOT nudge when the session that touched the staged file logged validation", () => {
+    const events = [
+      { sessionId: "s1", type: "file.saved", data: { fileName: "auth.ts" } },
+      { sessionId: "s1", type: "validation.command", data: {} },
+    ];
+    expect(shouldNudgeForStaged(["auth.ts"], sessions, events).nudge).toBe(false);
+  });
+
+  it("stays silent when staged files can't be tied to any session (no false alarm)", () => {
+    const events = [{ sessionId: "s1", type: "file.saved", data: { fileName: "other.ts" } }];
+    expect(shouldNudgeForStaged(["unrelated.ts"], sessions, events).nudge).toBe(false);
+  });
+
+  it("ambient-safe: validation in the SAME day-session covering the file silences it", () => {
+    // one big ambient session touched both files; one was validated → no nudge for either
+    const events = [
+      { sessionId: "day1", type: "file.saved", data: { fileName: "a.ts" } },
+      { sessionId: "day1", type: "validation.command", data: {} },
+    ];
+    expect(shouldNudgeForStaged(["a.ts"], [{ id: "day1", title: "Ambient" }], events).nudge).toBe(false);
+  });
+
+  it("does not nudge with nothing staged", () => {
+    expect(shouldNudgeForStaged([], sessions, []).nudge).toBe(false);
   });
 });
 

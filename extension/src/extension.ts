@@ -9,7 +9,7 @@ import { TerminalCollector } from "./collectors/terminalCollector";
 import { getGitDiffSummary } from "./collectors/gitCollector";
 import { toJson } from "./export/jsonExporter";
 import { toMarkdown } from "./export/markdownExporter";
-import { installHook, removeHook } from "./hooks/preCommitNudge";
+import { installHook, removeHook, nudgeInstallState } from "./hooks/preCommitNudge";
 import { StartSessionPanel } from "./panels/startSessionPanel";
 import { generateWeeklyReflection } from "./reflection/weeklyReflection";
 import { ambientDayKey, ambientTitle, ambientShouldStart } from "./core/ambient";
@@ -393,6 +393,29 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   // If ambient mode is on, make sure today's session exists (and roll over a
   // session left running from a previous day).
   void ensureAmbientDaySession();
+
+  // First-run offer: the pre-commit nudge is where validation actually matters —
+  // make it present (not buried in the palette). Asked once, only in a git repo.
+  const NUDGE_PROMPTED_KEY = "agentKarma.nudgePrompted";
+  const repo0 = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  if (
+    repo0 &&
+    !context.globalState.get<boolean>(NUDGE_PROMPTED_KEY) &&
+    nudgeInstallState(repo0) === "installable"
+  ) {
+    void context.globalState.update(NUDGE_PROMPTED_KEY, true);
+    void vscode.window
+      .showInformationMessage(
+        "Agent Karma can remind you to validate AI-assisted changes right before you commit — locally, and it never blocks the commit.",
+        "Add the reminder",
+        "Not now"
+      )
+      .then((choice) => {
+        if (choice === "Add the reminder") {
+          installNudgeFlow();
+        }
+      });
+  }
 
   return { getStorageDir: () => store.dir, startSession: (meta) => doStart(meta) };
 }
