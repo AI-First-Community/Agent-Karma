@@ -6,6 +6,7 @@ import { StatusBarController } from "./statusbar/statusBarItem";
 import { DashboardPanel } from "./dashboard/dashboardProvider";
 import { FileCollector } from "./collectors/fileCollector";
 import { TerminalCollector } from "./collectors/terminalCollector";
+import { GitCommitCollector } from "./collectors/gitCommitCollector";
 import { getGitDiffSummary } from "./collectors/gitCollector";
 import { getEffectiveSettings } from "./settings/effectiveSettings";
 import { toJson } from "./export/jsonExporter";
@@ -54,6 +55,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const settingsOf = () => getEffectiveSettings(store);
   const fileCollector = new FileCollector(manager, store, bus, settingsOf);
   const terminalCollector = new TerminalCollector(manager, settingsOf);
+  const gitCommitCollector = new GitCommitCollector(manager, settingsOf);
 
   const AMBIENT_KEY = "agentKarma.ambientMode";
   const ambientOn = (): boolean => context.globalState.get<boolean>(AMBIENT_KEY) === true;
@@ -666,7 +668,8 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     dashboard,
     startPanel,
     fileCollector,
-    terminalCollector
+    terminalCollector,
+    gitCommitCollector
   );
 
   // Keep the status bar + dashboard in sync as sessions start/end.

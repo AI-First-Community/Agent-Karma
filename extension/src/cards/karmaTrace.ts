@@ -10,6 +10,7 @@ const LABELS: Record<string, string> = {
   "dharma.generated": "Dharma Card generated",
   "file.saved": "File saved",
   "validation.command": "Validation command",
+  "git.commit": "Commit",
   "git.diff.summary": "Git diff summary captured",
   "karma.score.generated": "Karma Score generated",
   "phal.generated": "Phal Card generated",
@@ -31,6 +32,8 @@ export function buildKarmaTrace(events: AgentKarmaEvent[]): string[] {
         detail = `File saved: ${e.data.fileName}`;
       } else if (e.type === "validation.command") {
         detail = `Validation: ${String(e.data.commandType)} (${String(e.data.result)})`;
+      } else if (e.type === "git.commit" && typeof e.data.sha === "string") {
+        detail = `Commit ${e.data.sha}`;
       } else if (e.type === "git.diff.summary") {
         detail = `Git diff: ${e.data.filesChanged} files, +${e.data.linesAdded} / -${e.data.linesDeleted}`;
       }

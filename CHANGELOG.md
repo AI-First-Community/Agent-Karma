@@ -2,6 +2,11 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.43.0]
+- **Capture git commits — including CLI/agent commits.** A watcher on `.git/logs/HEAD` (where every commit lands, no matter how it's made) records a `git.commit` event into the active session, so commits driven by an AI agent or the terminal show up in your session — not just commits made through VS Code.
+  - **Metadata only**: the short commit hash, never the message, diff, files, or author. Active-session-gated, master-switch-gated, deduped by SHA.
+  - **Honest scope**: this records that a commit happened; it does **not** change the Karma score, which stays validation-based. It pairs with the pre-commit nudge to spotlight commits made without a logged validation.
+
 ## [0.42.0]
 - **Capture AI- and CLI-driven file changes, not just editor saves.** Previously only files you saved *in the editor* were recorded, so work done by AI coding agents (Claude Code, CLI tools), scripts, or another editor was invisible to your session. A new filesystem-watcher capture now sees those changes too.
   - **Metadata only** (file name, never content), **active-session-gated**, deduped per session, and dependency/build/cache folders (`node_modules`, `dist`, `.git`, `coverage`, `__pycache__`, …) plus generated/lock files are ignored.

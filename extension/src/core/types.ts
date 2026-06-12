@@ -54,6 +54,7 @@ export type AgentKarmaEventType =
   | "dharma.generated"
   | "file.saved"
   | "validation.command" // observed OR logged — data.source distinguishes
+  | "git.commit" // a commit landed (CLI/agent/editor); metadata only (short sha)
   | "git.diff.summary"
   | "karma.score.generated"
   | "phal.generated"
