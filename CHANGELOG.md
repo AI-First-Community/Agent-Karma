@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.31.0]
+- **Reset Karma History** — a new command (**Agent Karma: Reset Karma History**) that clears all sessions and your Karma trend for a fresh start, while **keeping your settings**. Lighter than "Delete All Local Data" and ideal for testing or starting over without re-configuring.
+
 ## [0.30.0]
 - **One-click toggle for local AI usage.** New command **Agent Karma: Toggle AI Usage Reading (Claude Code, local)** flips the opt-in on/off from the command palette — no more hunting in Settings — and refreshes the dashboard immediately.
 

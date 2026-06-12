@@ -307,6 +307,22 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     void vscode.window.showInformationMessage(`Agent Karma: exported to ${uri.fsPath}`);
   };
 
+  const resetHistoryFlow = async (): Promise<void> => {
+    const confirm = await vscode.window.showWarningMessage(
+      "Reset Karma history? This clears all sessions and your Karma trend (a fresh start) but keeps your settings. It cannot be undone.",
+      { modal: true },
+      "Reset History"
+    );
+    if (confirm !== "Reset History") {
+      return;
+    }
+    manager.discardActiveSession();
+    store.resetHistory();
+    syncStatusBar();
+    dashboard.refresh();
+    void vscode.window.showInformationMessage("Agent Karma history reset — sessions and Karma trend cleared. Your settings are kept.");
+  };
+
   const deleteFlow = async (): Promise<void> => {
     const confirm = await vscode.window.showWarningMessage(
       "Delete ALL Agent Karma data? This permanently removes every session, event, and setting stored on this machine. It cannot be undone.",
@@ -499,6 +515,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
+    vscode.commands.registerCommand("agentKarma.resetHistory", resetHistoryFlow),
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
     vscode.commands.registerCommand("agentKarma.checkValidationReadiness", checkReadinessFlow),
     vscode.commands.registerCommand("agentKarma.findValidationGaps", findValidationGapsFlow),

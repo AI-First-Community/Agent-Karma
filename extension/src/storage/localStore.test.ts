@@ -103,4 +103,19 @@ describe("LocalStore", () => {
     expect(store.deleteAll()).toBe(true);
     expect(fs.existsSync(store.dir)).toBe(false);
   });
+
+  it("resetHistory clears sessions and events but keeps settings", () => {
+    store.saveSessions({ schemaVersion: SCHEMA_VERSION, karmaEma: 72, sessions: [{ id: "s1" } as never] });
+    store.saveEvents({ schemaVersion: SCHEMA_VERSION, events: [{ id: "e1" } as never] });
+    store.saveSettings({ ...DEFAULT_SETTINGS, idleEndMinutes: 99 });
+
+    expect(store.resetHistory()).toBe(true);
+
+    const sessions = store.loadSessions();
+    expect(sessions.sessions).toEqual([]);
+    expect(sessions.karmaEma).toBeUndefined();
+    expect(store.loadEvents().events).toEqual([]);
+    // settings preserved
+    expect(store.loadSettings().idleEndMinutes).toBe(99);
+  });
 });

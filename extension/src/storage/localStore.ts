@@ -79,6 +79,19 @@ export class LocalStore {
     });
   }
 
+  // --- Reset history (clear sessions + events, keep settings) ---
+
+  /**
+   * Clear all sessions, the Karma trend (EMA), and all events — a fresh start — while
+   * preserving settings.json (your preferences). Lighter than deleteAll(); ideal for
+   * starting over without re-configuring.
+   */
+  resetHistory(): boolean {
+    const ok1 = this.saveSessions({ schemaVersion: SCHEMA_VERSION, sessions: [] });
+    const ok2 = this.saveEvents({ schemaVersion: SCHEMA_VERSION, events: [] });
+    return ok1 && ok2;
+  }
+
   // --- Delete everything (the privacy promise made tangible) ---
 
   /** Wipes the entire data directory. Returns true on success. */
