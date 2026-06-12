@@ -40,8 +40,8 @@ describe("generatePhalCard", () => {
     });
     expect(p.outcome).toBe("High Risk");
     expect(p.validationDetected).toBe(false);
-    expect(p.recommendations).toContain("Run tests or a build to validate these changes.");
-    expect(p.recommendations).toContain("Consider adding or updating a regression test.");
+    expect(p.recommendations.some((r) => /No validation ran/.test(r))).toBe(true);
+    expect(p.recommendations.some((r) => /regression test/.test(r))).toBe(true);
   });
 
   it("counts files and validation, and never includes raw command strings", () => {

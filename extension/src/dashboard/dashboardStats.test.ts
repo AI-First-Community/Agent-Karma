@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStats, computeBreakdown } from "./dashboardStats";
+import { computeStats, computeBreakdown, computeValidationHabits } from "./dashboardStats";
 import { AgentKarmaSession } from "../core/types";
 
 function session(over: Partial<AgentKarmaSession>): AgentKarmaSession {
@@ -65,5 +65,32 @@ describe("computeBreakdown", () => {
 
   it("returns an empty list with no completed sessions", () => {
     expect(computeBreakdown([], "taskType")).toEqual([]);
+  });
+});
+
+describe("computeValidationHabits", () => {
+  it("computes per-type rates and identifies strongest/weakest", () => {
+    const cmd = (type: string) => ({
+      outcome: "Needs Review" as const, filesChanged: 1, testFilesChanged: 0,
+      validationDetected: true, commandsDetected: [{ type, result: "passed" }] as never, recommendations: [],
+    });
+    const sessions: AgentKarmaSession[] = [
+      session({ phalCard: cmd("Test") }),
+      session({ phalCard: cmd("Test") }),
+      session({ phalCard: cmd("Lint") }),
+      session({ phalCard: cmd("Test") }),
+    ];
+    const h = computeValidationHabits(sessions);
+    const test = h.rates.find((r) => r.type === "Test");
+    const lint = h.rates.find((r) => r.type === "Lint");
+    expect(test?.rate).toBe(75); // 3 of 4
+    expect(lint?.rate).toBe(25); // 1 of 4
+    expect(h.strongest?.type).toBe("Test");
+  });
+
+  it("is empty-safe with no sessions", () => {
+    const h = computeValidationHabits([]);
+    expect(h.recentCount).toBe(0);
+    expect(h.strongest).toBeUndefined();
   });
 });

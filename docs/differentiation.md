@@ -102,13 +102,15 @@ Legend: ✅/✓ yes · ~ partial/indirect · ✗ no.
 | | MS AI-Engineering-Coach (community project) | Agent Karma |
 |---|---|---|
 | **Core question** | "Are your prompts and session hygiene good?" | "Did you **validate** the AI's output?" |
-| **Primary signal** | Parses AI **session logs** | Your validation **actions** (tests/build/lint/git) + a session tag |
-| **Browser AI** | Blind — no log to read | Works (validation is tool-independent) |
-| **Scoring** | 45-rule prompt/anti-pattern engine | Objective validation score |
-| **Gamification** | XP, achievements, quizzes | None — coaching only |
-| **Affiliation** | Microsoft employees' repo | Independent, vendor-neutral |
+| **Mechanism** | **Parses local session logs** (passive, retro-analytics) | **Intentional sessions** + observed/logged validation |
+| **Tool coverage** | Genuinely **multi-tool** — parses Copilot, Claude Code, Codex CLI, OpenCode, Copilot-for-Xcode/CLI logs | Tool-agnostic by the session tag (any tool) |
+| **Log-less / browser AI / copy-paste** | **Blind** — no log exists to parse (structural limit) | **Works** — the session is captured intentionally, not from a log |
+| **Scoring** | 45-rule prompt/anti-pattern engine → "practice scores" | One objective, validation-weighted score |
+| **Gamification** | **Heavy** — XP, Bronze→Diamond tiers, quizzes, achievements, shareable social cards, screenshot "story reels" | **None** — calm, self-comparative coaching |
+| **Privacy** | Local-first, read-only, no telemetry | Local-first, no telemetry (**same — table stakes, not an edge**) |
+| **Affiliation** | Microsoft employees' repo (MIT, ~2k★) | Independent, vendor-neutral (Apache-2.0) |
 
-We do **not** compete on prompt-linting or gamification — those are theirs; duplicating them would dilute our tone. We win on **validation focus + objective scoring + no-gamification + the privacy/identity moat.** Biggest threat: MS Coach (or CodePause) adding a test/build/lint signal — trivial for a log-reader. Our defense is the no-surveillance ethos and brand, not the feature.
+**Honest read (corrected after a 2026 feature scan):** MS Coach is **multi-tool too** (don't claim tool-agnosticism as *our* edge), and its **privacy posture matches ours** (so privacy is *not* a differentiator vs. them — only vs. commercial incumbents). The edges that genuinely survive against MS Coach are: **(1) log-less coverage** — their log-parsing *structurally cannot* see browser/copy-paste AI, ours can; **(2) validation-first** — they score practice-quality; we score whether you verified; **(3) no gamification** — their entire "Level Up" surface (XP/tiers/quizzes/social cards) is the antithesis of our objective, non-competitive coaching; **(4) intentional sessions vs. passive analytics.** We do **not** compete on prompt-linting or gamification — duplicating those would dilute our tone. The one craft idea worth borrowing (not their content): make every recommendation *actionable* (finding + concrete "do this instead").
 
 ---
 

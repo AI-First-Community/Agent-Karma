@@ -50,19 +50,25 @@ export function generatePhalCard(input: PhalInput): PhalCard {
     input.karmaScore
   );
 
+  // Actionable recommendations: each pairs the gap with a concrete next step.
   const recommendations: string[] = [];
   if (!validationDetected && !lowRiskInformational) {
-    recommendations.push("Run tests or a build to validate these changes.");
+    const what = dc?.riskLevel === "High" ? "this high-risk change" : "these changes";
+    recommendations.push(
+      `No validation ran — run your test or build command (e.g. \`npm test\` / \`pytest\`) before trusting ${what}.`
+    );
   }
   if (dc?.intentType === "Bug Fix" && testFilesChanged === 0) {
-    recommendations.push("Consider adding or updating a regression test.");
+    recommendations.push(
+      "This bug fix changed code but added no test — a regression test would catch it next time (and raise your Karma)."
+    );
   }
   if (!commandsDetected.some((c) => c.type === "Lint")) {
-    recommendations.push("Run lint before committing.");
+    recommendations.push("No lint ran — run your linter (e.g. `npm run lint`) before committing.");
   }
   const gitEvent = input.events.find((e) => e.type === "git.diff.summary");
   if (!gitEvent || gitEvent.data.captured !== true) {
-    recommendations.push("Review the git diff manually before committing.");
+    recommendations.push("The git diff wasn't captured — review your changes manually before committing.");
   }
 
   return {

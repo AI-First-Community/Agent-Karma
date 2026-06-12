@@ -1,6 +1,6 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
-import { DashboardStats, BreakdownRow } from "./dashboardStats";
+import { DashboardStats, BreakdownRow, ValidationHabits } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
@@ -10,6 +10,7 @@ export interface DashboardData {
   cspSource: string;
   stats?: DashboardStats;
   reflection?: WeeklyReflection;
+  validationHabits?: ValidationHabits;
   byTool?: BreakdownRow[];
   byTask?: BreakdownRow[];
   active: AgentKarmaSession | undefined;
@@ -31,6 +32,32 @@ const EMPTY_STATS: DashboardStats = {
 
 function trendArrow(t: "up" | "down" | "flat" | undefined): string {
   return t === "up" ? "↑" : t === "down" ? "↓" : "→";
+}
+
+/** Validation Habits — where you're strong and where you have gaps. */
+function habitsSection(h: ValidationHabits | undefined): string {
+  if (!h || h.recentCount === 0) {
+    return "";
+  }
+  const rows = h.rates
+    .map(
+      (r) => `
+      <div class="habit">
+        <span class="habit-label">${esc(r.type)}</span>
+        ${percentBar(r.rate)}
+        <span class="habit-pct">${r.rate}%</span>
+      </div>`
+    )
+    .join("");
+  const insight =
+    h.strongest && h.weakest && h.strongest.type !== h.weakest.type
+      ? `<div class="habit-insight">Strongest: <b>${esc(h.strongest.type)}</b> ${h.strongest.rate}% · biggest gap: <b>${esc(h.weakest.type)}</b> ${h.weakest.rate}%</div>`
+      : "";
+  return `
+    <h2>Validation habits</h2>
+    <p class="muted">How often you run each check (last ${h.recentCount} sessions).</p>
+    <div class="habits">${rows}</div>
+    ${insight}`;
 }
 
 /** The "This week" coaching card — one plain-language nudge from your own history. */
@@ -360,6 +387,12 @@ export function renderDashboardHtml(data: DashboardData): string {
     .refl-summary { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin: 0.15rem 0; }
     .refl-nudge { font-size: 0.95rem; }
     .bd-title { font-size: 0.9rem; margin: 0.9rem 0 0.3rem; }
+    .habits { display: flex; flex-direction: column; gap: 0.45rem; }
+    .habit { display: flex; align-items: center; gap: 0.7rem; }
+    .habit-label { flex: 0 0 5.5rem; font-size: 0.88rem; }
+    .habit .bar { flex: 1; width: auto; }
+    .habit-pct { flex: 0 0 2.6rem; text-align: right; font-size: 0.85rem; font-weight: 600; }
+    .habit-insight { margin-top: 0.5rem; font-size: 0.88rem; color: var(--vscode-descriptionForeground); }
     .risk-flag { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; margin: 0.1rem 0 0.5rem; }
     .risk-warn { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
     .risk-ok { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 14%, transparent); }
@@ -374,6 +407,8 @@ export function renderDashboardHtml(data: DashboardData): string {
   ${glanceSection(data.stats ?? EMPTY_STATS)}
 
   ${reflectionCard(data.reflection)}
+
+  ${habitsSection(data.validationHabits)}
 
   <h2>Active session</h2>
   ${activeSection(data.active, data.activeEvents ?? [])}

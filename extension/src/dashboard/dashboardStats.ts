@@ -1,4 +1,4 @@
-import { AgentKarmaSession } from "../core/types";
+import { AgentKarmaSession, ValidationCommandType } from "../core/types";
 
 // Pure aggregation of session history into the dashboard's "at a glance" stats.
 // These are OUR signals — validation discipline, score trend, outcome mix — never
@@ -19,6 +19,35 @@ export interface DashboardStats {
   /** Karma scores of recent sessions, chronological (for the sparkline). */
   scoreSeries: number[];
   outcomes: { ready: number; needs: number; highRisk: number; informational: number };
+}
+
+/** How consistently you run each kind of validation — your strengths and gaps. */
+export interface ValidationHabits {
+  recentCount: number;
+  rates: { type: ValidationCommandType; rate: number }[]; // % of recent sessions running this type
+  strongest?: { type: ValidationCommandType; rate: number };
+  weakest?: { type: ValidationCommandType; rate: number };
+}
+
+const HABIT_TYPES: ValidationCommandType[] = ["Test", "Build", "Lint", "Type Check"];
+
+export function computeValidationHabits(
+  sessions: AgentKarmaSession[],
+  lastN = 15
+): ValidationHabits {
+  const recent = sessions.filter((s) => s.status === "completed").slice(-lastN);
+  const n = recent.length;
+  const rates = HABIT_TYPES.map((type) => {
+    const count = recent.filter((s) =>
+      s.phalCard?.commandsDetected?.some((c) => c.type === type)
+    ).length;
+    return { type, rate: n > 0 ? Math.round((count / n) * 100) : 0 };
+  });
+  if (n === 0) {
+    return { recentCount: 0, rates };
+  }
+  const sorted = [...rates].sort((a, b) => b.rate - a.rate);
+  return { recentCount: n, rates, strongest: sorted[0], weakest: sorted[sorted.length - 1] };
 }
 
 /** One row of a per-dimension breakdown (validation discipline, not usage volume). */

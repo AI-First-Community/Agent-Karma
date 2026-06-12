@@ -49,13 +49,16 @@ Legend: ✅ **Adopt** · 🟦 **Adapt** (privacy-safe / validation-focused varia
 
 | Competitor feature | Verdict | Rationale |
 |---|:--:|---|
-| Local-first, read-only, no-telemetry | ✅ | Shared core value — we match and arguably exceed (no session-log reading needed). |
-| Reads AI **session logs** to analyze | 🟦 | We **don't** depend on logs — we observe validation *actions*, so we also cover browser/log-less AI. Different, on purpose. |
-| "Context health" / did-you-give-enough-context | 🟦 | We have a **light** version: the Dharma Card's `contextProvided`. We do **not** build a full context-health engine. |
-| 45-rule prompt-quality / anti-pattern engine | ❌ | Microsoft owns this; duplicating it is a losing me-too. We keep only a ≤10% "prompt hygiene hint," clearly soft. |
-| XP, achievements, tiers, streaks | ❌ | Gamification is off-tone for a calm reflection tool and duplicates them. Hard non-goal. |
-| Quizzes / Learning Center / skill catalog | ❌ | Out of scope; not our wedge; theirs already. |
-| Code-review-practices scoring | 🟦 | We reframe "code review" specifically as **validation** (tests/build/lint/coverage) — narrower, objective, measurable. |
+| Local-first, read-only, no-telemetry | ✅ | Shared core value — but they make the **same** promise, so this is **table stakes, not an edge** vs. them (only vs. commercial incumbents). |
+| **Multi-tool** (Copilot, Claude Code, Codex, OpenCode…) | ✅ (fact) | They're genuinely multi-harness too — so "we support many tools" is **not** our differentiator vs. MS Coach. |
+| Reads AI **session logs** to analyze | 🟦 | We **don't** depend on logs — we capture intentional sessions + observe validation *actions*, so we **also cover browser / copy-paste / log-less AI**, which their log-parsing **structurally cannot**. This is our real edge vs. them. |
+| "Context health" / did-you-give-enough-context | 🟦 | We have a **light** version (Dharma `contextProvided`). They have a mature one (treemap + checklist). We don't build a full engine. |
+| 45-rule prompt-quality / anti-pattern engine | ❌ | Theirs to own; duplicating it is a losing me-too. We keep only a ≤10% "prompt hygiene hint." |
+| **Actionable recommendations** (finding + concrete "do this instead") | ✅ **Adopt** | The one craft idea worth borrowing — make every signal actionable, not just a number. On-wedge, no gamification. (Adopted in v0.15.) |
+| XP / tiers / achievements / quizzes / Learning Center | ❌ | Their whole "Level Up" surface. Gamification is the antithesis of our calm, objective coaching. Hard non-goal. |
+| Shareable social stat cards / "Coding Moments" screenshot reels | ❌ | Social/novelty surface; surveillance-adjacent and off-ethos. Reject. |
+| Activity heatmap / "work-life-balance signals" | ❌ | Time-of-day tracking drifts into surveillance/usage-policing. Reject. |
+| Code-review-practices scoring | 🟦 | We reframe "code review" as **validation** (tests/build/lint/coverage) — narrower, objective, measurable. |
 
 ## 6. From CodePause (closest local competitor)
 
