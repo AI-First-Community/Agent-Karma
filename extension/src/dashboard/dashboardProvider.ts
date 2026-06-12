@@ -4,6 +4,7 @@ import { LocalStore } from "../storage/localStore";
 import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
 import { computeStats } from "./dashboardStats";
+import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -45,6 +46,7 @@ export class DashboardPanel {
     }
     const store = this.store.loadSessions();
     const stats = computeStats(store.sessions, store.karmaEma);
+    const reflection = generateWeeklyReflection(store.sessions, new Date().toISOString());
     const recent = store.sessions
       .filter((s) => s.status === "completed")
       .slice(-10)
@@ -62,6 +64,7 @@ export class DashboardPanel {
       nonce: randomUUID().replace(/-/g, ""),
       cspSource: this.panel.webview.cspSource,
       stats,
+      reflection,
       active,
       activeEvents,
       lastCompleted,

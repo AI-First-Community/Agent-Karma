@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -48,6 +48,10 @@
       {
         "command": "agentKarma.showDashboard",
         "title": "Agent Karma: Show Dashboard"
+      },
+      {
+        "command": "agentKarma.weeklyReflection",
+        "title": "Agent Karma: Weekly Reflection"
       },
       {
         "command": "agentKarma.addValidationCommand",

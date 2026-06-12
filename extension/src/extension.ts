@@ -11,6 +11,7 @@ import { toJson } from "./export/jsonExporter";
 import { toMarkdown } from "./export/markdownExporter";
 import { installHook, removeHook } from "./hooks/preCommitNudge";
 import { StartSessionPanel } from "./panels/startSessionPanel";
+import { generateWeeklyReflection } from "./reflection/weeklyReflection";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
 
@@ -224,6 +225,15 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const weeklyReflectionFlow = (): void => {
+    const reflection = generateWeeklyReflection(
+      store.loadSessions().sessions,
+      new Date().toISOString()
+    );
+    void vscode.window.showInformationMessage(`Agent Karma — this week: ${reflection.nudge}`);
+    dashboard.show();
+  };
+
   const removeNudgeFlow = (): void => {
     const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!folder) {
@@ -240,6 +250,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.endSession", endFlow),
     vscode.commands.registerCommand(TOGGLE_COMMAND, toggleFlow),
     vscode.commands.registerCommand("agentKarma.showDashboard", () => dashboard.show()),
+    vscode.commands.registerCommand("agentKarma.weeklyReflection", weeklyReflectionFlow),
     vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),

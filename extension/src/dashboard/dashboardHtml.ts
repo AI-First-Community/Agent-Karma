@@ -2,11 +2,13 @@ import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
 import { DashboardStats } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar } from "./charts";
+import { WeeklyReflection } from "../reflection/weeklyReflection";
 
 export interface DashboardData {
   nonce: string;
   cspSource: string;
   stats?: DashboardStats;
+  reflection?: WeeklyReflection;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -26,6 +28,21 @@ const EMPTY_STATS: DashboardStats = {
 
 function trendArrow(t: "up" | "down" | "flat" | undefined): string {
   return t === "up" ? "↑" : t === "down" ? "↓" : "→";
+}
+
+/** The "This week" coaching card — one plain-language nudge from your own history. */
+function reflectionCard(r: WeeklyReflection | undefined): string {
+  if (!r) {
+    return "";
+  }
+  const tone =
+    r.tone === "encourage" ? "refl-good" : r.tone === "suggest" ? "refl-suggest" : "refl-neutral";
+  return `
+    <div class="reflection ${tone}">
+      <div class="refl-head">🌱 This week</div>
+      <div class="refl-summary">${esc(r.summary)}</div>
+      <div class="refl-nudge">${esc(r.nudge)}</div>
+    </div>`;
 }
 
 /** Hero header + "at a glance" panel — our unique signals, visualized. */
@@ -278,6 +295,14 @@ export function renderDashboardHtml(data: DashboardData): string {
     .seg-needs { background: var(--vscode-charts-yellow, #b89500); }
     .seg-high { background: var(--vscode-charts-red, #e51400); }
     .seg-info { background: var(--vscode-descriptionForeground); }
+    /* weekly reflection */
+    .reflection { border-left: 3px solid var(--vscode-panel-border); padding: 0.6rem 0.9rem; margin: 0.75rem 0; border-radius: 0 6px 6px 0; background: var(--vscode-textBlockQuote-background, transparent); }
+    .refl-good { border-left-color: var(--vscode-charts-green, #388a34); }
+    .refl-suggest { border-left-color: var(--vscode-charts-yellow, #b89500); }
+    .refl-neutral { border-left-color: var(--vscode-descriptionForeground); }
+    .refl-head { font-weight: 600; font-size: 0.85rem; }
+    .refl-summary { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin: 0.15rem 0; }
+    .refl-nudge { font-size: 0.95rem; }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>
@@ -287,6 +312,8 @@ export function renderDashboardHtml(data: DashboardData): string {
   <p class="tagline">Make every agent action count.</p>
 
   ${glanceSection(data.stats ?? EMPTY_STATS)}
+
+  ${reflectionCard(data.reflection)}
 
   <h2>Active session</h2>
   ${activeSection(data.active, data.activeEvents ?? [])}
