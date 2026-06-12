@@ -88,6 +88,8 @@ Local-first. No source code captured. No terminal output captured.
 No cloud upload. No telemetry. No login. No surveillance.
 ```
 
+What it *does* record is **metadata only**: file **names** (including edits made by AI agents or the CLI, gated by a setting), the validation command **types** you ran, git diff **counts**, and short commit **SHAs** — never file contents, terminal output, or (unless you opt in) prompt text.
+
 Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 
 ---

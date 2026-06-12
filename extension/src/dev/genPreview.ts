@@ -8,7 +8,8 @@ import { assessReadiness } from "../collectors/validationReadiness";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
-import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard } from "../core/types";
+import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard, AI_TOOLS, TASK_TYPES } from "../core/types";
+import { renderStartForm } from "../panels/startSessionHtml";
 
 // Dev-only: render the dashboard with sample data to a standalone HTML file you can
 // open in a browser (no extension install needed) to iterate on the visual design.
@@ -186,3 +187,29 @@ fs.writeFileSync(
   "utf8"
 );
 console.log("Karma Card print preview written to", printFile);
+
+// Start Session form preview — strip the webview CSP and inline the font (same as
+// the dashboard) so it renders standalone in a browser / headless screenshot.
+// VS Code's default dark theme tokens, so the form renders authentically outside a webview.
+const VSCODE_DARK = `<style>:root{
+  --vscode-font-family:'Manrope',-apple-system,'Segoe UI',sans-serif;
+  --vscode-foreground:#cccccc; --vscode-descriptionForeground:#9d9d9d;
+  --vscode-input-background:#3c3c3c; --vscode-input-foreground:#e7e7e7;
+  --vscode-panel-border:#454545;
+  --vscode-button-background:#0e639c; --vscode-button-foreground:#ffffff; --vscode-button-hoverBackground:#1177bb;
+  --vscode-button-secondaryBackground:#3a3d41; --vscode-button-secondaryForeground:#ffffff;
+}
+body{background:#1e1e1e;padding:28px 32px}</style>`;
+const startHtml = renderStartForm({
+  nonce: "preview",
+  cspSource: "",
+  aiTools: AI_TOOLS,
+  taskTypes: TASK_TYPES,
+  lastTool: "Claude Code",
+  lastTask: "Bug Fix",
+})
+  .replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/, "")
+  .replace("</head>", `${FONT_LINKS}${VSCODE_DARK}</head>`);
+const startFile = path.join(outDir, "start-session-preview.html");
+fs.writeFileSync(startFile, startHtml, "utf8");
+console.log("Start Session preview written to", startFile);

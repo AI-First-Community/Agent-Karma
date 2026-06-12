@@ -15,8 +15,7 @@ A **local-first**, privacy-safe VS Code companion that turns *"did I actually ch
 
 </div>
 
-<!-- SHOT: hero.gif — a 10–15s loop: Start session → edit a file → run tests → End → dashboard opens. ~1000px wide. -->
-![Agent Karma in action](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/hero.gif)
+![Agent Karma — make every agent action count](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/hero.png)
 
 > ## Mind the verification gap: did you validate what the AI produced — before you trusted it?
 
@@ -123,7 +122,7 @@ Local-first. No source code captured. No terminal output captured.
 No cloud upload. No telemetry. No login. No surveillance.
 ```
 
-Agent Karma records *that* you validated — file-save events, the validation commands you ran, and a git **diff summary** (counts, not content). It does **not** capture your source code, your terminal output, or your keystrokes. Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md).
+Agent Karma records *that* you validated — file-change events (file **names** only, including edits made by AI agents, the CLI, or other tools, gated by `agentKarma.captureExternalFileChanges`), the validation command **types** you ran, a git **diff summary** (counts, not content), and the short **SHA** of commits. It does **not** capture your source code, your terminal output, your keystrokes, or your prompt text (unless you opt in). Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md).
 
 <!-- SHOT: karma-card.png — a generated Karma Card certificate (the personalised SVG/PDF). Looks great as the closing visual. -->
 ![Shareable Karma Card](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/karma-card.png)
