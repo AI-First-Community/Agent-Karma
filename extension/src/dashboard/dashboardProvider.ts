@@ -10,6 +10,7 @@ import { scanReadinessSignals } from "../collectors/validationReadinessScan";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
 import { nudgeInstallState } from "../hooks/preCommitNudge";
+import { highRiskWatchlist, scoreComposition } from "./insights";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -101,6 +102,8 @@ export class DashboardPanel {
       readiness,
       suggestions,
       heatmap: computeValidationHeatmap(store.sessions),
+      watchlist: highRiskWatchlist(store.sessions),
+      scoreComposition: scoreComposition(store.sessions),
       active,
       activeEvents,
       lastCompleted,

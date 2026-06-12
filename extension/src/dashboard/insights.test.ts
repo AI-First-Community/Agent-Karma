@@ -1,0 +1,67 @@
+import { describe, it, expect } from "vitest";
+import { highRiskWatchlist, worstTaskCheck, scoreComposition } from "./insights";
+import { AgentKarmaSession } from "../core/types";
+
+const sess = (over: Partial<AgentKarmaSession>): AgentKarmaSession =>
+  ({
+    id: "x",
+    title: "S",
+    aiTool: "Claude Code",
+    taskType: "Bug Fix",
+    intent: "",
+    startedAt: "t",
+    status: "completed",
+    ...over,
+  }) as AgentKarmaSession;
+
+describe("highRiskWatchlist", () => {
+  it("lists high-risk sessions that were not validated, newest first", () => {
+    const sessions = [
+      sess({ title: "A", dharmaCard: { riskLevel: "High" } as never, phalCard: { validationDetected: false } as never }),
+      sess({ title: "B", dharmaCard: { riskLevel: "High" } as never, phalCard: { validationDetected: true } as never }),
+      sess({ title: "C", dharmaCard: { riskLevel: "Low" } as never, phalCard: { validationDetected: false } as never }),
+      sess({ title: "D", dharmaCard: { riskLevel: "High" } as never, phalCard: { validationDetected: false } as never }),
+    ];
+    const w = highRiskWatchlist(sessions);
+    expect(w.map((x) => x.title)).toEqual(["D", "A"]);
+  });
+
+  it("is empty when nothing risky was left unvalidated", () => {
+    expect(highRiskWatchlist([sess({ dharmaCard: { riskLevel: "Low" } as never })])).toEqual([]);
+  });
+});
+
+describe("worstTaskCheck", () => {
+  it("finds the lowest task×check rate with enough sessions, below the threshold", () => {
+    const rows = [
+      { label: "Refactoring", cells: [{ label: "Test", value: 25, n: 4 }, { label: "Lint", value: 80, n: 4 }] },
+      { label: "Bug Fix", cells: [{ label: "Test", value: 90, n: 3 }, { label: "Lint", value: 70, n: 3 }] },
+    ];
+    expect(worstTaskCheck(rows)).toEqual({ task: "Refactoring", check: "Test", rate: 25, n: 4 });
+  });
+
+  it("ignores cells with too little data and returns null when nothing is a real gap", () => {
+    const rows = [
+      { label: "Bug Fix", cells: [{ label: "Test", value: 20, n: 1 }, { label: "Lint", value: 90, n: 5 }] },
+    ];
+    expect(worstTaskCheck(rows)).toBeNull();
+  });
+});
+
+describe("scoreComposition", () => {
+  it("splits earned Karma into real verification vs near-free points", () => {
+    const sessions = [
+      sess({ karmaReasons: ["Tests run (+25)", "Build / type-check ran clean (+20)", "Change measured (+5)"] }),
+      sess({ karmaReasons: ["Change measured (+5)", "Prompt hygiene hint (+8)"] }),
+    ];
+    const c = scoreComposition(sessions);
+    // real = 25 + 20 = 45; cheap = 5 + 5 + 8 = 18; total 63 → real ≈ 71%
+    expect(c.total).toBe(63);
+    expect(c.realPct).toBe(71);
+    expect(c.segs.find((s) => s.id === "tests-run")?.points).toBe(25);
+  });
+
+  it("is empty when no Karma was earned", () => {
+    expect(scoreComposition([sess({ karmaReasons: [] })]).total).toBe(0);
+  });
+});

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats, computeValidationHabits, computeValidationHeatmap } from "../dashboard/dashboardStats";
+import { highRiskWatchlist, scoreComposition } from "../dashboard/insights";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
@@ -84,6 +85,8 @@ const html = renderDashboardHtml({
   stats: computeStats(sessions, 64),
   validationHabits: computeValidationHabits(sessions),
   heatmap: computeValidationHeatmap(sessions),
+  watchlist: highRiskWatchlist(sessions),
+  scoreComposition: scoreComposition(sessions),
   reflection: generateWeeklyReflection(sessions, new Date().toISOString()),
   readiness: assessReadiness({
     testScript: true, testDep: true, testConfigFile: true,

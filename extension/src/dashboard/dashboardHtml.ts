@@ -9,6 +9,7 @@ import { KARMA_RULES } from "../scoring/karmaRules";
 import { KarmaMove, earnedRuleIds } from "../scoring/karmaExplain";
 import { SkillSuggestion } from "../skills/skillFinder";
 import { karmicMessage } from "./karmicMessage";
+import { worstTaskCheck, WatchItem, ScoreComposition } from "./insights";
 
 export interface DashboardData {
   nonce: string;
@@ -24,6 +25,10 @@ export interface DashboardData {
   suggestions?: SkillSuggestion[];
   /** Validation heatmap: task type (rows) × check (cols). */
   heatmap?: { rows: HeatRow[]; colLabels: string[] };
+  /** High-risk sessions changed but never validated — a to-do list to revisit. */
+  watchlist?: WatchItem[];
+  /** How earned Karma splits between real verification and near-free points. */
+  scoreComposition?: ScoreComposition;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -190,10 +195,56 @@ function heatmapSection(data: DashboardData): string {
   if (!hm || hm.rows.length === 0) {
     return "";
   }
+  const worst = worstTaskCheck(hm.rows);
+  const callout = worst
+    ? `<p class="heat-callout">⚠ Your biggest gap: <b>${esc(worst.check)}</b> on <b>${esc(worst.task)}</b> tasks — ${worst.rate}% over ${worst.n} sessions.</p>`
+    : "";
   return `
     <h2>Where you validate</h2>
-    <p class="muted">How often each check runs, by task type — your situational blind spots.</p>
-    ${heatmap(hm.rows, hm.colLabels)}`;
+    ${heatmap(hm.rows, hm.colLabels)}
+    ${callout}`;
+}
+
+/** High-risk watchlist — risky work you never validated. A literal to-do list. */
+function watchlistSection(items: WatchItem[] | undefined): string {
+  if (!items || items.length === 0) {
+    return "";
+  }
+  const rows = items
+    .map(
+      (it) =>
+        `<li><span class="wl-title">${esc(it.title)}</span> <span class="muted">${esc(it.taskType)}</span></li>`
+    )
+    .join("");
+  return `
+    <h2>⚠ Worth a second look</h2>
+    <p class="muted">High-risk work you changed but never validated — consider going back.</p>
+    <ul class="watchlist">${rows}</ul>`;
+}
+
+/** Score composition — how much of your Karma is real verification vs. near-free points. */
+function scoreCompositionSection(comp: ScoreComposition | undefined): string {
+  if (!comp || comp.total === 0) {
+    return "";
+  }
+  const segs = comp.segs
+    .map((s) => {
+      const pct = ((s.points / comp.total) * 100).toFixed(1);
+      return `<span class="seg seg-${s.category}" style="width:${pct}%" title="${esc(s.label)}: ${s.points} pts"></span>`;
+    })
+    .join("");
+  const read =
+    comp.realPct >= 60
+      ? `${comp.realPct}% of your Karma comes from real test/build/lint runs — a solid base.`
+      : `Only ${comp.realPct}% of your Karma comes from real verification; the rest is near-free points. Running tests would make it real.`;
+  return `
+    <h2>What your Karma is made of</h2>
+    <div class="stack comp-stack">${segs}</div>
+    <div class="comp-legend">
+      <span><i class="lg seg-real"></i> real verification</span>
+      <span><i class="lg seg-cheap"></i> near-free points</span>
+    </div>
+    <p class="comp-read">${esc(read)}</p>`;
 }
 
 /** Validation Consistency Strip — your validation rhythm across recent sessions. */
@@ -786,6 +837,20 @@ export function renderDashboardHtml(data: DashboardData): string {
     .hm-rowlabel { font-size: var(--fs-body); display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .hm-cell { min-height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: var(--fs-caption); font-variant-numeric: tabular-nums; color: var(--vscode-foreground); background: var(--ak-surface-2); }
     .hm-empty { background: var(--ak-hairline); color: transparent; }
+    .heat-callout { font-size: var(--fs-body); margin-top: var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-sm); background: var(--ak-warn-bg); }
+    /* high-risk watchlist */
+    .watchlist { list-style: none; margin: var(--sp-2) 0 0; padding: 0; }
+    .watchlist li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-2) 0; border-bottom: 1px solid var(--ak-hairline); font-size: var(--fs-body); }
+    .watchlist li:last-child { border-bottom: 0; }
+    .wl-title { font-weight: 600; }
+    /* score composition */
+    .seg-real { background: var(--ak-good); }
+    .seg-cheap { background: var(--vscode-descriptionForeground); }
+    .comp-stack { height: 14px; margin: var(--sp-2) 0; }
+    .comp-legend { display: flex; gap: var(--sp-4); font-size: var(--fs-caption); color: var(--vscode-descriptionForeground); }
+    .comp-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .comp-legend .lg { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .comp-read { font-size: var(--fs-body); margin-top: var(--sp-2); }
     footer { margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px solid var(--ak-hairline); color: var(--vscode-descriptionForeground); font-size: var(--fs-caption); }
   </style>
   <title>Agent Karma</title>
@@ -798,10 +863,12 @@ export function renderDashboardHtml(data: DashboardData): string {
     ${gridItem(karmicBanner(data), { span: true, carded: true })}
     ${gridItem(glanceSection(data.stats ?? EMPTY_STATS), { span: true, carded: true })}
     ${gridItem(sessionTabs(data), { span: true })}
+    ${gridItem(watchlistSection(data.watchlist), { span: true })}
     ${gridItem(consistencySection(data.stats ?? EMPTY_STATS))}
     ${gridItem(riskValidationSection(data.stats ?? EMPTY_STATS))}
     ${gridItem(trendsSection(data.stats ?? EMPTY_STATS), { span: true })}
     ${gridItem(heatmapSection(data), { span: true })}
+    ${gridItem(scoreCompositionSection(data.scoreComposition), { span: true })}
     ${gridItem(habitsSection(data.validationHabits))}
     ${gridItem(readinessSection(data.readiness))}
     ${gridItem(suggestionsSection(data.suggestions), { span: true, carded: true })}

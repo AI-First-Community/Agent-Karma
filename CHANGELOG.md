@@ -2,6 +2,12 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.26.0]
+- **Three deeper insights** (still all from your own sessions — no new capture):
+  - **⚠ Worth a second look** — a literal to-do list of high-risk sessions you changed but never validated, so you can go back and check them.
+  - **Skip-by-task callout** — names your single worst task-type × check gap under the heatmap ("your biggest gap: Test on Refactoring tasks").
+  - **What your Karma is made of** — splits earned Karma into *real verification* (tests/build/lint) vs. *near-free points* (git captured, prompt hygiene), so a high number can't hide weak validation.
+
 ## [0.25.0]
 - **Dashboard redesign.** A calmer, deeper, more insightful view — same privacy ethos, no new tracking.
   - **🪔 Karmic reflection banner** — an inspiring, mood-tinted line that reads your real state through the Dharma → Karma → Phal lens (luminous / steady / forming / dim), with a sub-line tying the intent you set to whether your Phal was validated. Encouraging, never shaming.
