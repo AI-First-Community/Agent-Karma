@@ -1,5 +1,12 @@
 # Agent Karma
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/agent-karma-hero-dark.png">
+    <img src="docs/assets/agent-karma-hero.png" width="900" alt="Agent Karma — make every agent action count. AI writes the code, but you decide what's safe to ship: Agent Karma tracks whether you actually tested and reviewed it before you commit. All on your machine.">
+  </picture>
+</p>
+
 ### You're the last line of trust. Agent Karma proves you're holding it.
 
 **Agent Karma** is an open-source, local-first VS Code extension that helps you close your **verification gap** — turning *"did I actually check what the AI wrote before I trusted it?"* into a visible, objective habit. It works with Claude Code, GitHub Copilot, Cursor, ChatGPT, and others — including browser/copy-paste workflows.
