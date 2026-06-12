@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.37.0]
+- **Brand icon.** Adds the Agent Karma marketplace icon — a 24-spoke dharmachakra in saffron on a dark rounded square (`media/icon.png`, with the source `media/icon.svg`).
+
 ## [0.36.0]
 - **Karma Card now renders in Manrope.** The bundled Manrope font is embedded directly into the card (and printable certificate) as a base64 data URI, so it shows in the real typeface whether viewed, saved as SVG, or printed to PDF — still 100% local, no network.
 
