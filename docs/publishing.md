@@ -4,12 +4,12 @@ A repeatable release checklist. Agent Karma is a single individual/community pro
 
 ## One-time setup
 
-1. **Create a publisher.** Sign in at <https://marketplace.visualstudio.com/manage> with the account that owns publisher id **`passion4architecture`** (must match `package.json` → `publisher`). If it doesn't exist yet, create it there.
+1. **Create a publisher.** Sign in at <https://marketplace.visualstudio.com/manage> with the account that owns publisher id **`innovate-with-sanjeev`** (must match `package.json` → `publisher`). If it doesn't exist yet, create it there.
 2. **Create a Personal Access Token (PAT).** In Azure DevOps (<https://dev.azure.com>), create a token with **Organization: All accessible organizations** and scope **Marketplace → Manage**. Copy it somewhere safe — it's shown once.
 3. **Log in `vsce` locally:**
    ```bash
    cd extension
-   npx vsce login passion4architecture     # paste the PAT when prompted
+   npx vsce login innovate-with-sanjeev     # paste the PAT when prompted
    ```
 
 ## Pre-flight (every release)
@@ -44,7 +44,7 @@ npx vsce publish                 # publishes the current package.json version
 ```
 
 Then verify the live listing at
-<https://marketplace.visualstudio.com/items?itemName=passion4architecture.agent-karma> —
+<https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma> —
 check the hero image, feature screenshots, badges, categories, and that "Free" pricing shows.
 
 ## Post-publish

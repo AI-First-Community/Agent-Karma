@@ -24,7 +24,7 @@ Phase 0  Bootstrap ──► 0.1 Foundation ──► 0.2 Dharma ──► 0.3 F
 Goal: a runnable, empty extension with tooling and guardrails in place, so every later task has a home and the no-network invariant is enforced from day one.
 
 > **Maintainer inputs for Phase 0:**
-> - ✅ **GitHub repo:** `https://github.com/Passion4Architecture/agent-karma` — **private now**, goes **public at v1.0**. Personal account, independent project.
+> - ✅ **GitHub repo:** `https://github.com/AI-First-Community/Agent-Karma-Public` — **private now**, goes **public at v1.0**. Personal account, independent project.
 > - ✅ **Maintainer identity:** Sanjeev Azad · `sanjeev.azad@gmail.com` — used for git author, `package.json` `author`, and `LICENSE` copyright.
 > - ✅ **License:** Apache-2.0.
 > - ⏳ **VS Code Marketplace publisher ID/handle** (personal; created on the Marketplace, separate from GitHub) — needed only at publish time, not for early commits.

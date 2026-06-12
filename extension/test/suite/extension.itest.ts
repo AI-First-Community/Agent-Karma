@@ -4,7 +4,7 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
-const EXTENSION_ID = "passion4architecture.agent-karma";
+const EXTENSION_ID = "innovate-with-sanjeev.agent-karma";
 const COMMANDS = [
   "agentKarma.startSession",
   "agentKarma.endSession",

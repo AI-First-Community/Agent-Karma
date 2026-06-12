@@ -652,7 +652,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),
     vscode.commands.registerCommand("agentKarma.toggleClaudeUsage", toggleClaudeUsageFlow),
     vscode.commands.registerCommand("agentKarma.openSettings", () =>
-      vscode.commands.executeCommand("workbench.action.openSettings", "@ext:passion4architecture.agent-karma")
+      vscode.commands.executeCommand("workbench.action.openSettings", "@ext:innovate-with-sanjeev.agent-karma")
     ),
     // The Activity Bar "home" view is a welcome-only panel (buttons via viewsWelcome);
     // register an empty tree provider so the welcome content renders instead of an error.

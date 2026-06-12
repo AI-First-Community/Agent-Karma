@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.45.0]
+- **Project identity finalized for launch.** Publisher is now **`innovate-with-sanjeev`** and the canonical home is **`AI-First-Community/Agent-Karma-Public`** (open-source, Apache-2.0). Marketplace links, repository/issue URLs, the in-app "Learn more"/settings deep-links, and badges all point there. No behavior change. _(Note: the extension ID changes to `innovate-with-sanjeev.agent-karma`, so local data lives under a new storage path — a clean slate, expected pre-launch.)_
+
 ## [0.44.0]
 - **Validation-readiness is now monorepo / subfolder aware.** "Check Validation Readiness" / "Can you validate?" previously scanned only the workspace **root**, so repos whose package lives in a subfolder (tests under `extension/`, `packages/*`, `apps/*`) were wrongly reported as having no tests/build/lint — even when they were fully set up. The scan now also inspects nested package roots (immediate subfolders + one level under `packages/`/`apps/`) and reports a repo as able to validate if **any** of its packages can. Dependency/build/cache folders are skipped and discovery is depth-bounded. _(Dogfooding catch: Karma had been misjudging its own repo.)_
 

@@ -2,8 +2,8 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.44.0",
-  "publisher": "passion4architecture",
+  "version": "0.45.0",
+  "publisher": "innovate-with-sanjeev",
   "license": "Apache-2.0",
   "author": {
     "name": "Sanjeev Azad",
@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Passion4Architecture/agent-karma.git"
+    "url": "https://github.com/AI-First-Community/Agent-Karma-Public.git"
   },
   "bugs": {
-    "url": "https://github.com/Passion4Architecture/agent-karma/issues"
+    "url": "https://github.com/AI-First-Community/Agent-Karma-Public/issues"
   },
-  "homepage": "https://github.com/Passion4Architecture/agent-karma#readme",
+  "homepage": "https://github.com/AI-First-Community/Agent-Karma-Public#readme",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -149,7 +149,7 @@
     "viewsWelcome": [
       {
         "view": "agentKarma.home",
-        "contents": "Track whether you validated what the AI produced — before you trusted it.\n\n[▶ Start Session](command:agentKarma.startSession)\n[■ End Session](command:agentKarma.endSession)\n[✅ Log a Validation](command:agentKarma.addValidationCommand)\n[📊 Open Dashboard](command:agentKarma.showDashboard)\n[🏅 Generate Karma Card](command:agentKarma.generateKarmaCard)\n[🩺 Check Validation Readiness](command:agentKarma.checkValidationReadiness)\n[📤 Export as JSON](command:agentKarma.exportJson)\n[📤 Export as Markdown](command:agentKarma.exportMarkdown)\n[⚙ Configure Settings](command:agentKarma.openSettings)\n[🗑 Reset Karma History](command:agentKarma.resetHistory)\n\nEverything stays on your machine. [Learn more](https://github.com/Passion4Architecture/agent-karma#readme)"
+        "contents": "Track whether you validated what the AI produced — before you trusted it.\n\n[▶ Start Session](command:agentKarma.startSession)\n[■ End Session](command:agentKarma.endSession)\n[✅ Log a Validation](command:agentKarma.addValidationCommand)\n[📊 Open Dashboard](command:agentKarma.showDashboard)\n[🏅 Generate Karma Card](command:agentKarma.generateKarmaCard)\n[🩺 Check Validation Readiness](command:agentKarma.checkValidationReadiness)\n[📤 Export as JSON](command:agentKarma.exportJson)\n[📤 Export as Markdown](command:agentKarma.exportMarkdown)\n[⚙ Configure Settings](command:agentKarma.openSettings)\n[🗑 Reset Karma History](command:agentKarma.resetHistory)\n\nEverything stays on your machine. [Learn more](https://github.com/AI-First-Community/Agent-Karma-Public#readme)"
       }
     ],
     "menus": {
