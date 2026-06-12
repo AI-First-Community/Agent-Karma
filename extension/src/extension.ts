@@ -18,6 +18,8 @@ import { scanReadinessSignals } from "./collectors/validationReadinessScan";
 import { explainKarmaMove } from "./scoring/karmaExplain";
 import { registerChatParticipant } from "./chat/agentKarmaParticipant";
 import { SummaryData } from "./chat/chatRouter";
+import { findSkills } from "./skills/skillFinder";
+import { computeValidationHabits } from "./dashboard/dashboardStats";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -350,6 +352,42 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const findValidationGapsFlow = async (): Promise<void> => {
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!folder) {
+      void vscode.window.showInformationMessage("Open a workspace folder to find validation gaps.");
+      return;
+    }
+    const habits = computeValidationHabits(store.loadSessions().sessions);
+    const suggestions = findSkills({
+      recentCount: habits.recentCount,
+      skipRates: habits.rates.map((r) => ({ type: r.type, skipRate: 100 - r.rate })),
+      signals: scanReadinessSignals(folder),
+      preCommitInstallable: nudgeInstallState(folder) === "installable",
+    });
+    dashboard.show();
+    if (suggestions.length === 0) {
+      void vscode.window.showInformationMessage(
+        "Agent Karma — your validation setup looks solid. Nothing to suggest right now."
+      );
+      return;
+    }
+    const top = suggestions[0];
+    if (top.action.kind === "install-precommit") {
+      const choice = await vscode.window.showInformationMessage(
+        `Agent Karma — ${top.title}. ${top.rationale}`,
+        "Install nudge"
+      );
+      if (choice === "Install nudge") {
+        installNudgeFlow();
+      }
+    } else {
+      void vscode.window.showInformationMessage(
+        `Agent Karma — ${top.title}. ${top.rationale}  Steps: ${top.action.steps.join(" → ")}`
+      );
+    }
+  };
+
   const whyKarmaMovedFlow = (): void => {
     const completed = store
       .loadSessions()
@@ -451,6 +489,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
     vscode.commands.registerCommand("agentKarma.checkValidationReadiness", checkReadinessFlow),
+    vscode.commands.registerCommand("agentKarma.findValidationGaps", findValidationGapsFlow),
     vscode.commands.registerCommand("agentKarma.installPreCommitNudge", installNudgeFlow),
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),

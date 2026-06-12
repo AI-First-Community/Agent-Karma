@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -80,6 +80,10 @@
       {
         "command": "agentKarma.checkValidationReadiness",
         "title": "Agent Karma: Check Validation Readiness (can you validate?)"
+      },
+      {
+        "command": "agentKarma.findValidationGaps",
+        "title": "Agent Karma: Find Validation Gaps (suggest next step)"
       },
       {
         "command": "agentKarma.installPreCommitNudge",

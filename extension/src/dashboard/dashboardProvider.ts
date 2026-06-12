@@ -8,6 +8,8 @@ import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { scanReadinessSignals } from "../collectors/validationReadinessScan";
 import { explainKarmaMove } from "../scoring/karmaExplain";
+import { findSkills } from "../skills/skillFinder";
+import { nudgeInstallState } from "../hooks/preCommitNudge";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -74,7 +76,18 @@ export class DashboardPanel {
         ? explainKarmaMove(prevCompleted, lastCompleted)
         : undefined;
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    const readiness = root ? assessReadiness(scanReadinessSignals(root)) : undefined;
+    const signals = root ? scanReadinessSignals(root) : undefined;
+    const readiness = signals ? assessReadiness(signals) : undefined;
+    const habits = computeValidationHabits(store.sessions);
+    const suggestions =
+      root && signals
+        ? findSkills({
+            recentCount: habits.recentCount,
+            skipRates: habits.rates.map((r) => ({ type: r.type, skipRate: 100 - r.rate })),
+            signals,
+            preCommitInstallable: nudgeInstallState(root) === "installable",
+          })
+        : [];
     const fontUri = this.panel.webview
       .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "media", "fonts", "manrope.woff2"))
       .toString();
@@ -84,8 +97,9 @@ export class DashboardPanel {
       fontUri,
       stats,
       reflection,
-      validationHabits: computeValidationHabits(store.sessions),
+      validationHabits: habits,
       readiness,
+      suggestions,
       active,
       activeEvents,
       lastCompleted,

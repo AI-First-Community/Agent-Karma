@@ -4,6 +4,7 @@ import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats } from "../dashboard/dashboardStats";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { explainKarmaMove } from "../scoring/karmaExplain";
+import { findSkills } from "../skills/skillFinder";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard } from "../core/types";
 
@@ -69,6 +70,23 @@ const html = renderDashboardHtml({
   lastCompleted: last,
   lastCompletedEvents: events.filter((e) => e.sessionId === last.id),
   karmaMove: explainKarmaMove(sessions[0], last),
+  suggestions: findSkills({
+    recentCount: 5,
+    skipRates: [
+      { type: "Lint", skipRate: 60 },
+      { type: "Test", skipRate: 20 },
+      { type: "Build", skipRate: 40 },
+      { type: "Type Check", skipRate: 40 },
+    ],
+    signals: {
+      testScript: true, testDep: true, testConfigFile: true,
+      buildScript: true, tsconfig: true,
+      lintScript: true, lintConfig: true, lintDep: true,
+      typecheckScript: true,
+      ci: true, preCommit: false, agentMentionsValidation: false,
+    },
+    preCommitInstallable: true,
+  }),
   recent: sessions.slice().reverse(),
 });
 

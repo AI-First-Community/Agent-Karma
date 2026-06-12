@@ -7,6 +7,7 @@ import { riskAlignment } from "../cards/riskAlignment";
 import { ValidationReadiness } from "../collectors/validationReadiness";
 import { KARMA_RULES } from "../scoring/karmaRules";
 import { KarmaMove, earnedRuleIds } from "../scoring/karmaExplain";
+import { SkillSuggestion } from "../skills/skillFinder";
 
 export interface DashboardData {
   nonce: string;
@@ -18,6 +19,8 @@ export interface DashboardData {
   validationHabits?: ValidationHabits;
   /** Workspace "can you even validate?" scan (config-only). Omitted with no folder open. */
   readiness?: ValidationReadiness;
+  /** Ranked, actionable next steps (habit gaps × missing infra). */
+  suggestions?: SkillSuggestion[];
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -86,6 +89,31 @@ function readinessSection(r: ValidationReadiness | undefined): string {
     <p class="muted">${esc(r.summary)} <span class="ready-score">${r.presentCount}/${r.total}</span></p>
     <div class="ready">${rows}</div>
     ${gap}`;
+}
+
+/** Suggested next step — the highest-leverage fix(es) from the Skill Finder. */
+function suggestionsSection(list: SkillSuggestion[] | undefined): string {
+  if (!list || list.length === 0) {
+    return "";
+  }
+  const rows = list
+    .slice(0, 2)
+    .map((s) => {
+      const body =
+        s.action.kind === "guidance"
+          ? `<ul class="sg-steps">${s.action.steps.map((st) => `<li>${esc(st)}</li>`).join("")}</ul>`
+          : `<div class="sg-oneclick">One-click: run <b>Agent Karma: Find Validation Gaps</b> and choose <b>Install nudge</b>.</div>`;
+      return `
+        <div class="suggestion sg-${esc(s.severity)}">
+          <div class="sg-title">${esc(s.title)}</div>
+          <div class="sg-why muted">${esc(s.rationale)}</div>
+          ${body}
+        </div>`;
+    })
+    .join("");
+  return `
+    <h2>Suggested next step</h2>
+    ${rows}`;
 }
 
 /** The "This week" coaching card — one plain-language nudge from your own history. */
@@ -470,6 +498,16 @@ export function renderDashboardHtml(data: DashboardData): string {
     .rule-label { font-weight: 600; }
     .rule-weight { text-align: right; font-variant-numeric: tabular-nums; color: var(--vscode-descriptionForeground); }
     .rule-desc { font-size: 0.82rem; }
+    /* suggested next step (skill finder) */
+    .suggestion { margin: 0.5rem 0; padding: 0.7rem 0.9rem; border-radius: 10px; border-left: 4px solid var(--vscode-descriptionForeground); background: var(--vscode-textBlockQuote-background, transparent); }
+    .suggestion.sg-high { border-left-color: var(--vscode-charts-red, #e51400); }
+    .suggestion.sg-medium { border-left-color: var(--vscode-charts-yellow, #b89500); }
+    .suggestion.sg-low { border-left-color: var(--vscode-charts-blue, #3794ff); }
+    .sg-title { font-weight: 700; font-size: 0.98rem; }
+    .sg-why { font-size: 0.85rem; margin: 0.15rem 0 0.35rem; }
+    .sg-steps { margin: 0.2rem 0 0; padding-left: 1.1rem; font-size: 0.86rem; }
+    .sg-steps li { padding: 0.05rem 0; }
+    .sg-oneclick { font-size: 0.86rem; padding: 0.3rem 0.5rem; border-radius: 6px; background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 12%, transparent); }
     .risk-flag { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; margin: 0.1rem 0 0.5rem; }
     .risk-warn { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
     .risk-ok { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 14%, transparent); }
@@ -491,6 +529,8 @@ export function renderDashboardHtml(data: DashboardData): string {
   ${reflectionCard(data.reflection)}
 
   ${readinessSection(data.readiness)}
+
+  ${suggestionsSection(data.suggestions)}
 
   ${habitsSection(data.validationHabits)}
 

@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.24.0]
+- **Validation Skill Finder.** A new **Suggested next step** dashboard panel and the **Find Validation Gaps** command turn what you *keep skipping* (from your own history) plus what *net you lack* (from the workspace scan) into the single highest-leverage fix — e.g. *"You skipped Lint on 60% of recent AI sessions and there's no pre-commit hook"* → **one click installs the nudge**. Where there's no one-click fix, it gives concrete copy-pasteable steps. Closes the loop from "you lack the net" to "here's the net."
+
 ## [0.23.0]
 - **`@agentkarma` chat participant.** Open the Chat view and talk to Agent Karma:
   - **/verify** _tests · build · lint · types_ — log that you validated the AI's work. This is the one capture path that covers **AI used in a browser or copy-pasted in** — work no log-parser can see. If no session is active it starts a per-day one for you. Self-reported, so it counts as *logged*, never *observed*.
