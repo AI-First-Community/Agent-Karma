@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { LocalStore } from "../storage/localStore";
 import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
-import { computeStats, computeValidationHabits } from "./dashboardStats";
+import { computeStats, computeValidationHabits, computeValidationHeatmap } from "./dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { scanReadinessSignals } from "../collectors/validationReadinessScan";
@@ -100,6 +100,7 @@ export class DashboardPanel {
       validationHabits: habits,
       readiness,
       suggestions,
+      heatmap: computeValidationHeatmap(store.sessions),
       active,
       activeEvents,
       lastCompleted,

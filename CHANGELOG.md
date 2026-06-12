@@ -2,6 +2,15 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.25.0]
+- **Dashboard redesign.** A calmer, deeper, more insightful view — same privacy ethos, no new tracking.
+  - **🪔 Karmic reflection banner** — an inspiring, mood-tinted line that reads your real state through the Dharma → Karma → Phal lens (luminous / steady / forming / dim), with a sub-line tying the intent you set to whether your Phal was validated. Encouraging, never shaming.
+  - **Bento grid layout** — cards arranged in equal-height rows that reflow to a single column on a narrow panel.
+  - **Active / Previous tabs** — the two session views are now one tabbed card (pure CSS, no scripts).
+  - **New insight, across time & risk:** a **validation-consistency strip** (one square per session — did you validate it?), **Karma & validation-rate trend lines**, a **task × check heatmap** ("where you validate"), a **risk × validation** breakdown (did you check the work that mattered?), and **habit trend arrows** (rising / steady / slipping).
+  - **Collapsible** reference sections (Karma rules, Recent sessions) to keep the page short.
+  - Adapts to any VS Code theme (light, dark, high-contrast) automatically.
+
 ## [0.24.0]
 - **Validation Skill Finder.** A new **Suggested next step** dashboard panel and the **Find Validation Gaps** command turn what you *keep skipping* (from your own history) plus what *net you lack* (from the workspace scan) into the single highest-leverage fix — e.g. *"You skipped Lint on 60% of recent AI sessions and there's no pre-commit hook"* → **one click installs the nudge**. Where there's no one-click fix, it gives concrete copy-pasteable steps. Closes the loop from "you lack the net" to "here's the net."
 

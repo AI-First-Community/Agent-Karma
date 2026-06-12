@@ -157,9 +157,7 @@ describe("renderDashboardHtml", () => {
         outcomes: { ready: 1, needs: 2, highRisk: 0, informational: 0 },
       },
     });
-    // "Last session" (the checklist) appears before "At a glance" (the number)
-    expect(html.indexOf("Last session")).toBeLessThan(html.indexOf("At a glance"));
-    // number is quiet (no big gauge) while the history is still forming
+    // The Karma number stays quiet (no big gauge) while history is still forming.
     expect(html).toContain("Karma forming · 3/5 sessions");
     expect(html).not.toContain(">58<");
   });
