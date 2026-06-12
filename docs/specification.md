@@ -21,7 +21,7 @@ While active, Agent Karma captures **safe metadata only** (§6–§8). Nothing i
 ### 1.3 Ending a session
 On end:
 1. Run the **Git diff summary** (§8).
-2. **Validation prompt (action-based, not a rating):** *"Did you run tests / build / lint this session? Add them so they count."* — this opens `Add Validation Command` so the user **logs the actual commands**. It is **not** a yes/no that feeds the score.
+2. **Validation checklist (action-based, not a rating):** *"Which validation did you run this session?"* — a multi-pick checklist (Tests / Build / Lint / Type check). Anything already **auto-detected is pre-checked**, so the user only adds what was missed; empty = none. This is far less confusing than typing a command, and keeps the score action-based, not feeling-based. (The standalone `Add Validation Command` still exists for logging a specific command mid-session.)
 3. *(Optional, unscored)* **Reflection prompt:** "Reviewed the diff? Did the outcome match your intent?" — captured for the user's own journaling and the Markdown export only. **Contributes 0 to the Karma Score** and is clearly labeled as reflection, not measurement.
 4. Compute the **Karma Score** (objective — [`scoring-model.md`](scoring-model.md) §3), then the **Phal Card** (§10, depends on the score), then render the **Karma Trace** (§9). Show the summary immediately.
 

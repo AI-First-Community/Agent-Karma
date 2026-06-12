@@ -13,7 +13,7 @@ import { installHook, removeHook } from "./hooks/preCommitNudge";
 import { StartSessionPanel } from "./panels/startSessionPanel";
 import { generateWeeklyReflection } from "./reflection/weeklyReflection";
 import { SessionMeta } from "./core/sessionManager";
-import { AI_TOOLS, TASK_TYPES, AgentKarmaSession } from "./core/types";
+import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
 // Agent Karma — local-first AI-coding validation & self-awareness coach.
 // Release 0.1 (foundation): manual sessions via a one-click status bar, atomic
@@ -117,18 +117,40 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       void vscode.window.showInformationMessage("No active Agent Karma session to end.");
       return;
     }
-    // End-of-session validation prompt: invite logging the commands you ran (not a yes/no).
-    let addMore = true;
-    while (addMore) {
-      const choice = await vscode.window.showInformationMessage(
-        "Did you run tests / build / lint this session? Add them so they count.",
-        "Add command",
-        "Done"
-      );
-      if (choice === "Add command") {
-        await addValidationFlow();
-      } else {
-        addMore = false;
+    // End-of-session validation checklist: just tick what you ran. Anything we
+    // already auto-detected is pre-checked, so you only add what we missed.
+    const activeForEnd = manager.getActiveSession();
+    const detected = new Set(
+      store
+        .loadEvents()
+        .events.filter(
+          (e) => e.sessionId === activeForEnd?.id && e.type === "validation.command"
+        )
+        .map((e) => String(e.data.commandType))
+    );
+    const checklistItems: (vscode.QuickPickItem & { type: ValidationCommandType })[] = (
+      [
+        { label: "Tests", type: "Test" },
+        { label: "Build", type: "Build" },
+        { label: "Lint", type: "Lint" },
+        { label: "Type check", type: "Type Check" },
+      ] as { label: string; type: ValidationCommandType }[]
+    ).map((it) => ({
+      label: it.label,
+      type: it.type,
+      description: detected.has(it.type) ? "auto-detected ✓" : undefined,
+      picked: detected.has(it.type),
+    }));
+    const picks = await vscode.window.showQuickPick(checklistItems, {
+      canPickMany: true,
+      title: "Which validation did you run this session?",
+      placeHolder: "Tick all you ran (auto-detected are pre-checked) — or leave empty if none",
+    });
+    if (picks) {
+      for (const p of picks) {
+        if (!detected.has(p.type)) {
+          terminalCollector.logValidationType(p.type);
+        }
       }
     }
 

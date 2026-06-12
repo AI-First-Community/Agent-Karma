@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { SessionManager } from "../core/sessionManager";
-import { ValidationResult } from "../core/types";
+import { ValidationResult, ValidationCommandType, ValidationCommandEventData } from "../core/types";
 import { toValidationData, asEventData } from "../privacy/privacyRules";
 import { classifyCommand } from "../utils/commandClassifier";
 
@@ -40,6 +40,15 @@ export class TerminalCollector {
   /** Manually log a validation command. Returns true if recorded. */
   logCommand(rawCommand: string): boolean {
     return this.record(rawCommand, "unknown", "logged");
+  }
+
+  /** Log a validation by TYPE directly (e.g. from the end-of-session checklist). */
+  logValidationType(type: ValidationCommandType): boolean {
+    if (!this.manager.hasActiveSession()) {
+      return false;
+    }
+    const data: ValidationCommandEventData = { commandType: type, result: "unknown", source: "logged" };
+    return this.manager.recordForActiveSession("validation.command", asEventData(data));
   }
 
   private onShellExec(e: ShellExecEndEvent): void {

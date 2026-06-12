@@ -72,7 +72,7 @@ Both are unobservable without surveillance (which we refuse) or self-report (whi
 ### 3.2 Fairness when auto-detection misses
 Terminal shell integration is unreliable across shells/prompts (see architecture risks). So:
 - The **manual** `Agent Karma: Add Validation Command` always exists; logged commands earn the base "ran" points.
-- At session end, the prompt is **"Did you run tests / build / lint? Add them so they count"** — it invites the user to *log the actual commands*, not to answer a yes/no. This keeps the score action-based, not feeling-based.
+- At session end, a **checklist** asks **"Which validation did you run this session?"** (Tests / Build / Lint / Type check), with auto-detected items pre-checked. The user ticks what they ran — action-based, not a feeling-based yes/no, and far less confusing than typing a command.
 - Only the **+10 "Tests passed"** bonus requires a real observed exit code, so observation is rewarded without punishing the common case.
 
 ### 3.3 Self-comparative presentation
