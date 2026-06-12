@@ -154,11 +154,18 @@ fs.writeFileSync(outFile, themed, "utf8");
 console.log("Preview written to", outFile);
 
 // Karma Card preview — all four moods, for visual review.
+let cardFont: string | undefined;
+try {
+  const fp = path.resolve(__dirname, "../../media/fonts/manrope.woff2");
+  cardFont = `data:font/woff2;base64,${fs.readFileSync(fp).toString("base64")}`;
+} catch {
+  cardFont = undefined;
+}
 const moods = [
-  { mood: "luminous" as const, name: "Sanjeev Azad", karma: 88, validationRate: 92, bestStreak: 14, sessions: 31 },
-  { mood: "steady" as const, name: "Sanjeev Azad", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24 },
-  { mood: "forming" as const, name: "Sanjeev Azad", karma: 52, validationRate: 58, bestStreak: 4, sessions: 9 },
-  { mood: "dim" as const, name: "Sanjeev Azad", karma: 28, validationRate: 30, bestStreak: 2, sessions: 6 },
+  { mood: "luminous" as const, name: "Sanjeev Azad", karma: 88, validationRate: 92, bestStreak: 14, sessions: 31, fontDataUri: cardFont },
+  { mood: "steady" as const, name: "Sanjeev Azad", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24, fontDataUri: cardFont },
+  { mood: "forming" as const, name: "Sanjeev Azad", karma: 52, validationRate: 58, bestStreak: 4, sessions: 9, fontDataUri: cardFont },
+  { mood: "dim" as const, name: "Sanjeev Azad", karma: 28, validationRate: 30, bestStreak: 2, sessions: 6, fontDataUri: cardFont },
 ];
 const cards = moods
   .map((m) => `<div class="c">${renderKarmaCardSvg({ ...m, dateLabel: "2026-06-12" })}</div>`)
@@ -175,7 +182,7 @@ console.log("Karma Card preview written to", cardFile);
 const printFile = path.join(outDir, "karma-card-print-preview.html");
 fs.writeFileSync(
   printFile,
-  renderKarmaCardPrintHtml({ mood: "steady", name: "Sanjeev Azad", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24, dateLabel: "2026-06-12" }),
+  renderKarmaCardPrintHtml({ mood: "steady", name: "Sanjeev Azad", karma: 72, validationRate: 80, bestStreak: 11, sessions: 24, dateLabel: "2026-06-12", fontDataUri: cardFont }),
   "utf8"
 );
 console.log("Karma Card print preview written to", printFile);

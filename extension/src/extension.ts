@@ -25,6 +25,7 @@ import { renderKarmaCardSvg, renderKarmaCardPrintHtml } from "./cards/karmaCard"
 import { randomUUID } from "crypto";
 import { execFileSync } from "child_process";
 import * as os from "os";
+import * as fs from "fs";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -350,12 +351,24 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  // Embed the bundled Manrope (base64) so the card renders in Manrope as a standalone
+  // SVG / printed page — no network.
+  const cardFontDataUri = (): string | undefined => {
+    try {
+      const fp = vscode.Uri.joinPath(context.extensionUri, "media", "fonts", "manrope.woff2").fsPath;
+      return `data:font/woff2;base64,${fs.readFileSync(fp).toString("base64")}`;
+    } catch {
+      return undefined;
+    }
+  };
+
   const generateKarmaCardFlow = async (): Promise<void> => {
     const s = store.loadSessions();
     const stats = computeStats(s.sessions, s.karmaEma);
     const cardInput = {
       mood: karmicMessage(stats).mood,
       name: resolveCardName(),
+      fontDataUri: cardFontDataUri(),
       karma: stats.rollingKarma,
       validationRate: stats.validationRate,
       bestStreak: stats.consistency?.bestRun,

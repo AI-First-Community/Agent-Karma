@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.36.0]
+- **Karma Card now renders in Manrope.** The bundled Manrope font is embedded directly into the card (and printable certificate) as a base64 data URI, so it shows in the real typeface whether viewed, saved as SVG, or printed to PDF — still 100% local, no network.
+
 ## [0.35.0]
 - **Karma Card redesigned as a proper certificate.** A4-landscape proportions, an ornamental **double border with corner accents**, a centered formal layout ("This certifies that → *Your Name*"), a **chakra wax-seal** medallion, a gradient flourish under the name, larger refined typography, and a clean four-stat band (Karma · Validation · Best streak · Sessions). Mood-tinted, still fully local and dependency-free.
 

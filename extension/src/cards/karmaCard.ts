@@ -14,6 +14,9 @@ export interface KarmaCardInput {
   bestStreak?: number;
   sessions?: number;
   dateLabel?: string;
+  /** Optional base64 `data:font/woff2;...` URI for Manrope, embedded so the card
+   *  renders in Manrope even as a standalone SVG / printed page (no network). */
+  fontDataUri?: string;
 }
 
 const MOOD: Record<KarmicMood, { color: string; credential: string; line: string }> = {
@@ -72,8 +75,12 @@ export function renderKarmaCardSvg(i: KarmaCardInput): string {
   const sessions = i.sessions ?? 0;
   const date = i.dateLabel ?? "";
   const name = (i.name ?? "").trim().slice(0, 24) || "A Mindful Developer";
+  const fontFace = i.fontDataUri
+    ? `<style>@font-face{font-family:'Manrope';font-weight:200 800;font-style:normal;src:url(${i.fontDataUri}) format('woff2');}</style>`
+    : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="${FONT}">
+  ${fontFace}
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0d1117"/>
@@ -131,9 +138,13 @@ export function renderKarmaCardSvg(i: KarmaCardInput): string {
  */
 export function renderKarmaCardPrintHtml(i: KarmaCardInput): string {
   const svg = renderKarmaCardSvg(i);
+  const fontFace = i.fontDataUri
+    ? `@font-face{font-family:'Manrope';font-weight:200 800;font-style:normal;src:url(${i.fontDataUri}) format('woff2');}`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8" /><title>Agent Karma — Karma Card</title>
 <style>
+  ${fontFace}
   @page { size: A4 landscape; margin: 10mm; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Manrope','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif; color: #1a1f24; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
