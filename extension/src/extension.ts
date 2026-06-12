@@ -631,6 +631,15 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),
     vscode.commands.registerCommand("agentKarma.toggleClaudeUsage", toggleClaudeUsageFlow),
+    vscode.commands.registerCommand("agentKarma.openSettings", () =>
+      vscode.commands.executeCommand("workbench.action.openSettings", "@ext:passion4architecture.agent-karma")
+    ),
+    // The Activity Bar "home" view is a welcome-only panel (buttons via viewsWelcome);
+    // register an empty tree provider so the welcome content renders instead of an error.
+    vscode.window.registerTreeDataProvider("agentKarma.home", {
+      getChildren: () => [],
+      getTreeItem: (item: never) => item,
+    } as vscode.TreeDataProvider<never>),
     // Ambient mode: a save is the trigger to ensure today's session exists / roll over.
     vscode.workspace.onDidSaveTextDocument(() => {
       void ensureAmbientDaySession();

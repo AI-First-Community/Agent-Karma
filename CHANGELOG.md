@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.39.0]
+- **Activity Bar home.** Agent Karma now has its own icon in the Activity Bar (a monochrome chakra glyph) opening a quick-actions sidebar: Start / End Session, Open Dashboard, Generate Karma Card, Check Validation Readiness, and Configure Settings — so the whole tool is discoverable without hunting through the Command Palette.
+- **Open Settings command.** New **Agent Karma: Open Settings** command (and a gear button in the sidebar) opens VS Code's Settings UI filtered to Agent Karma's settings.
+
 ## [0.38.0]
 - **Generate the Karma Card from the dashboard.** The shareable certificate was only reachable from the Command Palette — easy to miss. The dashboard now shows a **"🏅 Your Karma Card → Generate Karma Card"** button (once you have at least one session) that runs the generator directly. Implemented with a scoped `command:` URI — the dashboard stays script-free; only this one command is permitted from a link.
 
