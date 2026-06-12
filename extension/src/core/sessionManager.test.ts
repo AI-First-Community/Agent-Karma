@@ -81,6 +81,22 @@ describe("SessionManager", () => {
     expect(session.dharmaCard?.riskLevel).toBe("Medium");
   });
 
+  it("redacts the intent text but keeps the prompt score when capturePromptText is off", () => {
+    const events: AgentKarmaEvent[] = [];
+    bus.on((e) => events.push(e));
+    const session = makeManager().startSession(META, /* capturePromptText */ false);
+
+    // Intent text is not stored anywhere…
+    expect(session.intent).toBe("");
+    expect(store.loadSessions().sessions[0].intent).toBe("");
+    expect(events.map((e) => e.type)).not.toContain("intent.captured");
+    expect(JSON.stringify(store.loadEvents().events)).not.toContain("regression test");
+    // …but the derived prompt-clarity score (which doesn't reveal the text) is preserved.
+    expect(session.promptHintLabel).toBeDefined();
+    expect(events.map((e) => e.type)).toContain("prompt.scored");
+    expect(session.dharmaCard?.intentType).toBe("Bug Fix");
+  });
+
   it("still generates the Dharma card but skips intent.captured for an empty intent", () => {
     const events: AgentKarmaEvent[] = [];
     bus.on((e) => events.push(e));

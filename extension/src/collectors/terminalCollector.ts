@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { SessionManager } from "../core/sessionManager";
-import { ValidationResult, ValidationCommandType, ValidationCommandEventData } from "../core/types";
+import { ValidationResult, ValidationCommandType, ValidationCommandEventData, AgentKarmaSettings, DEFAULT_SETTINGS } from "../core/types";
 import { toValidationData, asEventData } from "../privacy/privacyRules";
 import { classifyCommand } from "../utils/commandClassifier";
 
@@ -24,7 +24,10 @@ interface ShellExecEndEvent {
 export class TerminalCollector {
   private readonly disposables: vscode.Disposable[] = [];
 
-  constructor(private readonly manager: SessionManager) {
+  constructor(
+    private readonly manager: SessionManager,
+    private readonly getSettings: () => AgentKarmaSettings = () => DEFAULT_SETTINGS
+  ) {
     const w = vscode.window as unknown as {
       onDidEndTerminalShellExecution?: (
         listener: (e: ShellExecEndEvent) => void
@@ -55,6 +58,10 @@ export class TerminalCollector {
     const cmd = e.execution?.commandLine?.value;
     if (!cmd) {
       return;
+    }
+    const settings = this.getSettings();
+    if (!settings.enabled || !settings.captureTerminalCommands) {
+      return; // master switch off, or automatic terminal capture disabled
     }
     // Only record recognized validation commands automatically — not every shell command.
     if (classifyCommand(cmd) === "Other") {

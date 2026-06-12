@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { SessionManager } from "../core/sessionManager";
 import { LocalStore } from "../storage/localStore";
 import { EventBus } from "../core/eventBus";
+import { AgentKarmaSettings } from "../core/types";
 import { toFileSavedData, asEventData } from "../privacy/privacyRules";
 import { baseName } from "../utils/fileUtils";
 
@@ -18,8 +19,9 @@ export class FileCollector {
 
   constructor(
     private readonly manager: SessionManager,
-    private readonly store: LocalStore,
-    bus: EventBus
+    store: LocalStore,
+    bus: EventBus,
+    private readonly getSettings: () => AgentKarmaSettings = () => store.loadSettings()
   ) {
     this.disposables.push(
       vscode.workspace.onDidSaveTextDocument((doc) => this.onSave(doc))
@@ -37,6 +39,9 @@ export class FileCollector {
     if (!this.manager.hasActiveSession()) {
       return;
     }
+    if (!this.getSettings().enabled) {
+      return; // master switch off — no passive capture
+    }
     if (doc.uri.scheme !== "file") {
       return;
     }
@@ -52,7 +57,7 @@ export class FileCollector {
     }
     this.seen.add(fsPath);
 
-    const settings = this.store.loadSettings();
+    const settings = this.getSettings();
     const data = toFileSavedData(baseName(fsPath), fsPath, settings.storeFullFilePath);
     this.manager.recordForActiveSession("file.saved", asEventData(data));
   }

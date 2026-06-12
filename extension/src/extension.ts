@@ -7,6 +7,7 @@ import { DashboardPanel } from "./dashboard/dashboardProvider";
 import { FileCollector } from "./collectors/fileCollector";
 import { TerminalCollector } from "./collectors/terminalCollector";
 import { getGitDiffSummary } from "./collectors/gitCollector";
+import { getEffectiveSettings } from "./settings/effectiveSettings";
 import { toJson } from "./export/jsonExporter";
 import { toMarkdown } from "./export/markdownExporter";
 import { installHook, removeHook, nudgeInstallState } from "./hooks/preCommitNudge";
@@ -49,8 +50,10 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const manager = new SessionManager(store, bus, context.globalState);
   const statusBar = new StatusBarController(TOGGLE_COMMAND);
   const dashboard = new DashboardPanel(store, manager, context.extensionUri);
-  const fileCollector = new FileCollector(manager, store, bus);
-  const terminalCollector = new TerminalCollector(manager);
+  // VS Code configuration is the source of truth for the user-facing toggles.
+  const settingsOf = () => getEffectiveSettings(store);
+  const fileCollector = new FileCollector(manager, store, bus, settingsOf);
+  const terminalCollector = new TerminalCollector(manager, settingsOf);
 
   const AMBIENT_KEY = "agentKarma.ambientMode";
   const ambientOn = (): boolean => context.globalState.get<boolean>(AMBIENT_KEY) === true;
@@ -74,13 +77,23 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       void vscode.window.showInformationMessage("Agent Karma is already recording a session.");
       return;
     }
+    const settings = settingsOf();
+    if (!settings.enabled) {
+      void vscode.window.showInformationMessage(
+        "Agent Karma is turned off (Settings → agentKarma.enabled). Turn it on to start a session."
+      );
+      return;
+    }
     try {
-      manager.startSession({
-        title: meta.title.trim() || "Untitled session",
-        aiTool: meta.aiTool,
-        taskType: meta.taskType,
-        intent: meta.intent.trim(),
-      });
+      manager.startSession(
+        {
+          title: meta.title.trim() || "Untitled session",
+          aiTool: meta.aiTool,
+          taskType: meta.taskType,
+          intent: meta.intent.trim(),
+        },
+        settings.capturePromptText
+      );
     } catch (err) {
       void vscode.window.showWarningMessage(
         err instanceof Error ? err.message : "Could not start the session."
@@ -179,7 +192,9 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       await validationChecklist();
     }
     const cwds = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
-    const gitSummary = await getGitDiffSummary(cwds);
+    const gitSummary = settingsOf().enableGitDiffSummary
+      ? await getGitDiffSummary(cwds)
+      : { filesChanged: 0, linesAdded: 0, linesDeleted: 0, captured: false, error: "disabled in settings" };
     manager.finalizeActiveSession(gitSummary);
 
     if (interactive) {
@@ -215,6 +230,9 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const ensureAmbientDaySession = async (): Promise<void> => {
     if (!ambientOn() || ambientBusy) {
       return;
+    }
+    if (!settingsOf().enabled) {
+      return; // master switch off — no passive/ambient capture
     }
     const today = ambientDayKey(new Date().toISOString());
     const active = manager.getActiveSession();
@@ -659,7 +677,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   context.subscriptions.push({ dispose: () => subscription.dispose() });
 
   // Survive-reload / crash recovery: rebuild any active session from disk.
-  const settings = store.loadSettings();
+  const settings = settingsOf();
   const restored = manager.restoreActiveSession(settings.idleEndMinutes);
   syncStatusBar();
   if (restored?.stale) {

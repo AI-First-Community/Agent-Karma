@@ -2,6 +2,15 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.40.0]
+- **Real, configurable settings.** Six settings are now exposed in VS Code's Settings UI (and reachable via the sidebar gear / **Agent Karma: Open Settings**), with VS Code configuration as the source of truth:
+  - `agentKarma.enabled` — **master switch**; when off, all passive capture stops (file saves, automatic terminal commands, ambient sessions) and starting a session is blocked.
+  - `agentKarma.captureTerminalCommands` — toggle automatic detection of validation commands in the terminal (manual logging / `@agentkarma /verify` still work).
+  - `agentKarma.capturePromptText` — when off, the session is kept but the intent text is **not stored** (the prompt-clarity score, which doesn't reveal the text, is still computed).
+  - `agentKarma.enableGitDiffSummary` — toggle the end-of-session git diff summary (counts only, never content).
+  - `agentKarma.storeFullFilePath` and `agentKarma.idleEndMinutes` — surfaced in the UI (previously file-only).
+  These were previously inert internal defaults; they are now wired to real behavior. Settings that did nothing (and the privacy-forced `captureTerminalOutput`) are deliberately **not** shown. Defaults are unchanged, so existing behavior is preserved unless you change a setting.
+
 ## [0.39.0]
 - **Activity Bar home.** Agent Karma now has its own icon in the Activity Bar (a monochrome chakra glyph) opening a quick-actions sidebar: Start / End Session, Open Dashboard, Generate Karma Card, Check Validation Readiness, and Configure Settings — so the whole tool is discoverable without hunting through the Command Palette.
 - **Open Settings command.** New **Agent Karma: Open Settings** command (and a gear button in the sidebar) opens VS Code's Settings UI filtered to Agent Karma's settings.

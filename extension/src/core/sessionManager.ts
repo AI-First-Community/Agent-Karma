@@ -77,14 +77,21 @@ export class SessionManager {
   }
 
   /** Start a session. Throws if one is already active (single-singleton rule). */
-  startSession(meta: SessionMeta): AgentKarmaSession {
+  /**
+   * @param capturePromptText when false, the raw intent text is not stored — the session
+   *   and its derived prompt-clarity score are kept, only the intent text is redacted.
+   */
+  startSession(meta: SessionMeta, capturePromptText = true): AgentKarmaSession {
     if (this.active) {
       throw new Error("A session is already active. End it before starting a new one.");
     }
 
+    // The prompt-clarity score is derived from the intent but doesn't expose it, so it is
+    // always computed; only the stored text + intent event are gated by capturePromptText.
     const promptHint = scorePrompt(meta.intent);
+    const storedIntent = capturePromptText ? meta.intent : "";
     const dharmaCard = generateDharmaCard(
-      { title: meta.title, aiTool: meta.aiTool, taskType: meta.taskType, intent: meta.intent },
+      { title: meta.title, aiTool: meta.aiTool, taskType: meta.taskType, intent: storedIntent },
       promptHint
     );
 
@@ -93,7 +100,7 @@ export class SessionManager {
       title: meta.title,
       aiTool: meta.aiTool,
       taskType: meta.taskType,
-      intent: meta.intent,
+      intent: storedIntent,
       startedAt: this.now().toISOString(),
       status: "active",
       ambient: meta.ambient ? true : undefined,
@@ -110,7 +117,7 @@ export class SessionManager {
     void this.pointer.update(this.pointerKey, session.id);
 
     this.record("session.started", session.id, {});
-    if (meta.intent.trim().length > 0) {
+    if (capturePromptText && meta.intent.trim().length > 0) {
       this.record("intent.captured", session.id, { intent: meta.intent });
     }
     this.record("prompt.scored", session.id, {

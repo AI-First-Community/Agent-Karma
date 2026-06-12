@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.39.0",
+  "version": "0.40.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -170,6 +170,38 @@
     "configuration": {
       "title": "Agent Karma",
       "properties": {
+        "agentKarma.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Master switch. When off, Agent Karma stops **automatically** capturing anything — file saves and terminal validation commands are ignored, and ambient day-sessions won't start. You can still open the dashboard and your existing data. Turn off to pause all passive capture."
+        },
+        "agentKarma.captureTerminalCommands": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically detect validation commands (tests / build / lint / type-check) you run in the integrated terminal, via shell integration. Only the command **type** and result are kept — the raw command string is classified then discarded. When off, log validations manually with **Agent Karma: Add Validation Command** or `@agentkarma /verify`."
+        },
+        "agentKarma.capturePromptText": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Store the **intent / prompt text** you enter when starting a session. The prompt-clarity score is always computed (it doesn't reveal the text); turning this off keeps the session but leaves the intent text blank. Local only — never sent anywhere."
+        },
+        "agentKarma.enableGitDiffSummary": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "At session end, compute a **git diff summary** — file/line **counts only**, never the diff content — to show how much changed. When off, sessions end without diff stats."
+        },
+        "agentKarma.storeFullFilePath": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Store the **full workspace-relative path** of saved files in the session timeline. Off by default (only the file name is kept). Turn on if you want to see exactly which files changed."
+        },
+        "agentKarma.idleEndMinutes": {
+          "type": "number",
+          "default": 30,
+          "minimum": 5,
+          "maximum": 480,
+          "markdownDescription": "If a recording session is recovered after a reload and has been idle longer than this many minutes, Agent Karma offers to end it (so a forgotten session doesn't run forever)."
+        },
         "agentKarma.readClaudeUsage": {
           "type": "boolean",
           "default": false,
