@@ -236,7 +236,8 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     if (next) {
       await ensureAmbientDaySession();
       void vscode.window.showInformationMessage(
-        "Ambient mode ON — Agent Karma will quietly capture your work, grouped by day. No manual start needed."
+        "Ambient mode ON (experimental) — captures saves + validation grouped by day, with no intent. " +
+          "A focused session you start yourself captures your intent and scores more meaningfully."
       );
     } else {
       if (manager.getActiveSession()?.ambient) {

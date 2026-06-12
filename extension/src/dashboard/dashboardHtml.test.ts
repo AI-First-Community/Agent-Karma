@@ -129,20 +129,39 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("seg-ready"); // outcome distribution
   });
 
-  it("renders the Patterns breakdown (by tool / by task) when present", () => {
+  it("does not render the per-AI-tool Patterns table (subtracted — it read like a usage dashboard)", () => {
     const html = renderDashboardHtml({
       nonce: "n",
       cspSource: "x",
       active: undefined,
       recent: [],
-      byTool: [{ key: "Claude Code", sessions: 4, validationRate: 80, avgKarma: 66 }],
-      byTask: [{ key: "Bug Fix", sessions: 3, validationRate: 67, avgKarma: 60 }],
     });
-    expect(html).toContain("Patterns");
-    expect(html).toContain("By AI tool");
-    expect(html).toContain("Claude Code");
-    expect(html).toContain("80%");
-    expect(html).toContain("By task type");
+    expect(html).not.toContain("By AI tool");
+    expect(html).not.toContain(">Patterns<");
+  });
+
+  it("leads with the validation checklist and keeps the Karma number quiet under 5 sessions", () => {
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [],
+      stats: {
+        rollingKarma: 58,
+        lastTrend: "up",
+        sessionCount: 3,
+        recentCount: 3,
+        validationRate: 60,
+        testsRunCount: 2,
+        scoreSeries: [50, 55, 58],
+        outcomes: { ready: 1, needs: 2, highRisk: 0, informational: 0 },
+      },
+    });
+    // "Last session" (the checklist) appears before "At a glance" (the number)
+    expect(html.indexOf("Last session")).toBeLessThan(html.indexOf("At a glance"));
+    // number is quiet (no big gauge) while the history is still forming
+    expect(html).toContain("Karma forming · 3/5 sessions");
+    expect(html).not.toContain(">58<");
   });
 
   it("shows a friendly empty hero when there are no sessions", () => {

@@ -2,6 +2,11 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.20.0]
+- **Sharper by subtraction.** The dashboard now **leads with the validation checklist**, not a big score. The Karma number stays **quiet until ~5 sessions** make a self-comparative trend meaningful (it shows "Karma forming" before that), and the redundant trend arrows are de-duplicated.
+- **Removed the per-AI-tool "Patterns" table** — it read like the usage dashboard we explicitly reject. Your validation strengths/gaps still live in **Validation habits**.
+- **Ambient mode is now labelled experimental** — it captures saves + validation but no intent, so a focused session you start yourself scores more meaningfully.
+
 ## [0.19.0]
 - The pre-commit nudge is the product's spine now. It's **change-aware** — it reminds you only when the *actually-staged files* were never validated (not just "your last session"), which also fixes it misfiring under ambient mode.
 - Agent Karma **offers to install the nudge on first run** (local, non-blocking, removable) so the one moment that matters — the commit — isn't buried in the command palette.

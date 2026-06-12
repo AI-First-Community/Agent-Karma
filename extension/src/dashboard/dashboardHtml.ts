@@ -1,6 +1,6 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
-import { DashboardStats, BreakdownRow, ValidationHabits } from "./dashboardStats";
+import { DashboardStats, ValidationHabits } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
@@ -13,8 +13,6 @@ export interface DashboardData {
   stats?: DashboardStats;
   reflection?: WeeklyReflection;
   validationHabits?: ValidationHabits;
-  byTool?: BreakdownRow[];
-  byTask?: BreakdownRow[];
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -31,10 +29,6 @@ const EMPTY_STATS: DashboardStats = {
   scoreSeries: [],
   outcomes: { ready: 0, needs: 0, highRisk: 0, informational: 0 },
 };
-
-function trendArrow(t: "up" | "down" | "flat" | undefined): string {
-  return t === "up" ? "↑" : t === "down" ? "↓" : "→";
-}
 
 /** Validation Habits — where you're strong and where you have gaps. */
 function habitsSection(h: ValidationHabits | undefined): string {
@@ -77,25 +71,34 @@ function reflectionCard(r: WeeklyReflection | undefined): string {
     </div>`;
 }
 
-/** Hero header + "at a glance" panel — our unique signals, visualized. */
+/**
+ * "At a glance" — validation discipline first; the Karma number stays quiet.
+ * The big gauge only appears once there are enough sessions (~5) for a
+ * self-comparative trend to mean anything (scoring-model §3.4). Below that the
+ * number is a muted "forming" note so the dashboard never grades a sparse history.
+ */
 function glanceSection(stats: DashboardStats): string {
   if (stats.rollingKarma === undefined) {
     return `<div class="hero hero-empty">
-      <div class="gauge-wrap">${gauge(0)}</div>
       <div class="hero-meta">
         <div class="hero-label muted">No sessions yet</div>
-        <div class="hero-sub">Start a session to begin building your Karma.</div>
+        <div class="hero-sub">Start a session — Agent Karma reflects back whether you validated the AI's work.</div>
       </div>
     </div>`;
   }
+  const forming = stats.sessionCount < 5;
+  const numberBlock = forming
+    ? `<div class="hero-meta">
+         <div class="karma-quiet muted">Karma forming · ${stats.sessionCount}/5 session${stats.sessionCount === 1 ? "" : "s"}</div>
+         <div class="hero-sub">The trend becomes meaningful after a few sessions. Focus on the checklist above.</div>
+       </div>`
+    : `<div class="gauge-wrap">${gauge(stats.rollingKarma)}</div>
+       <div class="hero-meta">
+         <div class="hero-label">Karma</div>
+         <div class="hero-sub">${stats.sessionCount} sessions · self-comparative (vs. your own average)</div>
+       </div>`;
   return `
-    <div class="hero">
-      <div class="gauge-wrap">${gauge(stats.rollingKarma)}</div>
-      <div class="hero-meta">
-        <div class="hero-label">Karma <span class="trend">${trendArrow(stats.lastTrend)}</span></div>
-        <div class="hero-sub">${stats.sessionCount} session${stats.sessionCount === 1 ? "" : "s"} · self-comparative (vs. your own average)</div>
-      </div>
-    </div>
+    <div class="hero">${numberBlock}</div>
     <div class="glance">
       <div class="g-item">
         <div class="g-label">Validation rate</div>
@@ -255,40 +258,6 @@ function lastSessionSection(
     </div>`;
 }
 
-function breakdownTable(label: string, rows: BreakdownRow[]): string {
-  if (rows.length === 0) {
-    return "";
-  }
-  const body = rows
-    .map(
-      (r) => `
-      <tr>
-        <td>${esc(r.key)}</td>
-        <td>${r.sessions}</td>
-        <td>${percentBar(r.validationRate)} ${r.validationRate}%</td>
-        <td>${r.avgKarma ?? "—"}</td>
-      </tr>`
-    )
-    .join("");
-  return `
-    <h3 class="bd-title">${esc(label)}</h3>
-    <table>
-      <thead><tr><th>${esc(label === "By AI tool" ? "AI tool" : "Task type")}</th><th>Sessions</th><th>Validation rate</th><th>Avg Karma</th></tr></thead>
-      <tbody>${body}</tbody>
-    </table>`;
-}
-
-function patternsSection(byTool: BreakdownRow[], byTask: BreakdownRow[]): string {
-  if (byTool.length === 0 && byTask.length === 0) {
-    return "";
-  }
-  return `
-    <h2>Patterns</h2>
-    <p class="muted">How consistently you validate, broken down — your own insight, never a usage count.</p>
-    ${breakdownTable("By AI tool", byTool)}
-    ${breakdownTable("By task type", byTask)}`;
-}
-
 function recentSection(recent: AgentKarmaSession[]): string {
   if (recent.length === 0) {
     return `<p class="muted">No completed sessions yet.</p>`;
@@ -371,6 +340,7 @@ export function renderDashboardHtml(data: DashboardData): string {
     .hero-label { font-size: 1.35rem; font-weight: 600; }
     .hero-sub { color: var(--vscode-descriptionForeground); font-size: 0.85rem; }
     .hero-empty .gauge-num { fill: var(--vscode-descriptionForeground); }
+    .karma-quiet { font-size: 0.98rem; font-weight: 700; letter-spacing: -0.01em; }
     .glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0 0 1.25rem; }
     .g-item { border: 1px solid var(--vscode-panel-border); border-radius: 8px; padding: 0.7rem 0.85rem; background: var(--vscode-textBlockQuote-background, transparent); }
     .g-wide { grid-column: 1 / -1; }
@@ -410,13 +380,7 @@ export function renderDashboardHtml(data: DashboardData): string {
 </head>
 <body>
   <h1>Agent Karma</h1>
-  <p class="tagline">Make every agent action count.</p>
-
-  ${glanceSection(data.stats ?? EMPTY_STATS)}
-
-  ${reflectionCard(data.reflection)}
-
-  ${habitsSection(data.validationHabits)}
+  <p class="tagline">Did you validate what the AI produced — before you trusted it?</p>
 
   <h2>Active session</h2>
   ${activeSection(data.active, data.activeEvents ?? [])}
@@ -424,7 +388,12 @@ export function renderDashboardHtml(data: DashboardData): string {
   <h2>Last session</h2>
   ${lastSessionSection(data.lastCompleted, data.lastCompletedEvents ?? [])}
 
-  ${patternsSection(data.byTool ?? [], data.byTask ?? [])}
+  ${reflectionCard(data.reflection)}
+
+  ${habitsSection(data.validationHabits)}
+
+  <h2>At a glance</h2>
+  ${glanceSection(data.stats ?? EMPTY_STATS)}
 
   <h2>Recent sessions</h2>
   ${recentSection(data.recent)}

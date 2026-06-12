@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
-import { computeStats, computeBreakdown } from "../dashboard/dashboardStats";
+import { computeStats } from "../dashboard/dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard } from "../core/types";
 
@@ -55,8 +55,6 @@ const html = renderDashboardHtml({
   cspSource: "vscode-resource:",
   stats: computeStats(sessions, 64),
   reflection: generateWeeklyReflection(sessions, new Date().toISOString()),
-  byTool: computeBreakdown(sessions, "aiTool"),
-  byTask: computeBreakdown(sessions, "taskType"),
   active: undefined,
   activeEvents: [],
   lastCompleted: last,

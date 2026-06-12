@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { LocalStore } from "../storage/localStore";
 import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
-import { computeStats, computeBreakdown, computeValidationHabits } from "./dashboardStats";
+import { computeStats, computeValidationHabits } from "./dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 
 /** A single read-only dashboard webview panel. */
@@ -75,8 +75,6 @@ export class DashboardPanel {
       stats,
       reflection,
       validationHabits: computeValidationHabits(store.sessions),
-      byTool: computeBreakdown(store.sessions, "aiTool"),
-      byTask: computeBreakdown(store.sessions, "taskType"),
       active,
       activeEvents,
       lastCompleted,
