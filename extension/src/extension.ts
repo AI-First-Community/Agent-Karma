@@ -19,7 +19,10 @@ import { explainKarmaMove } from "./scoring/karmaExplain";
 import { registerChatParticipant } from "./chat/agentKarmaParticipant";
 import { SummaryData } from "./chat/chatRouter";
 import { findSkills } from "./skills/skillFinder";
-import { computeValidationHabits } from "./dashboard/dashboardStats";
+import { computeValidationHabits, computeStats } from "./dashboard/dashboardStats";
+import { karmicMessage } from "./dashboard/karmicMessage";
+import { renderKarmaCardSvg } from "./cards/karmaCard";
+import { randomUUID } from "crypto";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -307,6 +310,57 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     void vscode.window.showInformationMessage(`Agent Karma: exported to ${uri.fsPath}`);
   };
 
+  const cardPageHtml = (svg: string, nonce: string): string => {
+    const csp = `default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'`;
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" />
+      <meta http-equiv="Content-Security-Policy" content="${csp}" />
+      <style nonce="${nonce}">
+        body { margin: 0; background: #0a0c10; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 28px; font-family: -apple-system, 'Segoe UI', sans-serif; color: #8b949e; }
+        .card { width: 100%; max-width: 920px; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 48px rgba(0,0,0,0.55); }
+        .card svg { width: 100%; height: auto; display: block; }
+        .tip { font-size: 13px; text-align: center; }
+      </style></head>
+      <body><div class="card">${svg}</div>
+      <div class="tip">Screenshot to share, or use “Save as SVG” to export. Generated locally — nothing leaves your machine.</div>
+      </body></html>`;
+  };
+
+  const generateKarmaCardFlow = async (): Promise<void> => {
+    const s = store.loadSessions();
+    const stats = computeStats(s.sessions, s.karmaEma);
+    const svg = renderKarmaCardSvg({
+      mood: karmicMessage(stats).mood,
+      karma: stats.rollingKarma,
+      validationRate: stats.validationRate,
+      bestStreak: stats.consistency?.bestRun,
+      sessions: stats.sessionCount,
+      dateLabel: new Date().toISOString().slice(0, 10),
+    });
+    const panel = vscode.window.createWebviewPanel("agentKarma.card", "Karma Card", vscode.ViewColumn.Active, {
+      enableScripts: false,
+      retainContextWhenHidden: false,
+    });
+    panel.webview.html = cardPageHtml(svg, randomUUID().replace(/-/g, ""));
+
+    const choice = await vscode.window.showInformationMessage(
+      "Your Karma Card is ready — screenshot it, or save it as an SVG to share.",
+      "Save as SVG"
+    );
+    if (choice === "Save as SVG") {
+      const folder = vscode.workspace.workspaceFolders?.[0]?.uri;
+      const defaultUri = folder ? vscode.Uri.joinPath(folder, "karma-card.svg") : undefined;
+      const uri = await vscode.window.showSaveDialog({
+        defaultUri,
+        filters: { "SVG image": ["svg"] },
+        saveLabel: "Save Karma Card",
+      });
+      if (uri) {
+        await vscode.workspace.fs.writeFile(uri, Buffer.from(svg, "utf8"));
+        void vscode.window.showInformationMessage(`Karma Card saved to ${uri.fsPath}`);
+      }
+    }
+  };
+
   const resetHistoryFlow = async (): Promise<void> => {
     const confirm = await vscode.window.showWarningMessage(
       "Reset Karma history? This clears all sessions and your Karma trend (a fresh start) but keeps your settings. It cannot be undone.",
@@ -515,6 +569,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
+    vscode.commands.registerCommand("agentKarma.generateKarmaCard", generateKarmaCardFlow),
     vscode.commands.registerCommand("agentKarma.resetHistory", resetHistoryFlow),
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
     vscode.commands.registerCommand("agentKarma.checkValidationReadiness", checkReadinessFlow),

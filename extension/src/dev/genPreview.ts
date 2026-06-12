@@ -3,6 +3,7 @@ import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats, computeValidationHabits, computeValidationHeatmap } from "../dashboard/dashboardStats";
 import { highRiskWatchlist, scoreComposition } from "../dashboard/insights";
+import { renderKarmaCardSvg } from "../cards/karmaCard";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
@@ -151,3 +152,21 @@ fs.mkdirSync(outDir, { recursive: true });
 const outFile = path.join(outDir, "dashboard-preview.html");
 fs.writeFileSync(outFile, themed, "utf8");
 console.log("Preview written to", outFile);
+
+// Karma Card preview — all four moods, for visual review.
+const moods = [
+  { mood: "luminous" as const, karma: 88, validationRate: 92, bestStreak: 14, sessions: 31 },
+  { mood: "steady" as const, karma: 72, validationRate: 80, bestStreak: 11, sessions: 24 },
+  { mood: "forming" as const, karma: 52, validationRate: 58, bestStreak: 4, sessions: 9 },
+  { mood: "dim" as const, karma: 28, validationRate: 30, bestStreak: 2, sessions: 6 },
+];
+const cards = moods
+  .map((m) => `<div class="c">${renderKarmaCardSvg({ ...m, dateLabel: "2026-06-12" })}</div>`)
+  .join("");
+const cardPage = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>
+  body{margin:0;background:#0a0c10;display:flex;flex-direction:column;align-items:center;gap:28px;padding:32px;font-family:-apple-system,'Segoe UI',sans-serif}
+  .c{width:100%;max-width:860px;border-radius:16px;overflow:hidden;box-shadow:0 10px 48px rgba(0,0,0,.55)} .c svg{width:100%;height:auto;display:block}
+</style></head><body>${cards}</body></html>`;
+const cardFile = path.join(outDir, "karma-card-preview.html");
+fs.writeFileSync(cardFile, cardPage, "utf8");
+console.log("Karma Card preview written to", cardFile);

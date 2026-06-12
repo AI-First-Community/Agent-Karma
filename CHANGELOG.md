@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.32.0]
+- **Shareable Karma Card.** New command **Agent Karma: Generate Karma Card** produces a beautiful, self-contained card celebrating your *validation practice* — your Karma mood (chakra-tinted), validation rate, best streak, and a statement like *"I use AI — and I check its work."* Preview it in an editor tab, then **screenshot** it or **Save as SVG** to share. Generated **100% locally** — no network, no auto-posting, no leaderboard, no vanity volume metrics. A motivating way to spread "use AI wisely, and verify it."
+
 ## [0.31.0]
 - **Reset Karma History** — a new command (**Agent Karma: Reset Karma History**) that clears all sessions and your Karma trend for a fresh start, while **keeping your settings**. Lighter than "Delete All Local Data" and ideal for testing or starting over without re-configuring.
 
