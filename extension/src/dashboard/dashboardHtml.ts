@@ -1,6 +1,6 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
-import { DashboardStats } from "./dashboardStats";
+import { DashboardStats, BreakdownRow } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 
@@ -9,6 +9,8 @@ export interface DashboardData {
   cspSource: string;
   stats?: DashboardStats;
   reflection?: WeeklyReflection;
+  byTool?: BreakdownRow[];
+  byTask?: BreakdownRow[];
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -210,6 +212,40 @@ function lastSessionSection(
     </div>`;
 }
 
+function breakdownTable(label: string, rows: BreakdownRow[]): string {
+  if (rows.length === 0) {
+    return "";
+  }
+  const body = rows
+    .map(
+      (r) => `
+      <tr>
+        <td>${esc(r.key)}</td>
+        <td>${r.sessions}</td>
+        <td>${percentBar(r.validationRate)} ${r.validationRate}%</td>
+        <td>${r.avgKarma ?? "—"}</td>
+      </tr>`
+    )
+    .join("");
+  return `
+    <h3 class="bd-title">${esc(label)}</h3>
+    <table>
+      <thead><tr><th>${esc(label === "By AI tool" ? "AI tool" : "Task type")}</th><th>Sessions</th><th>Validation rate</th><th>Avg Karma</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table>`;
+}
+
+function patternsSection(byTool: BreakdownRow[], byTask: BreakdownRow[]): string {
+  if (byTool.length === 0 && byTask.length === 0) {
+    return "";
+  }
+  return `
+    <h2>Patterns</h2>
+    <p class="muted">How consistently you validate, broken down — your own insight, never a usage count.</p>
+    ${breakdownTable("By AI tool", byTool)}
+    ${breakdownTable("By task type", byTask)}`;
+}
+
 function recentSection(recent: AgentKarmaSession[]): string {
   if (recent.length === 0) {
     return `<p class="muted">No completed sessions yet.</p>`;
@@ -303,6 +339,7 @@ export function renderDashboardHtml(data: DashboardData): string {
     .refl-head { font-weight: 600; font-size: 0.85rem; }
     .refl-summary { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin: 0.15rem 0; }
     .refl-nudge { font-size: 0.95rem; }
+    .bd-title { font-size: 0.9rem; margin: 0.9rem 0 0.3rem; }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>
@@ -320,6 +357,8 @@ export function renderDashboardHtml(data: DashboardData): string {
 
   <h2>Last session</h2>
   ${lastSessionSection(data.lastCompleted, data.lastCompletedEvents ?? [])}
+
+  ${patternsSection(data.byTool ?? [], data.byTask ?? [])}
 
   <h2>Recent sessions</h2>
   ${recentSection(data.recent)}

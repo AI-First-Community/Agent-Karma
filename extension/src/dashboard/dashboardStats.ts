@@ -21,6 +21,52 @@ export interface DashboardStats {
   outcomes: { ready: number; needs: number; highRisk: number; informational: number };
 }
 
+/** One row of a per-dimension breakdown (validation discipline, not usage volume). */
+export interface BreakdownRow {
+  key: string;
+  sessions: number;
+  validationRate: number; // 0–100
+  avgKarma?: number;
+}
+
+/**
+ * Group completed sessions by AI tool or task type and report how consistently
+ * each was validated (+ avg Karma). This is a self-insight ("where do I validate
+ * well?"), never a usage count. Sorted by session volume, then validation rate.
+ */
+export function computeBreakdown(
+  sessions: AgentKarmaSession[],
+  dimension: "aiTool" | "taskType"
+): BreakdownRow[] {
+  const completed = sessions.filter((s) => s.status === "completed");
+  const groups = new Map<string, AgentKarmaSession[]>();
+  for (const s of completed) {
+    const key = dimension === "aiTool" ? s.aiTool : s.taskType;
+    const arr = groups.get(key);
+    if (arr) {
+      arr.push(s);
+    } else {
+      groups.set(key, [s]);
+    }
+  }
+  const rows: BreakdownRow[] = [];
+  for (const [key, arr] of groups) {
+    const validated = arr.filter((s) => s.phalCard?.validationDetected).length;
+    const scores = arr
+      .map((s) => s.karmaScore)
+      .filter((x): x is number => typeof x === "number");
+    rows.push({
+      key,
+      sessions: arr.length,
+      validationRate: Math.round((validated / arr.length) * 100),
+      avgKarma: scores.length
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+        : undefined,
+    });
+  }
+  return rows.sort((a, b) => b.sessions - a.sessions || b.validationRate - a.validationRate);
+}
+
 export function computeStats(
   sessions: AgentKarmaSession[],
   karmaEma: number | undefined,

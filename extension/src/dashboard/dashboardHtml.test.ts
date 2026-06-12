@@ -128,6 +128,22 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("seg-ready"); // outcome distribution
   });
 
+  it("renders the Patterns breakdown (by tool / by task) when present", () => {
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [],
+      byTool: [{ key: "Claude Code", sessions: 4, validationRate: 80, avgKarma: 66 }],
+      byTask: [{ key: "Bug Fix", sessions: 3, validationRate: 67, avgKarma: 60 }],
+    });
+    expect(html).toContain("Patterns");
+    expect(html).toContain("By AI tool");
+    expect(html).toContain("Claude Code");
+    expect(html).toContain("80%");
+    expect(html).toContain("By task type");
+  });
+
   it("shows a friendly empty hero when there are no sessions", () => {
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: undefined, recent: [] });
     expect(html).toContain("No sessions yet");

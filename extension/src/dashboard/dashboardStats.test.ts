@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStats } from "./dashboardStats";
+import { computeStats, computeBreakdown } from "./dashboardStats";
 import { AgentKarmaSession } from "../core/types";
 
 function session(over: Partial<AgentKarmaSession>): AgentKarmaSession {
@@ -44,5 +44,26 @@ describe("computeStats", () => {
     expect(s.lastTrend).toBe(undefined); // last recent session has no trend set
     expect(s.scoreSeries).toEqual([62, 30]);
     expect(s.outcomes).toEqual({ ready: 0, needs: 1, highRisk: 1, informational: 0 });
+  });
+});
+
+describe("computeBreakdown", () => {
+  it("groups by AI tool with validation rate and avg karma, sorted by volume", () => {
+    const sessions: AgentKarmaSession[] = [
+      session({ aiTool: "Claude Code", karmaScore: 80, phalCard: { outcome: "Ready for Review", filesChanged: 1, testFilesChanged: 1, validationDetected: true, commandsDetected: [], recommendations: [] } }),
+      session({ aiTool: "Claude Code", karmaScore: 60, phalCard: { outcome: "Needs Review", filesChanged: 1, testFilesChanged: 0, validationDetected: true, commandsDetected: [], recommendations: [] } }),
+      session({ aiTool: "ChatGPT", karmaScore: 20, phalCard: { outcome: "High Risk", filesChanged: 1, testFilesChanged: 0, validationDetected: false, commandsDetected: [], recommendations: [] } }),
+    ];
+    const rows = computeBreakdown(sessions, "aiTool");
+    expect(rows[0].key).toBe("Claude Code"); // most sessions first
+    expect(rows[0].sessions).toBe(2);
+    expect(rows[0].validationRate).toBe(100);
+    expect(rows[0].avgKarma).toBe(70);
+    expect(rows[1].key).toBe("ChatGPT");
+    expect(rows[1].validationRate).toBe(0);
+  });
+
+  it("returns an empty list with no completed sessions", () => {
+    expect(computeBreakdown([], "taskType")).toEqual([]);
   });
 });
