@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.41.0",
+  "version": "0.42.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -179,6 +179,11 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "Automatically detect validation commands (tests / build / lint / type-check) you run in the integrated terminal, via shell integration. Only the command **type** and result are kept — the raw command string is classified then discarded. When off, log validations manually with **Agent Karma: Add Validation Command** or `@agentkarma /verify`."
+        },
+        "agentKarma.captureExternalFileChanges": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Also capture file changes made **outside the editor** — by AI coding agents (e.g. Claude Code), CLI tools, scripts, or another editor — using a filesystem watcher, not just VS Code's save event. **Metadata only** (file name, never content), only while a session is active, and dependency/build/cache folders (`node_modules`, `dist`, `.git`, `coverage`, …) are ignored. Turn off to capture only edits you save in the editor.\n\nNote: this records file **activity**. Your Karma **score** still reflects validation discipline — log tests/build/lint via **✅ Log a Validation** or `@agentkarma /verify` for work done outside the integrated terminal."
         },
         "agentKarma.capturePromptText": {
           "type": "boolean",

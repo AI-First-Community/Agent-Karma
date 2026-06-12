@@ -22,6 +22,7 @@ export function getEffectiveSettings(store: LocalStore): AgentKarmaSettings {
     ...file,
     enabled: bool("enabled", file.enabled),
     captureTerminalCommands: bool("captureTerminalCommands", file.captureTerminalCommands),
+    captureExternalFileChanges: bool("captureExternalFileChanges", file.captureExternalFileChanges),
     capturePromptText: bool("capturePromptText", file.capturePromptText),
     enableGitDiffSummary: bool("enableGitDiffSummary", file.enableGitDiffSummary),
     storeFullFilePath: bool("storeFullFilePath", file.storeFullFilePath),

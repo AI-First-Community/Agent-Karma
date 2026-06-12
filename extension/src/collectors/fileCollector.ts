@@ -4,13 +4,18 @@ import { LocalStore } from "../storage/localStore";
 import { EventBus } from "../core/eventBus";
 import { AgentKarmaSettings } from "../core/types";
 import { toFileSavedData, asEventData } from "../privacy/privacyRules";
-import { baseName } from "../utils/fileUtils";
+import { baseName, isIgnoredCapturePath } from "../utils/fileUtils";
 
 /**
- * Captures file saves as metadata only, while a session is active.
+ * Captures file changes as metadata only, while a session is active.
+ * - editor saves (`onDidSaveTextDocument`) AND — when `captureExternalFileChanges`
+ *   is on — external writes via a filesystem watcher, so changes made by AI coding
+ *   agents, the terminal, or other tools (which never fire an editor "save") are
+ *   not invisible.
  * - active-session-gated (nothing captured otherwise)
- * - real source files only (scheme "file", inside the workspace, not under .git)
- * - deduped per session (auto-save fires often)
+ * - real source files only (scheme "file", inside the workspace; deps, build output
+ *   and caches are skipped via `isIgnoredCapturePath`)
+ * - deduped per session (saves + the watcher fire often; a file counts once)
  * - never reads or stores file content
  */
 export class FileCollector {
@@ -24,8 +29,21 @@ export class FileCollector {
     private readonly getSettings: () => AgentKarmaSettings = () => store.loadSettings()
   ) {
     this.disposables.push(
-      vscode.workspace.onDidSaveTextDocument((doc) => this.onSave(doc))
+      vscode.workspace.onDidSaveTextDocument((doc) => this.onChange(doc.uri))
     );
+
+    // External / agent / CLI writes never raise an editor save. A filesystem
+    // watcher catches them; gated behind the captureExternalFileChanges setting.
+    const watcher = vscode.workspace.createFileSystemWatcher("**/*");
+    const onExternal = (uri: vscode.Uri): void => {
+      if (this.getSettings().captureExternalFileChanges) {
+        this.onChange(uri);
+      }
+    };
+    watcher.onDidChange(onExternal);
+    watcher.onDidCreate(onExternal);
+    this.disposables.push(watcher);
+
     // Reset the per-session dedupe set when sessions start/end.
     const sub = bus.on((e) => {
       if (e.type === "session.started" || e.type === "session.ended") {
@@ -35,22 +53,22 @@ export class FileCollector {
     this.disposables.push({ dispose: () => sub.dispose() });
   }
 
-  private onSave(doc: vscode.TextDocument): void {
+  private onChange(uri: vscode.Uri): void {
     if (!this.manager.hasActiveSession()) {
       return;
     }
     if (!this.getSettings().enabled) {
       return; // master switch off — no passive capture
     }
-    if (doc.uri.scheme !== "file") {
+    if (uri.scheme !== "file") {
       return;
     }
-    if (!vscode.workspace.getWorkspaceFolder(doc.uri)) {
+    if (!vscode.workspace.getWorkspaceFolder(uri)) {
       return; // outside the workspace
     }
-    const fsPath = doc.uri.fsPath;
-    if (/[\\/]\.git[\\/]/.test(fsPath)) {
-      return; // ignore git internals
+    const fsPath = uri.fsPath;
+    if (isIgnoredCapturePath(fsPath)) {
+      return; // .git, dependencies, build output, caches, generated/lock files
     }
     if (this.seen.has(fsPath)) {
       return;

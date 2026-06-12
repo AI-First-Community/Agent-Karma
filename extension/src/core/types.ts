@@ -147,6 +147,8 @@ export interface AgentKarmaSettings {
   enabled: boolean;
   storeFullFilePath: boolean;
   captureTerminalCommands: boolean;
+  /** Capture file changes made outside the editor (AI agents, CLI, external tools) via a filesystem watcher, not just editor saves. */
+  captureExternalFileChanges: boolean;
   /** Hardcoded off — never enabled, even if set true. */
   captureTerminalOutput: false;
   capturePromptText: boolean;
@@ -160,6 +162,7 @@ export const DEFAULT_SETTINGS: AgentKarmaSettings = {
   enabled: true,
   storeFullFilePath: false,
   captureTerminalCommands: true,
+  captureExternalFileChanges: true,
   captureTerminalOutput: false,
   capturePromptText: true,
   enableGitDiffSummary: true,

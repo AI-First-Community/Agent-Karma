@@ -2,6 +2,12 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.42.0]
+- **Capture AI- and CLI-driven file changes, not just editor saves.** Previously only files you saved *in the editor* were recorded, so work done by AI coding agents (Claude Code, CLI tools), scripts, or another editor was invisible to your session. A new filesystem-watcher capture now sees those changes too.
+  - **Metadata only** (file name, never content), **active-session-gated**, deduped per session, and dependency/build/cache folders (`node_modules`, `dist`, `.git`, `coverage`, `__pycache__`, …) plus generated/lock files are ignored.
+  - Controlled by the new **`agentKarma.captureExternalFileChanges`** setting (default on); the master switch and existing privacy rules still apply.
+  - Scope note: this records file **activity**. Your Karma **score** still reflects validation discipline — log tests/build/lint via **✅ Log a Validation** or `@agentkarma /verify` for validations run outside the integrated terminal.
+
 ## [0.41.0]
 - **Home panel surfaces more actions.** The Activity Bar **Agent Karma** view now offers one-click buttons for actions that were previously reachable only from the Command Palette:
   - **✅ Log a Validation** — the same flow as `@agentkarma /verify`, so you can record a validation **without** a chat provider (the `@agentkarma` chat participant only appears when a chat host like GitHub Copilot Chat is installed).
