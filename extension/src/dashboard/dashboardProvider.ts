@@ -5,6 +5,8 @@ import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
 import { computeStats, computeValidationHabits } from "./dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
+import { assessReadiness } from "../collectors/validationReadiness";
+import { scanReadinessSignals } from "../collectors/validationReadinessScan";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -65,6 +67,8 @@ export class DashboardPanel {
     const lastCompletedEvents = lastCompleted
       ? allEvents.filter((e) => e.sessionId === lastCompleted.id)
       : [];
+    const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const readiness = root ? assessReadiness(scanReadinessSignals(root)) : undefined;
     const fontUri = this.panel.webview
       .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "media", "fonts", "manrope.woff2"))
       .toString();
@@ -75,6 +79,7 @@ export class DashboardPanel {
       stats,
       reflection,
       validationHabits: computeValidationHabits(store.sessions),
+      readiness,
       active,
       activeEvents,
       lastCompleted,

@@ -4,6 +4,7 @@ import { DashboardStats, ValidationHabits } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
+import { ValidationReadiness } from "../collectors/validationReadiness";
 
 export interface DashboardData {
   nonce: string;
@@ -13,6 +14,8 @@ export interface DashboardData {
   stats?: DashboardStats;
   reflection?: WeeklyReflection;
   validationHabits?: ValidationHabits;
+  /** Workspace "can you even validate?" scan (config-only). Omitted with no folder open. */
+  readiness?: ValidationReadiness;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -54,6 +57,31 @@ function habitsSection(h: ValidationHabits | undefined): string {
     <p class="muted">How often you run each check (last ${h.recentCount} sessions).</p>
     <div class="habits">${rows}</div>
     ${insight}`;
+}
+
+/** "Can you even validate?" — the workspace's means to verify AI output. */
+function readinessSection(r: ValidationReadiness | undefined): string {
+  if (!r) {
+    return "";
+  }
+  const rows = r.checks
+    .map(
+      (c) => `
+      <div class="ready-row">
+        <span class="ready-mark ${c.present ? "ready-yes" : "ready-no"}">${c.present ? "✔" : "○"}</span>
+        <span class="ready-label">${esc(c.label)}</span>
+        <span class="ready-detail muted">${esc(c.detail)}</span>
+      </div>`
+    )
+    .join("");
+  const gap = r.topGap
+    ? `<div class="ready-gap">Biggest gap: <b>${esc(r.topGap.label)}</b> — ${esc(r.topGap.detail)}.</div>`
+    : "";
+  return `
+    <h2>Can you validate?</h2>
+    <p class="muted">${esc(r.summary)} <span class="ready-score">${r.presentCount}/${r.total}</span></p>
+    <div class="ready">${rows}</div>
+    ${gap}`;
 }
 
 /** The "This week" coaching card — one plain-language nudge from your own history. */
@@ -371,6 +399,16 @@ export function renderDashboardHtml(data: DashboardData): string {
     .habit .bar { flex: 1; width: auto; }
     .habit-pct { flex: 0 0 2.6rem; text-align: right; font-size: 0.85rem; font-weight: 600; }
     .habit-insight { margin-top: 0.5rem; font-size: 0.88rem; color: var(--vscode-descriptionForeground); }
+    /* validation context health */
+    .ready { display: flex; flex-direction: column; gap: 0.3rem; }
+    .ready-row { display: grid; grid-template-columns: 1.2rem 9rem 1fr; align-items: baseline; gap: 0.5rem; font-size: 0.88rem; }
+    .ready-mark { font-weight: 700; text-align: center; }
+    .ready-yes { color: var(--vscode-charts-green, #388a34); }
+    .ready-no { color: var(--vscode-descriptionForeground); }
+    .ready-label { font-weight: 600; }
+    .ready-detail { font-size: 0.84rem; }
+    .ready-score { font-weight: 700; color: var(--vscode-foreground); }
+    .ready-gap { margin-top: 0.5rem; font-size: 0.88rem; padding: 0.5rem 0.7rem; border-radius: 8px; background: color-mix(in srgb, var(--vscode-charts-yellow, #b89500) 12%, transparent); }
     .risk-flag { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; margin: 0.1rem 0 0.5rem; }
     .risk-warn { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
     .risk-ok { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 14%, transparent); }
@@ -389,6 +427,8 @@ export function renderDashboardHtml(data: DashboardData): string {
   ${lastSessionSection(data.lastCompleted, data.lastCompletedEvents ?? [])}
 
   ${reflectionCard(data.reflection)}
+
+  ${readinessSection(data.readiness)}
 
   ${habitsSection(data.validationHabits)}
 

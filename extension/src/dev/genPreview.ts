@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats } from "../dashboard/dashboardStats";
+import { assessReadiness } from "../collectors/validationReadiness";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard } from "../core/types";
 
@@ -55,6 +56,13 @@ const html = renderDashboardHtml({
   cspSource: "vscode-resource:",
   stats: computeStats(sessions, 64),
   reflection: generateWeeklyReflection(sessions, new Date().toISOString()),
+  readiness: assessReadiness({
+    testScript: true, testDep: true, testConfigFile: true,
+    buildScript: true, tsconfig: true,
+    lintScript: true, lintConfig: true, lintDep: true,
+    typecheckScript: true,
+    ci: true, preCommit: false, agentMentionsValidation: false,
+  }),
   active: undefined,
   activeEvents: [],
   lastCompleted: last,

@@ -164,6 +164,35 @@ describe("renderDashboardHtml", () => {
     expect(html).not.toContain(">58<");
   });
 
+  it("renders the 'Can you validate?' readiness panel and flags the top gap", () => {
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [],
+      readiness: {
+        checks: [
+          { key: "test", label: "Tests can run", present: true, detail: "a test runner is set up" },
+          { key: "preCommit", label: "A pre-commit net exists", present: false, detail: "install the Agent Karma pre-commit nudge" },
+        ],
+        presentCount: 1,
+        total: 2,
+        score: 50,
+        summary: "1 of 2 validation supports in place.",
+        topGap: { key: "preCommit", label: "A pre-commit net exists", present: false, detail: "install the Agent Karma pre-commit nudge" },
+      },
+    });
+    expect(html).toContain("Can you validate?");
+    expect(html).toContain("Tests can run");
+    expect(html).toContain("Biggest gap:");
+    expect(html).toContain("A pre-commit net exists");
+  });
+
+  it("omits the readiness panel when no workspace was scanned", () => {
+    const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: undefined, recent: [] });
+    expect(html).not.toContain("Can you validate?");
+  });
+
   it("shows a friendly empty hero when there are no sessions", () => {
     const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: undefined, recent: [] });
     expect(html).toContain("No sessions yet");

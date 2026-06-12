@@ -13,6 +13,8 @@ import { installHook, removeHook, nudgeInstallState } from "./hooks/preCommitNud
 import { StartSessionPanel } from "./panels/startSessionPanel";
 import { generateWeeklyReflection } from "./reflection/weeklyReflection";
 import { ambientDayKey, ambientTitle, ambientShouldStart } from "./core/ambient";
+import { assessReadiness } from "./collectors/validationReadiness";
+import { scanReadinessSignals } from "./collectors/validationReadinessScan";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -320,6 +322,31 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const checkReadinessFlow = async (): Promise<void> => {
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    if (!folder) {
+      void vscode.window.showInformationMessage("Open a workspace folder to check validation readiness.");
+      return;
+    }
+    const r = assessReadiness(scanReadinessSignals(folder));
+    dashboard.show(); // the full breakdown lives in the "Can you validate?" panel
+    if (!r.topGap) {
+      void vscode.window.showInformationMessage(`Agent Karma — ${r.summary}`);
+      return;
+    }
+    // If the missing net is the pre-commit hook (and we can install it), offer to.
+    const canInstallNudge =
+      r.topGap.key === "preCommit" && nudgeInstallState(folder) === "installable";
+    const action = canInstallNudge ? "Install nudge" : undefined;
+    const choice = await vscode.window.showInformationMessage(
+      `Agent Karma — ${r.summary} Biggest gap: ${r.topGap.label}.`,
+      ...(action ? [action] : [])
+    );
+    if (choice === action) {
+      installNudgeFlow();
+    }
+  };
+
   const weeklyReflectionFlow = (): void => {
     const reflection = generateWeeklyReflection(
       store.loadSessions().sessions,
@@ -350,6 +377,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
+    vscode.commands.registerCommand("agentKarma.checkValidationReadiness", checkReadinessFlow),
     vscode.commands.registerCommand("agentKarma.installPreCommitNudge", installNudgeFlow),
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),

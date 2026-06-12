@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.21.0]
+- **Validation Context Health — "Can you even validate?"** A new dashboard panel (and the **Check Validation Readiness** command) scans your workspace — config only, never your source — for the means to verify AI output: can tests / build / lint / type check run, is there a pre-commit net, CI, and does your agent guidance file (CLAUDE.md / AGENTS.md) ask the AI to validate. It names your single biggest gap and, when that gap is the pre-commit net, offers to install it in one click. A question no other coach asks.
+
 ## [0.20.0]
 - **Sharper by subtraction.** The dashboard now **leads with the validation checklist**, not a big score. The Karma number stays **quiet until ~5 sessions** make a self-comparative trend meaningful (it shows "Karma forming" before that), and the redundant trend arrows are de-duplicated.
 - **Removed the per-AI-tool "Patterns" table** — it read like the usage dashboard we explicitly reject. Your validation strengths/gaps still live in **Validation habits**.

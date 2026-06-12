@@ -46,6 +46,7 @@ For each AI-assisted coding session, Agent Karma produces:
 - 🔗 **Karma Trace** — a chronological, privacy-safe timeline of what happened (files saved, validation commands run, git diff summary)
 - 🍃 **Phal Card** — the outcome: files changed, tests/build/lint detected, and whether it's ready for commit or review
 - ⚖️ **Karma Score** — an **objective, transparent** score built only from the validation **actions** you actually took (tests/build/lint run, test coverage, change measured) — never a vague self-rating. Every point is explained.
+- 🩺 **Validation Context Health** — *"can you even validate?"* — a config-only scan of your workspace for the means to verify AI output (test/build/lint/type check, a pre-commit net, CI, and whether your CLAUDE.md/AGENTS.md asks the AI to validate); it names your biggest gap and offers a one-click fix
 - 🛡️ **Pre-commit nudge** *(opt-in)* — a local git hook that reminds you to validate AI-assisted changes *before* you commit them
 - 📤 **Export** — your session as JSON or Markdown
 - 🗑️ **Delete everything** — one command wipes all local data
