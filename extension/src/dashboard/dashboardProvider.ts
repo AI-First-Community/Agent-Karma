@@ -35,6 +35,9 @@ export class DashboardPanel {
       vscode.ViewColumn.Active,
       {
         enableScripts: false,
+        // Allow only the Karma Card command to be triggered from a dashboard link;
+        // the dashboard stays script-free otherwise.
+        enableCommandUris: ["agentKarma.generateKarmaCard"],
         retainContextWhenHidden: false,
         localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, "media")],
       }

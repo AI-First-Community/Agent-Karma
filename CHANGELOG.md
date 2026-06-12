@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.38.0]
+- **Generate the Karma Card from the dashboard.** The shareable certificate was only reachable from the Command Palette — easy to miss. The dashboard now shows a **"🏅 Your Karma Card → Generate Karma Card"** button (once you have at least one session) that runs the generator directly. Implemented with a scoped `command:` URI — the dashboard stays script-free; only this one command is permitted from a link.
+
 ## [0.37.1]
 - **Fix: dashboard chart bars and heatmap render again.** A nonce in the webview CSP `style-src` was making the browser ignore `'unsafe-inline'`, which silently blocked every dynamic inline style — so percent-bar fills (Validation Habits, "Did you validate the risky work?") showed empty and the "Where you validate" heatmap lost its cell colours and column layout. The nonce is dropped from `style-src` (the nonced `<style>` block still validates), and `.bar` is back to `display:inline-block` so its fill width resolves correctly.
 - **Marketplace polish.** Rewrites the extension README as a full listing (features, quick start, commands, settings, privacy, FAQ) with screenshot placeholders; adds `pricing`, `galleryBanner`, `preview`, `qna`, and richer keywords/categories to `package.json`.

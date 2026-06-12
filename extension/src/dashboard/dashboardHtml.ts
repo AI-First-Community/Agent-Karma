@@ -374,6 +374,25 @@ function consistencySection(stats: DashboardStats): string {
     <p class="consistency-read">${esc(consistencySummary(c))}</p>`;
 }
 
+/**
+ * Prominent call-to-action to generate the shareable Karma Card certificate.
+ * Uses a scoped command: URI (the only command the dashboard webview allows), so
+ * no scripts are needed. Shown once there's at least one session to celebrate.
+ */
+function cardCtaSection(stats: DashboardStats): string {
+  if (!stats || stats.sessionCount < 1) {
+    return "";
+  }
+  return `
+    <div class="card-cta">
+      <div class="card-cta__text">
+        <div class="card-cta__title">🏅 Your Karma Card</div>
+        <div class="card-cta__sub muted">A shareable certificate of your validation practice — generated entirely on your machine. Save as an image or a printable PDF.</div>
+      </div>
+      <a class="card-cta__btn" href="command:agentKarma.generateKarmaCard" role="button">Generate Karma Card</a>
+    </div>`;
+}
+
 /** Risk × validation — did you validate the work that actually mattered? */
 function riskValidationSection(stats: DashboardStats): string {
   const riskValidation = stats.riskValidation ?? [];
@@ -962,6 +981,12 @@ export function renderDashboardHtml(data: DashboardData): string {
     .waste-legend .lg { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
     .usage-waste .usage-read { color: var(--vscode-foreground); }
     .rework-read { font-size: var(--fs-body); }
+    /* Karma Card call-to-action */
+    .card-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap; border: 1px solid var(--ak-border); border-radius: var(--r-md); padding: var(--sp-4) var(--sp-5); background: linear-gradient(135deg, var(--ak-good-bg), transparent 72%); }
+    .card-cta__title { font-size: var(--fs-title); font-weight: 600; }
+    .card-cta__sub { font-size: var(--fs-body); margin-top: 2px; max-width: 46ch; }
+    .card-cta__btn { flex: 0 0 auto; display: inline-block; padding: var(--sp-2) var(--sp-4); border-radius: var(--r-pill); background: var(--ak-good); color: #fff; font-weight: 600; font-size: var(--fs-body); text-decoration: none; border: 1px solid color-mix(in srgb, var(--ak-good) 55%, transparent); white-space: nowrap; }
+    .card-cta__btn:hover { background: color-mix(in srgb, var(--ak-good) 85%, #000); }
     footer { margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px solid var(--ak-hairline); color: var(--vscode-descriptionForeground); font-size: var(--fs-caption); }
   </style>
   <title>Agent Karma</title>
@@ -973,6 +998,7 @@ export function renderDashboardHtml(data: DashboardData): string {
   <div class="bento">
     ${gridItem(karmicBanner(data), { span: true, carded: true })}
     ${gridItem(glanceSection(data.stats ?? EMPTY_STATS), { span: true, carded: true })}
+    ${gridItem(cardCtaSection(data.stats ?? EMPTY_STATS), { span: true, carded: true })}
     ${gridItem(sessionTabs(data), { span: true })}
     ${gridItem(watchlistSection(data.watchlist), { span: true })}
     ${gridItem(consistencySection(data.stats ?? EMPTY_STATS))}

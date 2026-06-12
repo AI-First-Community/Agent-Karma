@@ -135,6 +135,32 @@ describe("renderDashboardHtml", () => {
     expect(html).toContain("seg-ready"); // outcome distribution
   });
 
+  it("offers a Generate Karma Card button (scoped command URI) once there is a session", () => {
+    const html = renderDashboardHtml({
+      nonce: "n",
+      cspSource: "x",
+      active: undefined,
+      recent: [],
+      stats: {
+        rollingKarma: 71,
+        lastTrend: "up",
+        sessionCount: 3,
+        recentCount: 3,
+        validationRate: 70,
+        testsRunCount: 2,
+        scoreSeries: [40, 55, 71],
+        outcomes: { ready: 2, needs: 1, highRisk: 0, informational: 0 },
+      },
+    });
+    expect(html).toContain("Generate Karma Card");
+    expect(html).toContain('href="command:agentKarma.generateKarmaCard"');
+  });
+
+  it("hides the Karma Card button when there are no sessions yet", () => {
+    const html = renderDashboardHtml({ nonce: "n", cspSource: "x", active: undefined, recent: [] });
+    expect(html).not.toContain("command:agentKarma.generateKarmaCard");
+  });
+
   it("does not render the per-AI-tool Patterns table (subtracted — it read like a usage dashboard)", () => {
     const html = renderDashboardHtml({
       nonce: "n",
