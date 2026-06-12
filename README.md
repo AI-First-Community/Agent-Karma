@@ -48,8 +48,12 @@ For each AI-assisted coding session, Agent Karma produces:
 - ⚖️ **Karma Score** — an **objective, transparent** score built only from the validation **actions** you actually took (tests/build/lint run, test coverage, change measured) — never a vague self-rating. Every point is explained.
 - 🩺 **Validation Context Health** — *"can you even validate?"* — a config-only scan of your workspace for the means to verify AI output (test/build/lint/type check, a pre-commit net, CI, and whether your CLAUDE.md/AGENTS.md asks the AI to validate); it names your biggest gap and offers a one-click fix
 - 🛡️ **Pre-commit nudge** *(opt-in)* — a local git hook that reminds you to validate AI-assisted changes *before* you commit them
+- 📊 **Insight dashboard** — a calm, theme-adaptive view: a 🛞 karmic reflection, validation-consistency strip, Karma & validation **trend lines**, a task×check **heatmap**, risk×validation alignment, habit trends, a high-risk watchlist, and "what your Karma is made of"
+- 🧾 **Local AI usage** *(opt-in, Claude Code)* — reads Claude Code's **local** session logs (no network, no API key, metadata only) to show what your AI work cost — tokens, turns, plus *wastage* (tokens spent on unvalidated work)
+- 💬 **`@agentkarma` chat participant** — `/verify` (logs a validation — covers browser & copy-paste AI) and `/summary`
+- 🏅 **Shareable Karma Card** — a personalised, self-explanatory certificate of your validation practice; export as SVG or print to PDF, generated entirely locally
 - 📤 **Export** — your session as JSON or Markdown
-- 🗑️ **Delete everything** — one command wipes all local data
+- 🗑️ **Delete everything / Reset history** — wipe all local data, or just clear your Karma history while keeping settings
 
 Everything is stored as plain JSON on your machine.
 
@@ -83,7 +87,7 @@ Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 
 ## Project status
 
-🚧 **Pre-release.** Building incrementally, one release at a time (0.1 → 0.6, plus the opt-in pre-commit nudge in 0.7). See [`docs/roadmap.md`](docs/roadmap.md).
+🚧 **Pre-1.0, feature-complete and stable.** The full experience is built and tested — sessions, objective Karma Score, the insight dashboard, the opt-in pre-commit nudge, validation context health, the chat participant, opt-in local AI usage, and the shareable Karma Card. Every release ships with unit + integration tests, a zero-runtime-dependency build, and a CI-enforced no-network guard. Polishing toward a 1.0 Marketplace listing. See [`CHANGELOG.md`](CHANGELOG.md) and [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Documentation
 
