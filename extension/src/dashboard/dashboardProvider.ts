@@ -10,7 +10,7 @@ import { scanReadinessSignals } from "../collectors/validationReadinessScan";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
 import { nudgeInstallState } from "../hooks/preCommitNudge";
-import { highRiskWatchlist, scoreComposition } from "./insights";
+import { highRiskWatchlist, scoreComposition, usageAttribution, computeRework } from "./insights";
 import { readClaudeUsage } from "../collectors/claudeUsageScan";
 
 /** A single read-only dashboard webview panel. */
@@ -110,6 +110,10 @@ export class DashboardPanel {
       watchlist: highRiskWatchlist(store.sessions),
       scoreComposition: scoreComposition(store.sessions),
       claudeUsage,
+      usageAttribution: claudeUsage
+        ? usageAttribution(claudeUsage.timeline, store.sessions)
+        : undefined,
+      rework: computeRework(allEvents),
       active,
       activeEvents,
       lastCompleted,

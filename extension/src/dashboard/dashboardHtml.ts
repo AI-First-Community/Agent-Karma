@@ -9,7 +9,7 @@ import { KARMA_RULES } from "../scoring/karmaRules";
 import { KarmaMove, earnedRuleIds } from "../scoring/karmaExplain";
 import { SkillSuggestion } from "../skills/skillFinder";
 import { karmicMessage } from "./karmicMessage";
-import { worstTaskCheck, WatchItem, ScoreComposition } from "./insights";
+import { worstTaskCheck, WatchItem, ScoreComposition, UsageAttribution, ReworkSummary } from "./insights";
 import { ClaudeUsage } from "../collectors/claudeUsage";
 
 export interface DashboardData {
@@ -32,6 +32,10 @@ export interface DashboardData {
   scoreComposition?: ScoreComposition;
   /** Local Claude Code usage (opt-in, metadata-only). Undefined when off / unavailable. */
   claudeUsage?: ClaudeUsage;
+  /** AI output tokens attributed to validated vs. unvalidated work (needs usage). */
+  usageAttribution?: UsageAttribution;
+  /** Revision churn — files saved many times within a session. */
+  rework?: ReworkSummary;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -227,8 +231,33 @@ function fmtNum(n: number): string {
   return `${n}`;
 }
 
+/** AI output tokens split by whether the work was validated — the honest "wastage". */
+function wastageBlock(a: UsageAttribution | undefined): string {
+  if (!a || a.total === 0) {
+    return "";
+  }
+  const seg = (n: number, cls: string, label: string): string =>
+    n > 0
+      ? `<span class="seg ${cls}" style="width:${((n / a.total) * 100).toFixed(1)}%" title="${label}: ${fmtNum(n)}"></span>`
+      : "";
+  const read =
+    a.unvalidated > 0
+      ? `<b>${fmtNum(a.unvalidated)}</b> output tokens went into work you never validated.`
+      : `All your tracked AI output landed in sessions you validated — no wasted spend.`;
+  return `
+    <div class="usage-waste">
+      <div class="stack">${seg(a.validated, "seg-ready", "Validated")}${seg(a.unvalidated, "seg-high", "Unvalidated")}${seg(a.untracked, "seg-info", "Untracked")}</div>
+      <div class="waste-legend">
+        <span><i class="lg seg-ready"></i> validated</span>
+        <span><i class="lg seg-high"></i> unvalidated</span>
+        <span><i class="lg seg-info"></i> untracked (no session)</span>
+      </div>
+      <p class="usage-read">${read}</p>
+    </div>`;
+}
+
 /** Local Claude Code usage — what your AI work cost, framed by the validation question. */
-function claudeUsageSection(u: ClaudeUsage | undefined): string {
+function claudeUsageSection(u: ClaudeUsage | undefined, attribution?: UsageAttribution): string {
   if (!u || u.turns === 0) {
     return "";
   }
@@ -254,7 +283,21 @@ function claudeUsageSection(u: ClaudeUsage | undefined): string {
         <div class="g-value"><b style="font-size:0.9rem">${esc(topModel)}</b> <span class="muted">· ${fmtNum(u.cacheReadTokens)} cached reads (re-used context, near-free)</span></div>
       </div>
     </div>
-    <p class="usage-read muted">Read locally from Claude Code's session logs — no network, no API key, metadata only. The question that matters: did you validate what these tokens produced?</p>`;
+    ${wastageBlock(attribution)}
+    <p class="usage-read muted">Read locally from Claude Code's session logs — no network, no API key, metadata only.</p>`;
+}
+
+/** Revision churn — files saved many times in a session (iteration / rework). */
+function reworkSection(r: ReworkSummary | undefined): string {
+  if (!r || r.churnedFiles === 0) {
+    return "";
+  }
+  const top = r.topFile
+    ? ` Most revised: <b>${esc(r.topFile.name)}</b> (${r.topFile.saves}× in one session).`
+    : "";
+  return `
+    <h2>Rework</h2>
+    <p class="rework-read"><b>${r.churnedFiles}</b> file${r.churnedFiles === 1 ? "" : "s"} you revised 3+ times in a single session — iteration that's worth validating before you trust it.${top}</p>`;
 }
 
 /** High-risk watchlist — risky work you never validated. A literal to-do list. */
@@ -909,6 +952,13 @@ export function renderDashboardHtml(data: DashboardData): string {
     /* AI usage (local Claude Code) */
     .usage-tag { font-size: var(--fs-label); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ak-good); background: var(--ak-good-bg); padding: 2px 7px; border-radius: var(--r-pill); margin-left: var(--sp-2); }
     .usage-read { font-size: var(--fs-caption); margin-top: var(--sp-3); }
+    .usage-waste { margin-top: var(--sp-4); }
+    .usage-waste .stack { height: 12px; }
+    .waste-legend { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin-top: var(--sp-2); font-size: var(--fs-caption); color: var(--vscode-descriptionForeground); }
+    .waste-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .waste-legend .lg { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+    .usage-waste .usage-read { color: var(--vscode-foreground); }
+    .rework-read { font-size: var(--fs-body); }
     footer { margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px solid var(--ak-hairline); color: var(--vscode-descriptionForeground); font-size: var(--fs-caption); }
   </style>
   <title>Agent Karma</title>
@@ -927,8 +977,9 @@ export function renderDashboardHtml(data: DashboardData): string {
     ${gridItem(trendsSection(data.stats ?? EMPTY_STATS), { span: true })}
     ${gridItem(heatmapSection(data), { span: true })}
     ${gridItem(scoreCompositionSection(data.scoreComposition), { span: true })}
-    ${gridItem(claudeUsageSection(data.claudeUsage), { span: true })}
+    ${gridItem(claudeUsageSection(data.claudeUsage, data.usageAttribution), { span: true })}
     ${gridItem(habitsSection(data.validationHabits))}
+    ${gridItem(reworkSection(data.rework))}
     ${gridItem(readinessSection(data.readiness))}
     ${gridItem(suggestionsSection(data.suggestions), { span: true, carded: true })}
     ${gridItem(reflectionCard(data.reflection), { span: true, carded: true })}

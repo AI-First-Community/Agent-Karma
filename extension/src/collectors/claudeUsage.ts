@@ -24,6 +24,8 @@ export interface ClaudeUsage {
   models: ModelUsage[];
   firstTs?: string;
   lastTs?: string;
+  /** Per-turn (timestamp, output tokens) — metadata only, for correlating to sessions. */
+  timeline: { ts: string; output: number }[];
 }
 
 interface RawLine {
@@ -56,6 +58,7 @@ export function aggregateClaudeUsage(lines: Iterable<string>): ClaudeUsage {
     turns: 0,
     sessions: 0,
     models: [],
+    timeline: [],
   };
   const sessionIds = new Set<string>();
   const byModel = new Map<string, ModelUsage>();
@@ -97,6 +100,7 @@ export function aggregateClaudeUsage(lines: Iterable<string>): ClaudeUsage {
       if (!acc.lastTs || row.timestamp > acc.lastTs) {
         acc.lastTs = row.timestamp;
       }
+      acc.timeline.push({ ts: row.timestamp, output: out });
     }
   }
 

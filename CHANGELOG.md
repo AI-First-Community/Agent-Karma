@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.29.0]
+- **Token wastage, tied to validation.** When local Claude usage is on, the usage card now splits your AI **output tokens** into *validated* / *unvalidated* / *untracked* — so "wastage" means what it should: tokens you spent on changes you **never verified** (tokens outside any tracked session are shown as untracked, not blamed). Still local, still metadata-only.
+- **Rework (revision churn).** A new card counts files you saved **3+ times in one session** (from your own save events — honest about what it measures: iteration) and names the most-revised one — a quiet prompt to validate heavily-reworked code before trusting it.
+
 ## [0.28.0]
 - **Local AI usage — Claude Code** *(opt-in, off by default)*. Enable **Agent Karma › Read Claude Usage** and the dashboard shows what your AI work cost — fresh tokens (in + out), output, AI turns, model, and cache reuse — read **entirely from local disk** (`~/.claude/projects/…`), with **no network, no API key**. Strictly metadata-only: your prompts, the AI's replies, and your code are never read or stored. Framed by the one question that matters — *did you validate what these tokens produced?* (Claude Code first; other tools have no comparable local data.)
 - **Chakra, not a lamp.** The reflection banner now shows a slowly-turning dharmachakra tinted by your Karma mood (luminous green / steady blue / forming amber / dim red), honouring reduced-motion settings.

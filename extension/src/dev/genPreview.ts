@@ -91,8 +91,10 @@ const html = renderDashboardHtml({
     inputTokens: 1_240_000, outputTokens: 86_400, cacheReadTokens: 4_120_000, cacheCreationTokens: 318_000,
     turns: 412, sessions: 9,
     models: [{ model: "claude-opus-4-8", turns: 412, outputTokens: 86_400 }],
-    firstTs: "2026-06-05T09:00:00Z", lastTs: "2026-06-12T18:00:00Z",
+    firstTs: "2026-06-05T09:00:00Z", lastTs: "2026-06-12T18:00:00Z", timeline: [],
   },
+  usageAttribution: { validated: 64_000, unvalidated: 18_000, untracked: 4_400, total: 86_400, validatedPct: 74 },
+  rework: { churnedFiles: 3, topFile: { name: "auth.service.ts", saves: 5 } },
   reflection: generateWeeklyReflection(sessions, new Date().toISOString()),
   readiness: assessReadiness({
     testScript: true, testDep: true, testConfigFile: true,
