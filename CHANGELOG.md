@@ -2,6 +2,24 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.18.0]
+- **Ambient mode** (opt-in): continuous, no-manual-start capture grouped by day. Toggle with "Agent Karma: Toggle Ambient Mode" — it quietly captures saves + validation and rolls over at midnight. Fits long, continuous, mixed AI+manual development.
+
+## [0.17.0]
+- End-of-session validation prompt is now a **checklist** (tick Tests / Build / Lint / Type check; auto-detected pre-checked) instead of typing a command.
+
+## [0.16.0]
+- **Manrope** font bundled locally and used in the dashboard (stays no-network).
+
+## [0.15.0]
+- **Validation Habits** insight panel (where you're strong / your biggest gap) and **actionable recommendations**.
+
+## [0.14.0]
+- Dashboard design upgrade: Manrope-first typography, pill badges, gradient sparkline, circular Karma gauge.
+
+## [0.13.0]
+- Browser **preview generator** for the dashboard (dev tool) + initial visual polish.
+
 ## [0.12.0]
 - **Effort-vs-risk cross-check**: a per-session flag when a higher-risk task ships without validation (and reassurance when a high-risk change *was* validated). Low-risk changes draw no nag.
 

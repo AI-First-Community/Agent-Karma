@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -64,6 +64,10 @@
       {
         "command": "agentKarma.exportMarkdown",
         "title": "Agent Karma: Export Current Session as Markdown"
+      },
+      {
+        "command": "agentKarma.toggleAmbientMode",
+        "title": "Agent Karma: Toggle Ambient Mode (continuous capture)"
       },
       {
         "command": "agentKarma.deleteAllData",

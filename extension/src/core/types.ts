@@ -18,6 +18,8 @@ export interface AgentKarmaSession {
   startedAt: string;
   endedAt?: string;
   status: "active" | "completed";
+  /** True for auto-managed ambient (continuous, per-day) sessions. */
+  ambient?: boolean;
   /** Prompt hygiene hint (0–100), contributes ≤10% of the Karma Score. */
   promptHintScore?: number;
   promptHintLabel?: PromptHintLabel;

@@ -26,6 +26,13 @@ export class StatusBarController {
     this.item.tooltip = "Start an Agent Karma session";
   }
 
+  /** Ambient mode: continuously watching, grouped by day. */
+  setAmbient(): void {
+    this.stopTimer();
+    this.item.text = "$(eye) Agent Karma · watching";
+    this.item.tooltip = "Ambient mode — capturing your work by day. Click to open the dashboard.";
+  }
+
   /** Show the recording state with a live MM:SS timer computed from startedAt. */
   setRecording(startedAtIso: string): void {
     this.stopTimer();

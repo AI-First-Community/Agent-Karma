@@ -21,6 +21,8 @@ export interface SessionMeta {
   aiTool: string;
   taskType: string;
   intent: string;
+  /** Marks an auto-managed ambient (continuous, per-day) session. */
+  ambient?: boolean;
 }
 
 /** Minimal subset of vscode.Memento — lets us unit-test without the vscode API. */
@@ -94,6 +96,7 @@ export class SessionManager {
       intent: meta.intent,
       startedAt: this.now().toISOString(),
       status: "active",
+      ambient: meta.ambient ? true : undefined,
       promptHintScore: promptHint.score,
       promptHintLabel: promptHint.label,
       dharmaCard,

@@ -12,6 +12,7 @@ import { toMarkdown } from "./export/markdownExporter";
 import { installHook, removeHook } from "./hooks/preCommitNudge";
 import { StartSessionPanel } from "./panels/startSessionPanel";
 import { generateWeeklyReflection } from "./reflection/weeklyReflection";
+import { ambientDayKey, ambientTitle, ambientShouldStart } from "./core/ambient";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -38,10 +39,17 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const fileCollector = new FileCollector(manager, store, bus);
   const terminalCollector = new TerminalCollector(manager);
 
+  const AMBIENT_KEY = "agentKarma.ambientMode";
+  const ambientOn = (): boolean => context.globalState.get<boolean>(AMBIENT_KEY) === true;
+
   const syncStatusBar = (): void => {
     const active = manager.getActiveSession();
-    if (active) {
+    if (active?.ambient) {
+      statusBar.setAmbient();
+    } else if (active) {
       statusBar.setRecording(active.startedAt);
+    } else if (ambientOn()) {
+      statusBar.setAmbient();
     } else {
       statusBar.setIdle();
     }
@@ -112,23 +120,16 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     void vscode.window.showInformationMessage(`Logged validation: ${cmd.trim()}`);
   };
 
-  const endFlow = async (): Promise<void> => {
-    if (!manager.hasActiveSession()) {
-      void vscode.window.showInformationMessage("No active Agent Karma session to end.");
-      return;
-    }
-    // End-of-session validation checklist: just tick what you ran. Anything we
-    // already auto-detected is pre-checked, so you only add what we missed.
-    const activeForEnd = manager.getActiveSession();
+  // The end-of-session validation checklist (interactive): just tick what you ran.
+  const validationChecklist = async (): Promise<void> => {
+    const active = manager.getActiveSession();
     const detected = new Set(
       store
         .loadEvents()
-        .events.filter(
-          (e) => e.sessionId === activeForEnd?.id && e.type === "validation.command"
-        )
+        .events.filter((e) => e.sessionId === active?.id && e.type === "validation.command")
         .map((e) => String(e.data.commandType))
     );
-    const checklistItems: (vscode.QuickPickItem & { type: ValidationCommandType })[] = (
+    const items: (vscode.QuickPickItem & { type: ValidationCommandType })[] = (
       [
         { label: "Tests", type: "Test" },
         { label: "Build", type: "Build" },
@@ -141,7 +142,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       description: detected.has(it.type) ? "auto-detected ✓" : undefined,
       picked: detected.has(it.type),
     }));
-    const picks = await vscode.window.showQuickPick(checklistItems, {
+    const picks = await vscode.window.showQuickPick(items, {
       canPickMany: true,
       title: "Which validation did you run this session?",
       placeHolder: "Tick all you ran (auto-detected are pre-checked) — or leave empty if none",
@@ -153,33 +154,104 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
         }
       }
     }
+  };
 
-    // Git diff summary (counts only) + Phal Card, computed while the session is still active.
+  // Finalize + end the active session. interactive = ask the checklist + reflection
+  // (manual end); non-interactive = unattended (ambient day-rollover / toggle-off).
+  const finishActiveSession = async (interactive: boolean): Promise<void> => {
+    if (!manager.hasActiveSession()) {
+      return;
+    }
+    if (interactive) {
+      await validationChecklist();
+    }
     const cwds = (vscode.workspace.workspaceFolders ?? []).map((f) => f.uri.fsPath);
     const gitSummary = await getGitDiffSummary(cwds);
     manager.finalizeActiveSession(gitSummary);
 
-    // Optional, UNSCORED reflection.
-    const outcome = await vscode.window.showQuickPick(
-      ["Yes", "Partly", "No", "Skip"],
-      { title: "Did the outcome match your intent? (optional — not scored)", ignoreFocusOut: true }
-    );
-    if (outcome && outcome !== "Skip") {
-      manager.setReflectionForActiveSession({
-        outcomeMatchedIntent: outcome.toLowerCase() as "yes" | "partly" | "no",
+    if (interactive) {
+      const outcome = await vscode.window.showQuickPick(["Yes", "Partly", "No", "Skip"], {
+        title: "Did the outcome match your intent? (optional — not scored)",
+        ignoreFocusOut: true,
       });
+      if (outcome && outcome !== "Skip") {
+        manager.setReflectionForActiveSession({
+          outcomeMatchedIntent: outcome.toLowerCase() as "yes" | "partly" | "no",
+        });
+      }
     }
 
     const ended = manager.endSession();
     syncStatusBar();
     dashboard.refresh();
-    void vscode.window.showInformationMessage(
-      `Agent Karma session ended: ${ended?.title ?? ""}`
-    );
+    if (interactive) {
+      void vscode.window.showInformationMessage(`Agent Karma session ended: ${ended?.title ?? ""}`);
+    }
+  };
+
+  const endFlow = async (): Promise<void> => {
+    if (!manager.hasActiveSession()) {
+      void vscode.window.showInformationMessage("No active Agent Karma session to end.");
+      return;
+    }
+    await finishActiveSession(true);
+  };
+
+  // Ambient mode: ensure today's auto-managed session exists, rolling over at midnight.
+  let ambientBusy = false;
+  const ensureAmbientDaySession = async (): Promise<void> => {
+    if (!ambientOn() || ambientBusy) {
+      return;
+    }
+    const today = ambientDayKey(new Date().toISOString());
+    const active = manager.getActiveSession();
+    if (active && !active.ambient) {
+      return; // a manual session is active — leave it alone
+    }
+    if (!ambientShouldStart(true, active, today)) {
+      return;
+    }
+    ambientBusy = true;
+    try {
+      if (active?.ambient) {
+        await finishActiveSession(false); // roll the previous day over
+      }
+      manager.startSession({
+        title: ambientTitle(today),
+        aiTool: "Various",
+        taskType: "Other",
+        intent: "",
+        ambient: true,
+      });
+      syncStatusBar();
+      dashboard.refresh();
+    } finally {
+      ambientBusy = false;
+    }
+  };
+
+  const toggleAmbientFlow = async (): Promise<void> => {
+    const next = !ambientOn();
+    await context.globalState.update(AMBIENT_KEY, next);
+    if (next) {
+      await ensureAmbientDaySession();
+      void vscode.window.showInformationMessage(
+        "Ambient mode ON — Agent Karma will quietly capture your work, grouped by day. No manual start needed."
+      );
+    } else {
+      if (manager.getActiveSession()?.ambient) {
+        await finishActiveSession(false);
+      }
+      syncStatusBar();
+      void vscode.window.showInformationMessage("Ambient mode OFF.");
+    }
   };
 
   const toggleFlow = async (): Promise<void> => {
-    if (manager.hasActiveSession()) {
+    const active = manager.getActiveSession();
+    if (active?.ambient) {
+      dashboard.show(); // ambient sessions roll over by day, not by a click
+    } else if (active) {
       await endFlow();
     } else {
       startFlow();
@@ -279,6 +351,11 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.deleteAllData", deleteFlow),
     vscode.commands.registerCommand("agentKarma.installPreCommitNudge", installNudgeFlow),
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
+    vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),
+    // Ambient mode: a save is the trigger to ensure today's session exists / roll over.
+    vscode.workspace.onDidSaveTextDocument(() => {
+      void ensureAmbientDaySession();
+    }),
     statusBar,
     dashboard,
     startPanel,
@@ -312,6 +389,10 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
         }
       });
   }
+
+  // If ambient mode is on, make sure today's session exists (and roll over a
+  // session left running from a previous day).
+  void ensureAmbientDaySession();
 
   return { getStorageDir: () => store.dir, startSession: (meta) => doStart(meta) };
 }
