@@ -1,7 +1,7 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
 import { DashboardStats, ValidationHabits } from "./dashboardStats";
-import { sparkline, percentBar, outcomeBar, gauge, validationStreak, trendLine, heatmap, HeatRow } from "./charts";
+import { sparkline, percentBar, outcomeBar, gauge, validationStreak, trendLine, heatmap, HeatRow, chakra } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
 import { ValidationReadiness } from "../collectors/validationReadiness";
@@ -10,6 +10,7 @@ import { KarmaMove, earnedRuleIds } from "../scoring/karmaExplain";
 import { SkillSuggestion } from "../skills/skillFinder";
 import { karmicMessage } from "./karmicMessage";
 import { worstTaskCheck, WatchItem, ScoreComposition } from "./insights";
+import { ClaudeUsage } from "../collectors/claudeUsage";
 
 export interface DashboardData {
   nonce: string;
@@ -29,6 +30,8 @@ export interface DashboardData {
   watchlist?: WatchItem[];
   /** How earned Karma splits between real verification and near-free points. */
   scoreComposition?: ScoreComposition;
+  /** Local Claude Code usage (opt-in, metadata-only). Undefined when off / unavailable. */
+  claudeUsage?: ClaudeUsage;
   active: AgentKarmaSession | undefined;
   /** Events for the active session (used to show live file/validation capture). */
   activeEvents?: AgentKarmaEvent[];
@@ -156,9 +159,17 @@ function collapsible(title: string, inner: string, open = false): string {
 function karmicBanner(data: DashboardData): string {
   const m = karmicMessage(data.stats ?? EMPTY_STATS, data.lastCompleted);
   const sub = m.sub ? `<div class="karmic-sub">${esc(m.sub)}</div>` : "";
+  const color =
+    m.mood === "luminous"
+      ? "var(--ak-good)"
+      : m.mood === "steady"
+        ? "var(--ak-info)"
+        : m.mood === "forming"
+          ? "var(--ak-warn)"
+          : "var(--ak-risk)";
   return `
     <div class="karmic karmic-${m.mood}">
-      <div class="karmic-lamp">🪔</div>
+      <div class="karmic-chakra">${chakra(color)}</div>
       <div class="karmic-text">
         <div class="karmic-headline">${esc(m.headline)}</div>
         ${sub}
@@ -203,6 +214,47 @@ function heatmapSection(data: DashboardData): string {
     <h2>Where you validate</h2>
     ${heatmap(hm.rows, hm.colLabels)}
     ${callout}`;
+}
+
+/** Compact human number: 1234 → 1.2k, 1_200_000 → 1.2M. */
+function fmtNum(n: number): string {
+  if (n >= 1_000_000) {
+    return `${(n / 1_000_000).toFixed(1)}M`;
+  }
+  if (n >= 1_000) {
+    return `${(n / 1_000).toFixed(1)}k`;
+  }
+  return `${n}`;
+}
+
+/** Local Claude Code usage — what your AI work cost, framed by the validation question. */
+function claudeUsageSection(u: ClaudeUsage | undefined): string {
+  if (!u || u.turns === 0) {
+    return "";
+  }
+  const fresh = u.inputTokens + u.outputTokens;
+  const topModel = u.models[0]?.model ?? "—";
+  return `
+    <h2>AI usage · Claude Code <span class="usage-tag">local</span></h2>
+    <div class="glance">
+      <div class="g-item">
+        <div class="g-label">Fresh tokens (in + out)</div>
+        <div class="g-value"><b>${fmtNum(fresh)}</b></div>
+      </div>
+      <div class="g-item">
+        <div class="g-label">Output tokens</div>
+        <div class="g-value"><b>${fmtNum(u.outputTokens)}</b></div>
+      </div>
+      <div class="g-item">
+        <div class="g-label">AI turns</div>
+        <div class="g-value"><b>${u.turns}</b> <span class="muted">/ ${u.sessions} sess</span></div>
+      </div>
+      <div class="g-item g-wide">
+        <div class="g-label">Model · cache reuse</div>
+        <div class="g-value"><b style="font-size:0.9rem">${esc(topModel)}</b> <span class="muted">· ${fmtNum(u.cacheReadTokens)} cached reads (re-used context, near-free)</span></div>
+      </div>
+    </div>
+    <p class="usage-read muted">Read locally from Claude Code's session logs — no network, no API key, metadata only. The question that matters: did you validate what these tokens produced?</p>`;
 }
 
 /** High-risk watchlist — risky work you never validated. A literal to-do list. */
@@ -660,8 +712,11 @@ export function renderDashboardHtml(data: DashboardData): string {
     .bento-card > .sec > summary { padding-top: 0; }
     .recording-head { margin-bottom: var(--sp-2); }
     /* karmic reflection banner */
-    .karmic { display: flex; gap: var(--sp-4); align-items: flex-start; padding: var(--sp-4) var(--sp-5); border: 1px solid var(--ak-border); border-radius: var(--r-md); background: linear-gradient(135deg, var(--karmic-bg, var(--ak-surface-2)), transparent 70%); }
-    .karmic-lamp { font-size: 1.7rem; line-height: 1.2; filter: saturate(1.1); }
+    .karmic { display: flex; gap: var(--sp-4); align-items: center; padding: var(--sp-4) var(--sp-5); border: 1px solid var(--ak-border); border-radius: var(--r-md); background: linear-gradient(135deg, var(--karmic-bg, var(--ak-surface-2)), transparent 70%); }
+    .karmic-chakra { flex: 0 0 auto; display: flex; }
+    .chakra { transform-origin: center; animation: ak-spin 24s linear infinite; }
+    @keyframes ak-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .chakra { animation: none; } }
     .karmic-headline { font-size: 1.0625rem; font-weight: 350; line-height: 1.45; letter-spacing: -0.01em; color: var(--vscode-foreground); }
     .karmic-sub { margin-top: var(--sp-2); font-size: var(--fs-caption); color: var(--vscode-descriptionForeground); }
     .karmic-luminous { --karmic-bg: color-mix(in srgb, var(--ak-good) 16%, transparent); }
@@ -851,6 +906,9 @@ export function renderDashboardHtml(data: DashboardData): string {
     .comp-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .comp-legend .lg { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
     .comp-read { font-size: var(--fs-body); margin-top: var(--sp-2); }
+    /* AI usage (local Claude Code) */
+    .usage-tag { font-size: var(--fs-label); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ak-good); background: var(--ak-good-bg); padding: 2px 7px; border-radius: var(--r-pill); margin-left: var(--sp-2); }
+    .usage-read { font-size: var(--fs-caption); margin-top: var(--sp-3); }
     footer { margin-top: var(--sp-7); padding-top: var(--sp-4); border-top: 1px solid var(--ak-hairline); color: var(--vscode-descriptionForeground); font-size: var(--fs-caption); }
   </style>
   <title>Agent Karma</title>
@@ -869,6 +927,7 @@ export function renderDashboardHtml(data: DashboardData): string {
     ${gridItem(trendsSection(data.stats ?? EMPTY_STATS), { span: true })}
     ${gridItem(heatmapSection(data), { span: true })}
     ${gridItem(scoreCompositionSection(data.scoreComposition), { span: true })}
+    ${gridItem(claudeUsageSection(data.claudeUsage), { span: true })}
     ${gridItem(habitsSection(data.validationHabits))}
     ${gridItem(readinessSection(data.readiness))}
     ${gridItem(suggestionsSection(data.suggestions), { span: true, carded: true })}

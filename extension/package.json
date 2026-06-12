@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -105,6 +105,16 @@
           "when": "false"
         }
       ]
+    },
+    "configuration": {
+      "title": "Agent Karma",
+      "properties": {
+        "agentKarma.readClaudeUsage": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Read Claude Code's **local** session logs (`~/.claude/projects/…`) to show what your AI work cost — tokens, turns, model. Off by default. Fully local: no network, no API key, and only usage **metadata** is read (your prompts, the AI's replies, and your code are never read or stored)."
+        }
+      }
     },
     "chatParticipants": [
       {

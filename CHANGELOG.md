@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.28.0]
+- **Local AI usage — Claude Code** *(opt-in, off by default)*. Enable **Agent Karma › Read Claude Usage** and the dashboard shows what your AI work cost — fresh tokens (in + out), output, AI turns, model, and cache reuse — read **entirely from local disk** (`~/.claude/projects/…`), with **no network, no API key**. Strictly metadata-only: your prompts, the AI's replies, and your code are never read or stored. Framed by the one question that matters — *did you validate what these tokens produced?* (Claude Code first; other tools have no comparable local data.)
+- **Chakra, not a lamp.** The reflection banner now shows a slowly-turning dharmachakra tinted by your Karma mood (luminous green / steady blue / forming amber / dim red), honouring reduced-motion settings.
+
 ## [0.27.0]
 - **Karmic reflection now grows with you.** Each level (nascent → dim → forming → steady → luminous) has a *pool* of messages instead of one fixed line, and the banner picks by your progress (session count) so it rotates over time. It also speaks to **momentum** — an *ascending* voice when your Karma is trending up, a gentle *slipping* one when it's dipping — so the message reflects where you're heading, not just where you are.
 

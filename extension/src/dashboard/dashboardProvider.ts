@@ -11,6 +11,7 @@ import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
 import { nudgeInstallState } from "../hooks/preCommitNudge";
 import { highRiskWatchlist, scoreComposition } from "./insights";
+import { readClaudeUsage } from "../collectors/claudeUsageScan";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -77,6 +78,10 @@ export class DashboardPanel {
         ? explainKarmaMove(prevCompleted, lastCompleted)
         : undefined;
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const claudeUsage =
+      root && vscode.workspace.getConfiguration("agentKarma").get<boolean>("readClaudeUsage")
+        ? readClaudeUsage(root) ?? undefined
+        : undefined;
     const signals = root ? scanReadinessSignals(root) : undefined;
     const readiness = signals ? assessReadiness(signals) : undefined;
     const habits = computeValidationHabits(store.sessions);
@@ -104,6 +109,7 @@ export class DashboardPanel {
       heatmap: computeValidationHeatmap(store.sessions),
       watchlist: highRiskWatchlist(store.sessions),
       scoreComposition: scoreComposition(store.sessions),
+      claudeUsage,
       active,
       activeEvents,
       lastCompleted,

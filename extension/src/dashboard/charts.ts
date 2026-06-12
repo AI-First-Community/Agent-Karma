@@ -52,6 +52,29 @@ export function gauge(score: number, size = 104): string {
   </svg>`;
 }
 
+/**
+ * A dharmachakra (spoked wheel) tinted by mood. Pure SVG, CSP-safe; a very slow CSS
+ * spin (disabled under prefers-reduced-motion) evokes the turning wheel.
+ */
+export function chakra(color: string, size = 46): string {
+  const c = size / 2;
+  const r = size / 2 - 3;
+  const hub = 3.2;
+  const spokes = Array.from({ length: 12 }, (_, i) => {
+    const a = (i * Math.PI) / 6;
+    const x1 = (c + hub * Math.cos(a)).toFixed(1);
+    const y1 = (c + hub * Math.sin(a)).toFixed(1);
+    const x2 = (c + (r - 1.5) * Math.cos(a)).toFixed(1);
+    const y2 = (c + (r - 1.5) * Math.sin(a)).toFixed(1);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.2" stroke-linecap="round"/>`;
+  }).join("");
+  return `<svg class="chakra" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="2"/>
+    ${spokes}
+    <circle cx="${c}" cy="${c}" r="${hub}" fill="${color}"/>
+  </svg>`;
+}
+
 /** A cell type for the validation-consistency strip. */
 export type StreakCell = "good" | "warn" | "risk" | "empty";
 

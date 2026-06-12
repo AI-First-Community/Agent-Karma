@@ -87,6 +87,12 @@ const html = renderDashboardHtml({
   heatmap: computeValidationHeatmap(sessions),
   watchlist: highRiskWatchlist(sessions),
   scoreComposition: scoreComposition(sessions),
+  claudeUsage: {
+    inputTokens: 1_240_000, outputTokens: 86_400, cacheReadTokens: 4_120_000, cacheCreationTokens: 318_000,
+    turns: 412, sessions: 9,
+    models: [{ model: "claude-opus-4-8", turns: 412, outputTokens: 86_400 }],
+    firstTs: "2026-06-05T09:00:00Z", lastTs: "2026-06-12T18:00:00Z",
+  },
   reflection: generateWeeklyReflection(sessions, new Date().toISOString()),
   readiness: assessReadiness({
     testScript: true, testDep: true, testConfigFile: true,
