@@ -3,6 +3,7 @@ import { buildKarmaTrace } from "../cards/karmaTrace";
 import { DashboardStats, BreakdownRow } from "./dashboardStats";
 import { sparkline, percentBar, outcomeBar } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
+import { riskAlignment } from "../cards/riskAlignment";
 
 export interface DashboardData {
   nonce: string;
@@ -196,10 +197,16 @@ function lastSessionSection(
     ? `<pre class="trace">${trace.map(esc).join("\n")}</pre>`
     : "";
 
+  const risk = riskAlignment(session);
+  const riskBadge = risk.label
+    ? `<div class="risk-flag ${risk.warn ? "risk-warn" : "risk-ok"}">${risk.warn ? "⚠" : "✓"} ${esc(risk.label)}</div>`
+    : "";
+
   return `
     <div class="card">
       <div class="outcome outcome-${esc(p.outcome.replace(/\s+/g, "-").toLowerCase())}">🍃 ${esc(p.outcome)}</div>
       <h3>${esc(session.title)}</h3>
+      ${riskBadge}
       ${scoreBlock(session)}
       <dl>
         <dt>Files changed</dt><dd>${p.filesChanged} (${p.testFilesChanged} test)</dd>
@@ -340,6 +347,9 @@ export function renderDashboardHtml(data: DashboardData): string {
     .refl-summary { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin: 0.15rem 0; }
     .refl-nudge { font-size: 0.95rem; }
     .bd-title { font-size: 0.9rem; margin: 0.9rem 0 0.3rem; }
+    .risk-flag { display: inline-block; font-size: 0.85rem; padding: 0.2rem 0.55rem; border-radius: 4px; margin: 0.1rem 0 0.4rem; }
+    .risk-warn { color: var(--vscode-charts-red, #e51400); background: var(--vscode-inputValidation-errorBackground, transparent); }
+    .risk-ok { color: var(--vscode-charts-green, #388a34); }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>

@@ -1,6 +1,21 @@
 # Changelog
 
-All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time.
+All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
+
+## [0.12.0]
+- **Effort-vs-risk cross-check**: a per-session flag when a higher-risk task ships without validation (and reassurance when a high-risk change *was* validated). Low-risk changes draw no nag.
+
+## [0.11.0]
+- **Patterns**: per-AI-tool and per-task-type **validation-rate** breakdown on the dashboard (your own insight — never a usage count).
+
+## [0.10.0]
+- **Weekly reflection**: one plain-language, self-comparative coaching nudge distilled from your last 7 days, on the dashboard and via a command.
+
+## [0.9.0]
+- **Rich dashboard**: a hero Karma + trend, an "at a glance" panel (validation rate, tests-run, a Karma sparkline, outcome distribution) — zero-dependency, CSP-safe SVG/CSS charts.
+
+## [0.8.0]
+- **Start Session config UI**: a single form (title, AI tool, task type, intent) replaces the sequential prompts; pre-selects your last choices.
 
 ## [0.7.0]
 - Opt-in, non-blocking **pre-commit nudge**: a local git hook that reminds you to validate AI-assisted changes before committing when your latest session logged no tests/build/lint. Safe install — never clobbers husky / lefthook / pre-commit-framework / existing hooks; fully reversible. Off by default.
