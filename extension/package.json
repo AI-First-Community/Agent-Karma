@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -125,6 +125,11 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Read Claude Code's **local** session logs (`~/.claude/projects/…`) to show what your AI work cost — tokens, turns, model. Off by default. Fully local: no network, no API key, and only usage **metadata** is read (your prompts, the AI's replies, and your code are never read or stored)."
+        },
+        "agentKarma.cardName": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Name to print on your shareable **Karma Card**. Leave blank to use your local git `user.name` (or your OS username). Resolved locally — never sent anywhere."
         }
       }
     },

@@ -23,6 +23,8 @@ import { computeValidationHabits, computeStats } from "./dashboard/dashboardStat
 import { karmicMessage } from "./dashboard/karmicMessage";
 import { renderKarmaCardSvg, renderKarmaCardPrintHtml } from "./cards/karmaCard";
 import { randomUUID } from "crypto";
+import { execFileSync } from "child_process";
+import * as os from "os";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -325,11 +327,35 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       </body></html>`;
   };
 
+  // Recipient name for the Karma Card — resolved LOCALLY (setting → git user.name → OS
+  // user). No network, no account/auth lookup.
+  const resolveCardName = (): string => {
+    const override = vscode.workspace.getConfiguration("agentKarma").get<string>("cardName");
+    if (override && override.trim()) {
+      return override.trim();
+    }
+    const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    try {
+      const n = execFileSync("git", ["config", "user.name"], { cwd, timeout: 2000 }).toString().trim();
+      if (n) {
+        return n;
+      }
+    } catch {
+      /* no git / no name configured */
+    }
+    try {
+      return os.userInfo().username ?? "";
+    } catch {
+      return "";
+    }
+  };
+
   const generateKarmaCardFlow = async (): Promise<void> => {
     const s = store.loadSessions();
     const stats = computeStats(s.sessions, s.karmaEma);
     const cardInput = {
       mood: karmicMessage(stats).mood,
+      name: resolveCardName(),
       karma: stats.rollingKarma,
       validationRate: stats.validationRate,
       bestStreak: stats.consistency?.bestRun,

@@ -7,6 +7,8 @@ import { KarmicMood } from "../dashboard/karmicMessage";
 
 export interface KarmaCardInput {
   mood: KarmicMood;
+  /** Recipient name (resolved locally — git user.name / OS user). */
+  name?: string;
   karma?: number;
   validationRate?: number;
   bestStreak?: number;
@@ -53,6 +55,15 @@ export function renderKarmaCardSvg(i: KarmaCardInput): string {
   const streak = i.bestStreak ?? 0;
   const sessions = i.sessions ?? 0;
   const date = i.dateLabel ?? "";
+  const name = (i.name ?? "").trim().slice(0, 26);
+
+  const recipient = name
+    ? `<text x="70" y="168" font-size="15" font-weight="700" letter-spacing="3" fill="#8b949e">AWARDED TO</text>
+  <text x="70" y="210" font-size="42" font-weight="800" fill="#e6edf3">${esc(name)}</text>`
+    : "";
+  const moodY = name ? 300 : 250;
+  const moodSize = name ? 76 : 96;
+  const subY = name ? 344 : 300;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="${FONT}">
   <defs>
@@ -68,8 +79,9 @@ export function renderKarmaCardSvg(i: KarmaCardInput): string {
   <text x="124" y="86" font-size="26" font-weight="800" letter-spacing="3" fill="#e6edf3">AGENT KARMA</text>
   <text x="124" y="112" font-size="16" font-weight="600" letter-spacing="4" fill="#8b949e">KARMA CARD</text>
 
-  <text x="70" y="250" font-size="96" font-weight="800" fill="${m.color}">${esc(m.label)}</text>
-  <text x="74" y="300" font-size="30" font-weight="600" fill="#c9d1d9">Karma ${esc(karma)} · ${vr}% of AI-assisted work validated</text>
+  ${recipient}
+  <text x="70" y="${moodY}" font-size="${moodSize}" font-weight="800" fill="${m.color}">${esc(m.label)}</text>
+  <text x="74" y="${subY}" font-size="28" font-weight="600" fill="#c9d1d9">Karma ${esc(karma)} · ${vr}% of AI-assisted work validated</text>
 
   ${stat(74, "VALIDATION RATE", `${vr}%`, "#e6edf3")}
   ${stat(434, "BEST STREAK", `${streak}`, "#e6edf3")}

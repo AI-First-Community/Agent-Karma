@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.34.0]
+- **Karma Card is now personalised** — it shows the recipient's name ("Awarded to …"). The name is resolved **locally** from your git `user.name` (falling back to your OS username), or you can set **Agent Karma › Card Name** to override it. Never sent anywhere.
+
 ## [0.33.0]
 - **Karma Card → printable PDF + self-explanatory.** The card can now be exported as a **printable certificate**: choose **Printable PDF**, it opens in your browser, and you ⌘P → *Save as PDF*. The printable version is **self-explanatory** — it states what Agent Karma measures and explains every stat (validation rate, best streak, Karma mood), so the certificate stands on its own. Still fully local, zero dependencies, no network.
 

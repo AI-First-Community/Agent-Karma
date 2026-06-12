@@ -18,6 +18,12 @@ describe("renderKarmaCardSvg", () => {
     expect(svg).toContain(">11<"); // best streak
     expect(svg).toContain(">24<"); // sessions
     expect(svg).toContain("2026-06-12");
+  });
+
+  it("shows the recipient name when provided", () => {
+    const svg = renderKarmaCardSvg({ mood: "steady", name: "Sanjeev Azad" });
+    expect(svg).toContain("AWARDED TO");
+    expect(svg).toContain("Sanjeev Azad");
     // self-contained: no external resource refs, no scripts (xmlns namespace aside)
     expect(svg).not.toContain("<image");
     expect(svg).not.toContain("href");
