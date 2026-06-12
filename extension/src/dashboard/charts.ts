@@ -19,7 +19,9 @@ export function sparkline(values: number[], width = 130, height = 28): string {
       return `${x},${y}`;
     })
     .join(" ");
-  return `<svg class="spark" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${points}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+  // Close the path to the baseline for a soft gradient area fill under the line.
+  const area = `0,${height} ${points} ${width},${height}`;
+  return `<svg class="spark" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="ak-spark" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity="0.28"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><polygon points="${area}" fill="url(#ak-spark)" stroke="none"/><polyline points="${points}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
 }
 
 /** A circular Karma gauge (donut arc + centered number). Pure SVG, CSP-safe. */

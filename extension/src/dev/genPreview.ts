@@ -64,7 +64,19 @@ const html = renderDashboardHtml({
   recent: sessions.slice().reverse(),
 });
 
-const themed = html.replace('<style nonce="preview">', `<style nonce="preview">${THEME}`);
+// Dev-only browser preview: inject theme vars, drop the webview CSP (so the browser
+// can load the web font), and load Manrope from Google Fonts purely for visual review.
+// NOTE: the shipped extension stays no-network; Manrope is bundled locally there.
+const FONT_LINKS =
+  '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+  '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+  '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">';
+
+const themed = html
+  .replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/, "")
+  .replace("</head>", `${FONT_LINKS}</head>`)
+  .replace('<style nonce="preview">', `<style nonce="preview">${THEME}`);
+
 const outDir = path.resolve(__dirname, "../../preview");
 fs.mkdirSync(outDir, { recursive: true });
 const outFile = path.join(outDir, "dashboard-preview.html");

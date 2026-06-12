@@ -299,13 +299,13 @@ export function renderDashboardHtml(data: DashboardData): string {
   <meta http-equiv="Content-Security-Policy" content="${csp}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style nonce="${data.nonce}">
-    body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); padding: 1.25rem 1.75rem; max-width: 760px; line-height: 1.45; }
-    h1 { font-size: 1.4rem; margin: 0; letter-spacing: -0.01em; }
+    body { font-family: 'Manrope', var(--vscode-font-family), -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; color: var(--vscode-foreground); padding: 1.5rem 1.9rem; max-width: 780px; line-height: 1.5; }
+    h1 { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
     .tagline { color: var(--vscode-descriptionForeground); margin-top: 0.2rem; font-size: 0.9rem; }
-    h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--vscode-descriptionForeground); margin: 1.9rem 0 0.6rem; padding-bottom: 0; border: 0; }
-    h3 { font-size: 1.05rem; margin: 0.2rem 0 0.4rem; }
+    h2 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--vscode-descriptionForeground); margin: 2rem 0 0.7rem; padding-bottom: 0; border: 0; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin: 0.2rem 0 0.5rem; letter-spacing: -0.01em; }
     .muted { color: var(--vscode-descriptionForeground); }
-    .card { border: 1px solid var(--vscode-panel-border); border-radius: 10px; padding: 0.9rem 1.1rem; }
+    .card { border: 1px solid var(--vscode-panel-border); border-radius: 12px; padding: 1rem 1.2rem; background: var(--vscode-textBlockQuote-background, transparent); }
     .card.recording { border-color: var(--vscode-charts-red, #e51400); }
     .badge { color: var(--vscode-charts-red, #e51400); font-weight: 600; font-size: 0.8rem; }
     dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.15rem 1rem; margin: 0.5rem 0 0; }
@@ -316,11 +316,11 @@ export function renderDashboardHtml(data: DashboardData): string {
     .dharma { margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px dashed var(--vscode-panel-border); }
     .dharma-head { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem; }
     .hint { font-weight: 400; font-size: 0.8rem; color: var(--vscode-descriptionForeground); font-style: italic; margin-left: 0.5rem; }
-    .outcome { display: inline-block; font-weight: 600; font-size: 0.8rem; padding: 0.1rem 0.5rem; border-radius: 4px; margin-bottom: 0.25rem; }
-    .outcome-ready-for-review { color: var(--vscode-charts-green, #388a34); }
-    .outcome-needs-review { color: var(--vscode-charts-yellow, #b89500); }
-    .outcome-high-risk { color: var(--vscode-charts-red, #e51400); }
-    .outcome-informational { color: var(--vscode-descriptionForeground); }
+    .outcome { display: inline-block; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.2rem 0.6rem; border-radius: 999px; margin-bottom: 0.4rem; }
+    .outcome-ready-for-review { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 16%, transparent); }
+    .outcome-needs-review { color: var(--vscode-charts-yellow, #b89500); background: color-mix(in srgb, var(--vscode-charts-yellow, #b89500) 16%, transparent); }
+    .outcome-high-risk { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
+    .outcome-informational { color: var(--vscode-descriptionForeground); background: color-mix(in srgb, var(--vscode-descriptionForeground) 14%, transparent); }
     .recs ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
     .trace { background: var(--vscode-textCodeBlock-background); padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.82rem; white-space: pre-wrap; overflow-x: auto; }
     .checklist { list-style: none; margin: 0.25rem 0 0; padding-left: 0; }
@@ -360,9 +360,9 @@ export function renderDashboardHtml(data: DashboardData): string {
     .refl-summary { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin: 0.15rem 0; }
     .refl-nudge { font-size: 0.95rem; }
     .bd-title { font-size: 0.9rem; margin: 0.9rem 0 0.3rem; }
-    .risk-flag { display: inline-block; font-size: 0.85rem; padding: 0.2rem 0.55rem; border-radius: 4px; margin: 0.1rem 0 0.4rem; }
-    .risk-warn { color: var(--vscode-charts-red, #e51400); background: var(--vscode-inputValidation-errorBackground, transparent); }
-    .risk-ok { color: var(--vscode-charts-green, #388a34); }
+    .risk-flag { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; margin: 0.1rem 0 0.5rem; }
+    .risk-warn { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
+    .risk-ok { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 14%, transparent); }
     footer { margin-top: 2rem; color: var(--vscode-descriptionForeground); font-size: 0.8rem; }
   </style>
   <title>Agent Karma</title>
