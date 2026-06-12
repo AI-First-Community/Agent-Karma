@@ -23,6 +23,8 @@ coverage/
 # @vscode/test-electron downloads a full VS Code here (100s of MB)
 .vscode-test/
 .vscode-test.mjs
+# local-only editor settings (per-machine overrides; keep out of the public repo)
+.vscode/settings.json
 # dev-only dashboard preview output
 preview/
 

@@ -701,8 +701,11 @@ function recentSection(recent: AgentKarmaSession[]): string {
 export function renderDashboardHtml(data: DashboardData): string {
   const csp = [
     `default-src 'none'`,
-    // 'unsafe-inline' covers dynamic style attributes (chart widths); no scripts allowed.
-    `style-src '${data.cspSource}' 'nonce-${data.nonce}' 'unsafe-inline'`,
+    // 'unsafe-inline' covers dynamic style attributes (chart widths, heatmap colours);
+    // no scripts allowed. NOTE: a nonce/hash in style-src makes the browser IGNORE
+    // 'unsafe-inline', which would block every inline style="" attribute — so style-src
+    // must NOT carry a nonce. The nonced <style> block still validates via 'unsafe-inline'.
+    `style-src '${data.cspSource}' 'unsafe-inline'`,
     `img-src '${data.cspSource}'`,
     `font-src '${data.cspSource}'`,
   ].join("; ");
@@ -827,7 +830,7 @@ export function renderDashboardHtml(data: DashboardData): string {
     .g-value .muted { font-size: 0.62em; font-weight: 450; }
     /* charts */
     .spark { color: var(--ak-info); display: block; }
-    .bar { display: inline-flex; flex: 1; min-width: 64px; height: 6px; border-radius: var(--r-pill); background: var(--ak-surface-2); box-shadow: inset 0 0 0 1px var(--ak-hairline); overflow: hidden; vertical-align: middle; }
+    .bar { display: inline-block; flex: 1; min-width: 64px; height: 6px; border-radius: var(--r-pill); background: var(--ak-surface-2); box-shadow: inset 0 0 0 1px var(--ak-hairline); overflow: hidden; vertical-align: middle; }
     .bar-fill { display: block; height: 100%; border-radius: var(--r-pill); background: var(--ak-good); }
     .stack { display: flex; gap: 1px; width: 100%; height: 10px; border-radius: var(--r-sm); overflow: hidden; background: var(--ak-hairline); }
     .seg { display: block; height: 100%; }

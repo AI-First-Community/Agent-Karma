@@ -17,7 +17,13 @@ describe("renderDashboardHtml", () => {
     const html = renderDashboardHtml({ nonce: "abc123", cspSource: "vscode-resource:", active: undefined, recent: [] });
     expect(html).toContain("Content-Security-Policy");
     expect(html).toContain("default-src 'none'");
-    expect(html).toContain("nonce-abc123");
+    // nonce is applied to the <style> element…
+    expect(html).toContain('nonce="abc123"');
+    // …but must NOT appear in style-src: a nonce there makes the browser ignore
+    // 'unsafe-inline', which would block every dynamic inline style="" (chart bars,
+    // heatmap colours). style-src must rely on 'unsafe-inline' instead.
+    expect(html).toContain("style-src 'vscode-resource:' 'unsafe-inline'");
+    expect(html).not.toContain("'nonce-abc123'");
     // no scripts allowed at all
     expect(html).not.toContain("<script");
   });
