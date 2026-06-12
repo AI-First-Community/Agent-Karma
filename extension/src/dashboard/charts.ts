@@ -22,6 +22,30 @@ export function sparkline(values: number[], width = 130, height = 28): string {
   return `<svg class="spark" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><polyline points="${points}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
 }
 
+/** A circular Karma gauge (donut arc + centered number). Pure SVG, CSP-safe. */
+export function gauge(score: number, size = 88): string {
+  const s = Math.max(0, Math.min(100, Math.round(score)));
+  const stroke = 9;
+  const r = (size - stroke) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (s / 100) * circ;
+  const color =
+    s >= 80
+      ? "var(--vscode-charts-green, #388a34)"
+      : s >= 60
+        ? "var(--vscode-charts-blue, #3794ff)"
+        : s >= 40
+          ? "var(--vscode-charts-yellow, #b89500)"
+          : "var(--vscode-charts-red, #e51400)";
+  return `<svg class="gauge" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--vscode-panel-border)" stroke-width="${stroke}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" class="gauge-num">${s}</text>
+  </svg>`;
+}
+
 /** A horizontal percent bar (0–100). */
 export function percentBar(pct: number): string {
   const p = Math.max(0, Math.min(100, Math.round(pct)));

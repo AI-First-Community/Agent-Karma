@@ -1,5 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { sparkline, percentBar, outcomeBar } from "./charts";
+import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
+
+describe("gauge", () => {
+  it("renders an SVG donut with the clamped score", () => {
+    const svg = gauge(62);
+    expect(svg).toContain("<svg");
+    expect(svg).toContain(">62<");
+    expect(svg).toContain("stroke-dasharray");
+  });
+  it("clamps out-of-range scores", () => {
+    expect(gauge(140)).toContain(">100<");
+    expect(gauge(-5)).toContain(">0<");
+  });
+});
 
 describe("sparkline", () => {
   it("is empty for no data", () => {

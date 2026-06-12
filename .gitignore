@@ -23,6 +23,8 @@ coverage/
 # @vscode/test-electron downloads a full VS Code here (100s of MB)
 .vscode-test/
 .vscode-test.mjs
+# dev-only dashboard preview output
+preview/
 
 # --- Agent Karma local data (created at runtime) ---
 agent-karma-data/

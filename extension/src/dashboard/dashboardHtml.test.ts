@@ -120,10 +120,11 @@ describe("renderDashboardHtml", () => {
         outcomes: { ready: 3, needs: 5, highRisk: 2, informational: 0 },
       },
     });
-    expect(html).toContain("Karma <b>71</b>");
     expect(html).toContain("12 sessions");
     expect(html).toContain("70%");
-    expect(html).toContain("6 / 10");
+    expect(html).toContain(">6</b>"); // tests-run count
+    expect(html).toContain("/ 10"); // of recent window
+    expect(html).toContain(">71<"); // gauge number
     expect(html).toContain("<polyline"); // sparkline
     expect(html).toContain("seg-ready"); // outcome distribution
   });

@@ -1,7 +1,7 @@
 import { AgentKarmaSession, AgentKarmaEvent } from "../core/types";
 import { buildKarmaTrace } from "../cards/karmaTrace";
 import { DashboardStats, BreakdownRow } from "./dashboardStats";
-import { sparkline, percentBar, outcomeBar } from "./charts";
+import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
 
@@ -51,23 +51,30 @@ function reflectionCard(r: WeeklyReflection | undefined): string {
 /** Hero header + "at a glance" panel — our unique signals, visualized. */
 function glanceSection(stats: DashboardStats): string {
   if (stats.rollingKarma === undefined) {
-    return `<div class="hero"><div class="hero-karma muted">No sessions yet</div><div class="tagline">Start a session to begin building your Karma.</div></div>`;
+    return `<div class="hero hero-empty">
+      <div class="gauge-wrap">${gauge(0)}</div>
+      <div class="hero-meta">
+        <div class="hero-label muted">No sessions yet</div>
+        <div class="hero-sub">Start a session to begin building your Karma.</div>
+      </div>
+    </div>`;
   }
   return `
     <div class="hero">
-      <div class="hero-karma">Karma <b>${stats.rollingKarma}</b> <span class="trend">${trendArrow(
-        stats.lastTrend
-      )}</span></div>
-      <div class="tagline">${stats.sessionCount} session${stats.sessionCount === 1 ? "" : "s"} · self-comparative (vs. your own average)</div>
+      <div class="gauge-wrap">${gauge(stats.rollingKarma)}</div>
+      <div class="hero-meta">
+        <div class="hero-label">Karma <span class="trend">${trendArrow(stats.lastTrend)}</span></div>
+        <div class="hero-sub">${stats.sessionCount} session${stats.sessionCount === 1 ? "" : "s"} · self-comparative (vs. your own average)</div>
+      </div>
     </div>
     <div class="glance">
       <div class="g-item">
         <div class="g-label">Validation rate</div>
-        <div class="g-value">${percentBar(stats.validationRate ?? 0)} ${stats.validationRate ?? 0}%</div>
+        <div class="g-value">${percentBar(stats.validationRate ?? 0)} <b>${stats.validationRate ?? 0}%</b></div>
       </div>
       <div class="g-item">
         <div class="g-label">Tests run</div>
-        <div class="g-value">${stats.testsRunCount} / ${stats.recentCount}</div>
+        <div class="g-value"><b>${stats.testsRunCount}</b> <span class="muted">/ ${stats.recentCount}</span></div>
       </div>
       <div class="g-item">
         <div class="g-label">Karma trend</div>
@@ -292,12 +299,13 @@ export function renderDashboardHtml(data: DashboardData): string {
   <meta http-equiv="Content-Security-Policy" content="${csp}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style nonce="${data.nonce}">
-    body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); padding: 1rem 1.5rem; }
-    h1 { font-size: 1.3rem; margin-bottom: 0; }
-    .tagline { color: var(--vscode-descriptionForeground); margin-top: 0.25rem; }
-    h2 { font-size: 1rem; margin-top: 1.75rem; border-bottom: 1px solid var(--vscode-panel-border); padding-bottom: 0.25rem; }
+    body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); padding: 1.25rem 1.75rem; max-width: 760px; line-height: 1.45; }
+    h1 { font-size: 1.4rem; margin: 0; letter-spacing: -0.01em; }
+    .tagline { color: var(--vscode-descriptionForeground); margin-top: 0.2rem; font-size: 0.9rem; }
+    h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--vscode-descriptionForeground); margin: 1.9rem 0 0.6rem; padding-bottom: 0; border: 0; }
+    h3 { font-size: 1.05rem; margin: 0.2rem 0 0.4rem; }
     .muted { color: var(--vscode-descriptionForeground); }
-    .card { border: 1px solid var(--vscode-panel-border); border-radius: 6px; padding: 0.75rem 1rem; }
+    .card { border: 1px solid var(--vscode-panel-border); border-radius: 10px; padding: 0.9rem 1.1rem; }
     .card.recording { border-color: var(--vscode-charts-red, #e51400); }
     .badge { color: var(--vscode-charts-red, #e51400); font-weight: 600; font-size: 0.8rem; }
     dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.15rem 1rem; margin: 0.5rem 0 0; }
@@ -321,14 +329,19 @@ export function renderDashboardHtml(data: DashboardData): string {
     .scoreline b { font-size: 1.15rem; }
     .trend { color: var(--vscode-descriptionForeground); font-size: 0.82rem; margin-left: 0.5rem; }
     /* hero + at-a-glance */
-    .hero { margin: 1rem 0 0.5rem; }
-    .hero-karma { font-size: 1.05rem; }
-    .hero-karma b { font-size: 1.9rem; }
-    .glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem 1rem; margin: 0.5rem 0 0.5rem; }
-    .g-item { border: 1px solid var(--vscode-panel-border); border-radius: 6px; padding: 0.55rem 0.7rem; }
+    .hero { display: flex; align-items: center; gap: 1.1rem; margin: 1.25rem 0 1rem; }
+    .gauge-wrap { flex: 0 0 auto; }
+    .gauge-num { fill: var(--vscode-foreground); font-size: 1.55rem; font-weight: 700; }
+    .hero-meta { display: flex; flex-direction: column; gap: 0.15rem; }
+    .hero-label { font-size: 1.35rem; font-weight: 600; }
+    .hero-sub { color: var(--vscode-descriptionForeground); font-size: 0.85rem; }
+    .hero-empty .gauge-num { fill: var(--vscode-descriptionForeground); }
+    .glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 0 0 1.25rem; }
+    .g-item { border: 1px solid var(--vscode-panel-border); border-radius: 8px; padding: 0.7rem 0.85rem; background: var(--vscode-textBlockQuote-background, transparent); }
     .g-wide { grid-column: 1 / -1; }
-    .g-label { color: var(--vscode-descriptionForeground); font-size: 0.78rem; margin-bottom: 0.3rem; }
-    .g-value { font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
+    .g-label { color: var(--vscode-descriptionForeground); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+    .g-value { font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .g-value b { font-size: 1.1rem; }
     .spark { color: var(--vscode-charts-blue, #3794ff); display: block; }
     .bar { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--vscode-panel-border); overflow: hidden; vertical-align: middle; }
     .bar-fill { display: block; height: 100%; background: var(--vscode-charts-green, #388a34); }

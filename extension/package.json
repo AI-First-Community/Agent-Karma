@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -99,6 +99,7 @@
     "lint": "eslint src --ext ts",
     "test": "vitest run --passWithNoTests",
     "compile-tests": "tsc -p tsconfig.test.json",
+    "preview": "tsc -p tsconfig.dev.json && node out/dev/genPreview.js",
     "test:integration": "npm run build && npm run compile-tests && node ./out/test/runTest.js",
     "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\"",
     "package": "vsce package --no-dependencies -o agent-karma.vsix"
