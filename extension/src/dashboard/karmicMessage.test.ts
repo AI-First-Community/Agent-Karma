@@ -43,6 +43,26 @@ describe("karmicMessage", () => {
     expect(m.sub).toContain("Phal answered");
   });
 
+  it("rotates the message as progress (session count) grows, within the same level", () => {
+    const a = karmicMessage({ rollingKarma: 70, consistency: cons(4, 6), sessionCount: 7 });
+    const b = karmicMessage({ rollingKarma: 70, consistency: cons(4, 6), sessionCount: 8 });
+    expect(a.headline).not.toBe(b.headline); // different line as you progress
+    expect(a.mood).toBe("steady");
+    expect(b.mood).toBe("steady");
+  });
+
+  it("speaks to momentum — rising when the trend is up, slipping when down", () => {
+    const up = karmicMessage({ rollingKarma: 55, consistency: cons(3, 6), lastTrend: "up", sessionCount: 6 });
+    const down = karmicMessage({ rollingKarma: 55, consistency: cons(3, 6), lastTrend: "down", sessionCount: 6 });
+    expect(up.headline.toLowerCase()).toMatch(/rising|upward|momentum/);
+    expect(down.headline.toLowerCase()).toMatch(/slipping|dipping|drifting/);
+  });
+
+  it("uses the nascent voice for the first few sessions", () => {
+    const m = karmicMessage({ rollingKarma: 50, consistency: cons(1, 2), sessionCount: 2 });
+    expect(m.headline.toLowerCase()).toMatch(/begin|journey|new/);
+  });
+
   it("notes when the Dharma asked for validation but the Phal went unverified", () => {
     const last = {
       intent: "",

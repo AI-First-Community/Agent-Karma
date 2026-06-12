@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.27.0]
+- **Karmic reflection now grows with you.** Each level (nascent → dim → forming → steady → luminous) has a *pool* of messages instead of one fixed line, and the banner picks by your progress (session count) so it rotates over time. It also speaks to **momentum** — an *ascending* voice when your Karma is trending up, a gentle *slipping* one when it's dipping — so the message reflects where you're heading, not just where you are.
+
 ## [0.26.0]
 - **Three deeper insights** (still all from your own sessions — no new capture):
   - **⚠ Worth a second look** — a literal to-do list of high-risk sessions you changed but never validated, so you can go back and check them.
