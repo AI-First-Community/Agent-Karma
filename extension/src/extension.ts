@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
   const bus = new EventBus();
   const manager = new SessionManager(store, bus, context.globalState);
   const statusBar = new StatusBarController(TOGGLE_COMMAND);
-  const dashboard = new DashboardPanel(store, manager);
+  const dashboard = new DashboardPanel(store, manager, context.extensionUri);
   const fileCollector = new FileCollector(manager, store, bus);
   const terminalCollector = new TerminalCollector(manager);
 

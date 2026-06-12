@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -105,16 +105,17 @@
     "package": "vsce package --no-dependencies -o agent-karma.vsix"
   },
   "devDependencies": {
+    "@fontsource-variable/manrope": "^5.2.8",
     "@types/mocha": "^10.0.7",
     "@types/node": "^20.14.0",
     "@types/vscode": "~1.74.0",
-    "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^3.2.0",
-    "mocha": "^10.7.3",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.2.0",
     "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
+    "mocha": "^10.7.3",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   }

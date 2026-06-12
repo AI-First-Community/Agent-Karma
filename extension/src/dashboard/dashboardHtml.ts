@@ -8,6 +8,8 @@ import { riskAlignment } from "../cards/riskAlignment";
 export interface DashboardData {
   nonce: string;
   cspSource: string;
+  /** Webview URI of the bundled Manrope woff2 (omitted in the browser preview). */
+  fontUri?: string;
   stats?: DashboardStats;
   reflection?: WeeklyReflection;
   validationHabits?: ValidationHabits;
@@ -317,7 +319,12 @@ export function renderDashboardHtml(data: DashboardData): string {
     // 'unsafe-inline' covers dynamic style attributes (chart widths); no scripts allowed.
     `style-src '${data.cspSource}' 'nonce-${data.nonce}' 'unsafe-inline'`,
     `img-src '${data.cspSource}'`,
+    `font-src '${data.cspSource}'`,
   ].join("; ");
+
+  const fontFace = data.fontUri
+    ? `@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url(${data.fontUri}) format('woff2');}`
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -326,6 +333,7 @@ export function renderDashboardHtml(data: DashboardData): string {
   <meta http-equiv="Content-Security-Policy" content="${csp}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style nonce="${data.nonce}">
+    ${fontFace}
     body { font-family: 'Manrope', var(--vscode-font-family), -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; color: var(--vscode-foreground); padding: 1.5rem 1.9rem; max-width: 780px; line-height: 1.5; }
     h1 { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
     .tagline { color: var(--vscode-descriptionForeground); margin-top: 0.2rem; font-size: 0.9rem; }

@@ -12,7 +12,8 @@ export class DashboardPanel {
 
   constructor(
     private readonly store: LocalStore,
-    private readonly sessions: SessionManager
+    private readonly sessions: SessionManager,
+    private readonly extensionUri: vscode.Uri
   ) {}
 
   show(): void {
@@ -25,7 +26,11 @@ export class DashboardPanel {
       "agentKarma.dashboard",
       "Agent Karma",
       vscode.ViewColumn.Active,
-      { enableScripts: false, retainContextWhenHidden: false }
+      {
+        enableScripts: false,
+        retainContextWhenHidden: false,
+        localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, "media")],
+      }
     );
     this.panel.onDidDispose(() => {
       this.panel = undefined;
@@ -60,9 +65,13 @@ export class DashboardPanel {
     const lastCompletedEvents = lastCompleted
       ? allEvents.filter((e) => e.sessionId === lastCompleted.id)
       : [];
+    const fontUri = this.panel.webview
+      .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "media", "fonts", "manrope.woff2"))
+      .toString();
     this.panel.webview.html = renderDashboardHtml({
       nonce: randomUUID().replace(/-/g, ""),
       cspSource: this.panel.webview.cspSource,
+      fontUri,
       stats,
       reflection,
       validationHabits: computeValidationHabits(store.sessions),
