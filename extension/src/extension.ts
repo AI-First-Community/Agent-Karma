@@ -587,6 +587,9 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     type: ValidationCommandType,
     result: "passed" | "failed"
   ): { ok: boolean; sessionTitle?: string } => {
+    if (!settingsOf().enabled) {
+      return { ok: false }; // master switch off — no passive capture, no session creation
+    }
     let active = manager.getActiveSession();
     if (!active) {
       const today = ambientDayKey(new Date().toISOString());

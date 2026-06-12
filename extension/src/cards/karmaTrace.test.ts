@@ -30,4 +30,13 @@ describe("buildKarmaTrace", () => {
     expect(trace[0]).toBe("10:20 Validation: Test (passed)");
     expect(trace[1]).toBe("10:24 Git diff: 3 files, +48 / -12");
   });
+
+  it("formats a git.commit event with its short sha, and falls back without one", () => {
+    const trace = buildKarmaTrace([
+      ev("git.commit", "2026-06-10T10:30:00.000Z", { sha: "abcdef1234" }),
+      ev("git.commit", "2026-06-10T10:31:00.000Z"),
+    ]);
+    expect(trace[0]).toBe("10:30 Commit abcdef1234");
+    expect(trace[1]).toBe("10:31 Commit");
+  });
 });

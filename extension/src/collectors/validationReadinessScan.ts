@@ -73,7 +73,12 @@ function nonEmptyDir(root: string, rel: string): boolean {
 
 function readJson(root: string, rel: string): Record<string, unknown> | null {
   try {
-    return JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(path.join(root, rel), "utf8"));
+    // Only a JSON object is a usable manifest; a valid-but-non-object (array,
+    // string, number) must not be cast to a record — guard against a latent crash.
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null;
   } catch {
     return null;
   }

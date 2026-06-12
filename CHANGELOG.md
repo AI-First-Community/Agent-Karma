@@ -2,6 +2,17 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.46.0]
+- **Post-audit hardening.** A multi-agent quality/security/privacy review (now that the repo is public) confirmed no security or privacy blocker — zero network calls, metadata-only capture, strict webview CSP, and a clean commit history. This release fixes the confirmed findings:
+  - **Fix (correctness):** `@agentkarma /verify` now respects the master switch — a disabled extension no longer creates a session or writes to disk via the chat surface.
+  - **Fix:** commit capture now recognizes **SHA-256** git repos (previously every commit was dropped in repos using the newer object format).
+  - **Fix:** the readiness scanner guards against a non-object `package.json`/config (latent crash).
+  - **Perf:** the dashboard now **debounces** re-renders and **caches** the (multi-root) readiness scan, the event store keeps an **in-memory mirror** (no full disk re-read per captured event), and the file watcher reads settings **once** per event and gates on the cheapest check first.
+  - **Compat:** lowered `engines.vscode` to `^1.74.0` (the chat/shell APIs are already feature-guarded), so the extension installs on more versions.
+  - **Tests:** added coverage for SHA-256 reflog parsing, worktree `gitdir:` resolution, and the `git.commit` trace line (201 tests).
+  - **Docs:** the README privacy sections now disclose the external/agent file-change watcher and short-SHA commit capture; added real **screenshots** (hero, dashboard, Karma Card, start-session) so the listing renders.
+  - _Deferred (tracked):_ an O(1) append-only event log + retention policy — it changes the on-disk format and the crash-recovery path, so it warrants its own focused pass.
+
 ## [0.45.0]
 - **Project identity finalized for launch.** Publisher is now **`innovate-with-sanjeev`** and the canonical home is **`AI-First-Community/Agent-Karma`** (open-source, Apache-2.0). Marketplace links, repository/issue URLs, the in-app "Learn more"/settings deep-links, and badges all point there. Maintainer identity (git author + `package.json` author) is **Sanjeev Azad · `subscribe.sanjeev@gmail.com`** (the org account); the Marketplace publisher is under `sanjeev.azad@gmail.com`. No behavior change. _(Note: the extension ID changes to `innovate-with-sanjeev.agent-karma`, so local data lives under a new storage path — a clean slate, expected pre-launch.)_
 

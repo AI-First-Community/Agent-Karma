@@ -5,7 +5,7 @@ import { SessionManager } from "../core/sessionManager";
 import { renderDashboardHtml } from "./dashboardHtml";
 import { computeStats, computeValidationHabits, computeValidationHeatmap } from "./dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
-import { assessReadiness } from "../collectors/validationReadiness";
+import { assessReadiness, ReadinessSignals, ValidationReadiness } from "../collectors/validationReadiness";
 import { scanReadinessSignals } from "../collectors/validationReadinessScan";
 import { explainKarmaMove } from "../scoring/karmaExplain";
 import { findSkills } from "../skills/skillFinder";
@@ -16,6 +16,11 @@ import { readClaudeUsage } from "../collectors/claudeUsageScan";
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
   private panel: vscode.WebviewPanel | undefined;
+  private refreshTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Short-lived cache for the readiness scan (sync FS over many roots — rarely changes). */
+  private readinessCache:
+    | { root: string; at: number; signals: ReadinessSignals; readiness: ValidationReadiness }
+    | undefined;
 
   constructor(
     private readonly store: LocalStore,
@@ -48,11 +53,40 @@ export class DashboardPanel {
     this.render();
   }
 
-  /** Re-render if the panel is open (called on session events). */
+  /**
+   * Re-render if the panel is open. Debounced: this is called on every captured
+   * event, and a render does full store reads + a multi-root readiness scan + a
+   * full HTML rebuild — so bursts (e.g. an agent saving many files) coalesce into
+   * one render on the trailing edge.
+   */
   refresh(): void {
-    if (this.panel) {
-      this.render();
+    if (!this.panel) {
+      return;
     }
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+    }
+    this.refreshTimer = setTimeout(() => {
+      this.refreshTimer = undefined;
+      this.render();
+    }, 300);
+  }
+
+  /** Readiness scan, cached briefly (it's sync FS over root + nested package roots). */
+  private getReadiness(
+    root: string | undefined
+  ): { signals: ReadinessSignals; readiness: ValidationReadiness } | undefined {
+    if (!root) {
+      return undefined;
+    }
+    const now = Date.now();
+    if (this.readinessCache && this.readinessCache.root === root && now - this.readinessCache.at < 15000) {
+      return this.readinessCache;
+    }
+    const signals = scanReadinessSignals(root);
+    const readiness = assessReadiness(signals);
+    this.readinessCache = { root, at: now, signals, readiness };
+    return this.readinessCache;
   }
 
   private render(): void {
@@ -85,8 +119,9 @@ export class DashboardPanel {
       root && vscode.workspace.getConfiguration("agentKarma").get<boolean>("readClaudeUsage")
         ? readClaudeUsage(root) ?? undefined
         : undefined;
-    const signals = root ? scanReadinessSignals(root) : undefined;
-    const readiness = signals ? assessReadiness(signals) : undefined;
+    const readinessResult = this.getReadiness(root);
+    const signals = readinessResult?.signals;
+    const readiness = readinessResult?.readiness;
     const habits = computeValidationHabits(store.sessions);
     const suggestions =
       root && signals
@@ -127,6 +162,10 @@ export class DashboardPanel {
   }
 
   dispose(): void {
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
     this.panel?.dispose();
   }
 }

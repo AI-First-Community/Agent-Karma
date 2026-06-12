@@ -29,17 +29,13 @@ export class FileCollector {
     private readonly getSettings: () => AgentKarmaSettings = () => store.loadSettings()
   ) {
     this.disposables.push(
-      vscode.workspace.onDidSaveTextDocument((doc) => this.onChange(doc.uri))
+      vscode.workspace.onDidSaveTextDocument((doc) => this.onChange(doc.uri, false))
     );
 
     // External / agent / CLI writes never raise an editor save. A filesystem
     // watcher catches them; gated behind the captureExternalFileChanges setting.
     const watcher = vscode.workspace.createFileSystemWatcher("**/*");
-    const onExternal = (uri: vscode.Uri): void => {
-      if (this.getSettings().captureExternalFileChanges) {
-        this.onChange(uri);
-      }
-    };
+    const onExternal = (uri: vscode.Uri): void => this.onChange(uri, true);
     watcher.onDidChange(onExternal);
     watcher.onDidCreate(onExternal);
     this.disposables.push(watcher);
@@ -53,12 +49,18 @@ export class FileCollector {
     this.disposables.push({ dispose: () => sub.dispose() });
   }
 
-  private onChange(uri: vscode.Uri): void {
+  private onChange(uri: vscode.Uri, fromWatcher: boolean): void {
+    // Cheapest gate first — most events arrive with no active session.
     if (!this.manager.hasActiveSession()) {
       return;
     }
-    if (!this.getSettings().enabled) {
+    // Resolve settings once per event (avoids 2–3 disk reads during bursts).
+    const settings = this.getSettings();
+    if (!settings.enabled) {
       return; // master switch off — no passive capture
+    }
+    if (fromWatcher && !settings.captureExternalFileChanges) {
+      return; // external/agent capture opted out
     }
     if (uri.scheme !== "file") {
       return;
@@ -75,7 +77,6 @@ export class FileCollector {
     }
     this.seen.add(fsPath);
 
-    const settings = this.getSettings();
     const data = toFileSavedData(baseName(fsPath), fsPath, settings.storeFullFilePath);
     this.manager.recordForActiveSession("file.saved", asEventData(data));
   }

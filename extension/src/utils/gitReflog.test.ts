@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { latestCommitSha } from "./gitReflog";
+import { latestCommitSha, parseGitdirPointer } from "./gitReflog";
 
 const TS = "Jane Doe <jane@example.com> 1700000000 +0000";
 
@@ -34,5 +34,21 @@ describe("latestCommitSha", () => {
     expect(latestCommitSha("")).toBeNull();
     expect(latestCommitSha("   \n  ")).toBeNull();
     expect(latestCommitSha("no-tab-here commit")).toBeNull();
+  });
+
+  it("accepts 64-char SHA-256 object ids (git's newer hash format)", () => {
+    const sha256 = "a".repeat(64);
+    expect(latestCommitSha(`old ${sha256} ${TS}\tcommit: sha256 repo`)).toBe("aaaaaaaaaa");
+  });
+});
+
+describe("parseGitdirPointer", () => {
+  it("extracts the path from a `.git` pointer file", () => {
+    expect(parseGitdirPointer("gitdir: ../.git/worktrees/feature\n")).toBe("../.git/worktrees/feature");
+    expect(parseGitdirPointer("gitdir: /abs/path/.git/modules/sub")).toBe("/abs/path/.git/modules/sub");
+  });
+  it("returns null when there is no gitdir line", () => {
+    expect(parseGitdirPointer("")).toBeNull();
+    expect(parseGitdirPointer("ref: refs/heads/main")).toBeNull();
   });
 });

@@ -25,5 +25,15 @@ export function latestCommitSha(logHeadContent: string): string | null {
     return null; // commit, commit (amend), commit (initial) only
   }
   const newSha = last.slice(0, tab).split(" ")[1] ?? "";
-  return /^[0-9a-f]{7,40}$/i.test(newSha) ? newSha.slice(0, 10) : null;
+  // 40 hex = SHA-1, 64 hex = SHA-256 (git's newer object format)
+  return /^[0-9a-f]{7,64}$/i.test(newSha) ? newSha.slice(0, 10) : null;
+}
+
+/**
+ * For worktrees/submodules, `.git` is a file containing `gitdir: <path>`. Returns
+ * that path (verbatim — caller resolves relative-to-root), or null if absent. Pure.
+ */
+export function parseGitdirPointer(content: string): string | null {
+  const m = /gitdir:\s*(.+)/.exec(content);
+  return m ? m[1].trim() : null;
 }

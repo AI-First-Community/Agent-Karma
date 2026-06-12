@@ -4,7 +4,7 @@ import * as path from "path";
 import { SessionManager } from "../core/sessionManager";
 import { AgentKarmaSettings } from "../core/types";
 import { asEventData } from "../privacy/privacyRules";
-import { latestCommitSha } from "../utils/gitReflog";
+import { latestCommitSha, parseGitdirPointer } from "../utils/gitReflog";
 
 /**
  * Records git commits into the active session by watching `.git/logs/HEAD`.
@@ -87,9 +87,8 @@ function resolveGitDir(): string | null {
       return dotGit;
     }
     if (stat.isFile()) {
-      const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(dotGit, "utf8"));
-      if (m) {
-        const target = m[1].trim();
+      const target = parseGitdirPointer(fs.readFileSync(dotGit, "utf8"));
+      if (target) {
         return path.isAbsolute(target) ? target : path.join(root, target);
       }
     }

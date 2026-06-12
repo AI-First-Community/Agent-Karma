@@ -28,6 +28,14 @@ export class LocalStore {
   static readonly EVENTS_FILE = "events.json";
   static readonly SETTINGS_FILE = "settings.json";
 
+  /**
+   * In-memory mirror of the event store. This class is the sole writer, so the
+   * cache stays authoritative; it spares us a full disk read + JSON parse on every
+   * captured event (events fire far more often than any other write). Disk is still
+   * written on every save, so crash-recovery is unchanged.
+   */
+  private eventsCache: AgentKarmaEventStore | undefined;
+
   constructor(baseDir: string) {
     this.dir = path.join(baseDir, "agent-karma-data");
   }
@@ -48,13 +56,17 @@ export class LocalStore {
   // --- Events (events.json → AgentKarmaEventStore) ---
 
   loadEvents(): AgentKarmaEventStore {
-    return this.readJson<AgentKarmaEventStore>(LocalStore.EVENTS_FILE, {
-      schemaVersion: SCHEMA_VERSION,
-      events: [],
-    });
+    if (!this.eventsCache) {
+      this.eventsCache = this.readJson<AgentKarmaEventStore>(LocalStore.EVENTS_FILE, {
+        schemaVersion: SCHEMA_VERSION,
+        events: [],
+      });
+    }
+    return this.eventsCache;
   }
 
   saveEvents(store: AgentKarmaEventStore): boolean {
+    this.eventsCache = store; // keep the in-memory mirror authoritative
     return this.writeJson(LocalStore.EVENTS_FILE, store);
   }
 
@@ -98,6 +110,7 @@ export class LocalStore {
   deleteAll(): boolean {
     try {
       fs.rmSync(this.dir, { recursive: true, force: true });
+      this.eventsCache = undefined; // invalidate the in-memory mirror
       return true;
     } catch {
       return false;
