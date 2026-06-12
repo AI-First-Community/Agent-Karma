@@ -1,24 +1,26 @@
 # Agent Karma
 
-### Make every agent action count.
+### You're the last line of trust. Agent Karma proves you're holding it.
 
-**Agent Karma** is an open-source, local-first VS Code extension that helps developers understand and improve **how they use AI coding tools** — Claude Code, GitHub Copilot, Cursor, ChatGPT, Windsurf, Gemini CLI, Codex CLI, and others.
+**Agent Karma** is an open-source, local-first VS Code extension that helps you close your **verification gap** — turning *"did I actually check what the AI wrote before I trusted it?"* into a visible, objective habit. It works with Claude Code, GitHub Copilot, Cursor, ChatGPT, and others — including browser/copy-paste workflows.
 
 It is **not** another AI coding assistant. It is **not** an enterprise analytics dashboard. It is **not** a surveillance tool.
 
-It is a personal companion that helps you answer one question after every AI-assisted session:
-
-> ## Did I use AI well — did I validate what it produced before I trusted it?
+> ## Mind the verification gap: did you validate what the AI produced — before you trusted it?
 
 ---
 
 ## Why Agent Karma exists
 
-AI now writes a large share of our code: **84% of developers** use or plan to use AI coding tools (Stack Overflow 2025). Yet only **29% trust the output**, **66%** say AI answers are "almost right but not quite," and **45%** find debugging AI-generated code a top frustration. We ship code we never really checked.
+The problem with AI code isn't *generating* it — it's *trusting* it. The industry now has a name and a number for this:
 
-Every existing tool measures AI usage **for managers**: acceptance rates, lines generated, tokens consumed, team ROI. None of them help **you** notice whether *you* validated the AI's work before shipping it.
+> **96% of developers don't fully trust AI-generated code — yet only 48% always verify it before committing.** *(Sonar, State of Code 2026)*
 
-Agent Karma closes that gap. It is the mirror, not the dashboard.
+AWS's Werner Vogels calls the growing pile of unchecked AI code **"verification debt."** As agents write more of our code (already ~42% of committed code, heading toward 65%), **the developer becomes the last line of trust** — and most of us aren't reliably holding that line.
+
+The industry's answer is to **automate** the review (Anthropic Code Review, CodeRabbit, Sonar…) — machines checking machine code. Agent Karma's answer is the opposite: keep the **human in the loop** by making verification a visible habit, *without* automating your judgment away — and without surveillance, gamification, or your code ever leaving your machine.
+
+Every other tool measures AI *usage* for managers (acceptance rates, lines, tokens). Agent Karma measures one thing, **for you**: did you validate the AI's work? It is the mirror, not the dashboard.
 
 ---
 

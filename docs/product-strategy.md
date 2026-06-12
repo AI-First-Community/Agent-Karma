@@ -6,13 +6,13 @@
 
 ## 1. The problem
 
-AI writes a large and growing share of our code. Adoption is near-universal (84%+ of developers — Stack Overflow 2025). But adoption has outrun **trust and judgment**:
+AI writes a large and growing share of our code (~42% of committed code, heading toward 65%). The problem isn't *generating* it — it's *trusting* it. The industry now has a name and a number for this — **the verification gap**:
 
-- Only **29% of developers trust AI output**, **66%** say it's "almost right but not quite," and **45%** cite debugging AI-generated code as a top frustration (Stack Overflow 2025). The confidence gap is real and measured.
+- **96% of developers don't fully trust AI-generated code, yet only 48% always verify it before committing** (Sonar, State of Code 2026). AWS's Werner Vogels coined **"verification debt"** for the growing pile of unchecked AI code. This is our thesis, externally validated, with a number.
 - Developers routinely accept AI output they never truly validated — untested, unreviewed, unbuilt.
-- Every analytics tool on the market answers a *manager's* question ("how much AI is the team using?"), not the *individual's* question ("am I using it well?").
+- The industry's answer is to **automate** the review (Anthropic Code Review, CodeRabbit, Sonar). Ours is the opposite: keep the **human in the loop** by making verification a visible habit — answering the *individual's* question ("did I validate it?"), not the *manager's* ("how much AI is the team using?").
 
-> Note on evidence: an earlier draft led with the 2025 METR "19% slower" trial. METR has since redesigned that experiment (Feb 2026) citing selection-bias concerns and now treats the original result as weak; we therefore lead with the more robust, current Stack Overflow trust-gap data instead.
+> Note on evidence: earlier drafts led with the 2025 METR "19% slower" trial (since walked back) and the softer Stack Overflow trust-gap. We now lead with Sonar's verification-gap data — it is current, robust, names the exact problem, and is the wave to ride.
 
 There is no private, personal mirror that helps a developer build the habit of **validating** AI output and reflecting on their own AI-assisted practice.
 
@@ -56,9 +56,11 @@ These are settled. They drive the spec, the scoring, and the roadmap. (See [`dif
 6. **Tool-agnostic = a fact, not a headline USP.** Agent Karma works regardless of where the AI ran (including browser ChatGPT/Claude) because validation signals are tool-independent. The AI-tool tag is a reflection label, not a tracking capability — we state this plainly rather than overselling "log-less coverage."
 7. **Forcing function = opt-in pre-commit nudge.** A local, dismissible git hook that surfaces the thesis at the moment of risk ("AI-assisted changes, no tests run — proceed?"). Off by default; the answer to the "vitamin not painkiller" retention risk without betraying the ethos. See [`specification.md`](specification.md) §13.
 
-## 6. Target users
+## 6. Target user (sharpened)
 
-Individual developers, students, open-source contributors, and small teams who use AI coding tools and want to use them *consciously* — without their data leaving their machine. Explicitly **not** engineering managers seeking team ROI dashboards (that market is well served and is not our mission).
+**Primary:** the conscientious **mid-to-senior engineer in the agentic era** who now trusts agent output more than they're comfortable with, fears **deskilling** ("I didn't become a developer to rubber-stamp AI slop"), and wants *private proof* they're staying in the loop — **not** a manager, **not** a team. **Secondary:** intentional juniors/students building the verification habit early.
+
+Explicitly **not** engineering managers seeking team ROI dashboards (well-served, not our mission). The "aha" for this user is not the dashboard — it's the **pre-commit nudge firing in their own repo** ("AI-assisted changes staged, nothing validated — commit anyway?").
 
 ## 7. Non-goals (MVP)
 
