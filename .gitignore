@@ -33,3 +33,6 @@ agent-karma-data/
 *.log
 .env
 .env.*
+
+# --- Private dogfooding notes (local-only) ---
+DOGFOODING-NOTES.md
