@@ -2,6 +2,14 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.41.0]
+- **Home panel surfaces more actions.** The Activity Bar **Agent Karma** view now offers one-click buttons for actions that were previously reachable only from the Command Palette:
+  - **✅ Log a Validation** — the same flow as `@agentkarma /verify`, so you can record a validation **without** a chat provider (the `@agentkarma` chat participant only appears when a chat host like GitHub Copilot Chat is installed).
+  - **📤 Export as JSON** / **📤 Export as Markdown**.
+  - **🗑 Reset Karma History** — clears sessions and the Karma trend but keeps your settings; still modal-confirmed before anything is removed.
+
+  **Delete All Local Data** stays Command-Palette-only by design (kept out of one-click reach). The underlying commands are unchanged.
+
 ## [0.40.0]
 - **Real, configurable settings.** Six settings are now exposed in VS Code's Settings UI (and reachable via the sidebar gear / **Agent Karma: Open Settings**), with VS Code configuration as the source of truth:
   - `agentKarma.enabled` — **master switch**; when off, all passive capture stops (file saves, automatic terminal commands, ambient sessions) and starting a session is blocked.
