@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Passion4Architecture/agent-karma#readme",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other",
@@ -101,7 +101,26 @@
           "when": "false"
         }
       ]
-    }
+    },
+    "chatParticipants": [
+      {
+        "id": "agentKarma.chat",
+        "name": "agentkarma",
+        "fullName": "Agent Karma",
+        "description": "Log that you validated the AI's work, or see your Karma summary.",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "verify",
+            "description": "Log a validation you ran (tests/build/lint/types) — covers browser & copy-paste AI"
+          },
+          {
+            "name": "summary",
+            "description": "Your latest Karma, this week's nudge, and whether you can even validate"
+          }
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run build -- --minify",

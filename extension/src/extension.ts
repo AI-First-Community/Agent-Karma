@@ -16,6 +16,8 @@ import { ambientDayKey, ambientTitle, ambientShouldStart } from "./core/ambient"
 import { assessReadiness } from "./collectors/validationReadiness";
 import { scanReadinessSignals } from "./collectors/validationReadinessScan";
 import { explainKarmaMove } from "./scoring/karmaExplain";
+import { registerChatParticipant } from "./chat/agentKarmaParticipant";
+import { SummaryData } from "./chat/chatRouter";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -385,6 +387,57 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
       ? vscode.window.showInformationMessage("Agent Karma pre-commit nudge removed.")
       : vscode.window.showWarningMessage(`Agent Karma: ${res.reason}`));
   };
+
+  // @agentkarma chat surface: /verify logs a validation (covers browser/copy-paste AI
+  // with no IDE trail); /summary reflects your latest Karma. Feature-guarded inside.
+  const recordValidationFromChat = (
+    type: ValidationCommandType,
+    result: "passed" | "failed"
+  ): { ok: boolean; sessionTitle?: string } => {
+    let active = manager.getActiveSession();
+    if (!active) {
+      const today = ambientDayKey(new Date().toISOString());
+      active = manager.startSession({
+        title: ambientTitle(today),
+        aiTool: "Various",
+        taskType: "Other",
+        intent: "",
+        ambient: true,
+      });
+      syncStatusBar();
+    }
+    const ok = manager.recordForActiveSession("validation.command", {
+      commandType: type,
+      result,
+      source: "logged",
+    });
+    dashboard.refresh();
+    return { ok, sessionTitle: active?.title };
+  };
+
+  const getSummaryData = (): SummaryData => {
+    const sessions = store.loadSessions().sessions;
+    const lastScored = [...sessions]
+      .reverse()
+      .find((s) => s.status === "completed" && s.karmaScore !== undefined);
+    const reflection = generateWeeklyReflection(sessions, new Date().toISOString());
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const readiness = folder ? assessReadiness(scanReadinessSignals(folder)) : undefined;
+    return {
+      lastTitle: lastScored?.title,
+      lastScore: lastScored?.karmaScore,
+      lastLabel: lastScored?.karmaScoreLabel,
+      lastReasons: lastScored?.karmaReasons,
+      reflectionNudge: reflection.nudge,
+      readinessSummary: readiness?.summary,
+      readinessTopGap: readiness?.topGap?.label,
+    };
+  };
+
+  registerChatParticipant(context, {
+    recordValidation: recordValidationFromChat,
+    getSummaryData,
+  });
 
   context.subscriptions.push(
     vscode.commands.registerCommand("agentKarma.startSession", startFlow),

@@ -2,6 +2,12 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.23.0]
+- **`@agentkarma` chat participant.** Open the Chat view and talk to Agent Karma:
+  - **/verify** _tests · build · lint · types_ — log that you validated the AI's work. This is the one capture path that covers **AI used in a browser or copy-pasted in** — work no log-parser can see. If no session is active it starts a per-day one for you. Self-reported, so it counts as *logged*, never *observed*.
+  - **/summary** — your latest Karma + reasons, this week's nudge, and your "can you validate?" status, right in chat.
+- Requires VS Code 1.90+ for the Chat API; on older builds the participant simply doesn't appear (everything else still works). No language model is called — the chat surface stays fully local and no-network.
+
 ## [0.22.0]
 - **Transparent Karma rules.** The score is now a **declared rule table** — every point traces to one named, documented rule. A new **Karma rules** dashboard panel lists every rule, its weight, and whether your last session earned it. No opaque engine: you can read exactly how Karma is computed.
 - **"Why did my Karma move?"** A new command and dashboard card explain the change from your previous session in plain language — *which rules you gained or dropped* — not just a number going up or down. Works on your existing history.
