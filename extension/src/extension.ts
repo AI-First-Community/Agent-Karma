@@ -255,6 +255,18 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const toggleClaudeUsageFlow = async (): Promise<void> => {
+    const cfg = vscode.workspace.getConfiguration("agentKarma");
+    const now = cfg.get<boolean>("readClaudeUsage") ?? false;
+    await cfg.update("readClaudeUsage", !now, vscode.ConfigurationTarget.Global);
+    dashboard.refresh();
+    void vscode.window.showInformationMessage(
+      !now
+        ? "Agent Karma: local AI usage is ON — reading token metadata from Claude Code's local logs (no network, no API key). Open the dashboard to see it."
+        : "Agent Karma: local AI usage is OFF."
+    );
+  };
+
   const toggleFlow = async (): Promise<void> => {
     const active = manager.getActiveSession();
     if (active?.ambient) {
@@ -493,6 +505,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand("agentKarma.installPreCommitNudge", installNudgeFlow),
     vscode.commands.registerCommand("agentKarma.removePreCommitNudge", removeNudgeFlow),
     vscode.commands.registerCommand("agentKarma.toggleAmbientMode", toggleAmbientFlow),
+    vscode.commands.registerCommand("agentKarma.toggleClaudeUsage", toggleClaudeUsageFlow),
     // Ambient mode: a save is the trigger to ensure today's session exists / roll over.
     vscode.workspace.onDidSaveTextDocument(() => {
       void ensureAmbientDaySession();

@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.29.0",
+  "version": "0.30.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
@@ -72,6 +72,10 @@
       {
         "command": "agentKarma.toggleAmbientMode",
         "title": "Agent Karma: Toggle Ambient Mode (experimental, continuous capture)"
+      },
+      {
+        "command": "agentKarma.toggleClaudeUsage",
+        "title": "Agent Karma: Toggle AI Usage Reading (Claude Code, local)"
       },
       {
         "command": "agentKarma.deleteAllData",

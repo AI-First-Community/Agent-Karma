@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.30.0]
+- **One-click toggle for local AI usage.** New command **Agent Karma: Toggle AI Usage Reading (Claude Code, local)** flips the opt-in on/off from the command palette — no more hunting in Settings — and refreshes the dashboard immediately.
+
 ## [0.29.0]
 - **Token wastage, tied to validation.** When local Claude usage is on, the usage card now splits your AI **output tokens** into *validated* / *unvalidated* / *untracked* — so "wastage" means what it should: tokens you spent on changes you **never verified** (tokens outside any tracked session are shown as untracked, not blamed). Still local, still metadata-only.
 - **Rework (revision churn).** A new card counts files you saved **3+ times in one session** (from your own save events — honest about what it measures: iteration) and names the most-revised one — a quiet prompt to validate heavily-reworked code before trusting it.
