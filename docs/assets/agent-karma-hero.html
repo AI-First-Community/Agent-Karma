@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Agent Karma — hero</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --ink:#1C1A16;
+    --ink2:#3A352D;
+    --muted:#6E6557;
+    --cream:#FBF6EC;
+    --cream2:#F4ECDB;
+    --saffron:#E8801A;
+    --saffron-d:#C75D08;
+    --amber:#F4A82C;
+    --green:#2F9E5B;
+    --line:#E7DCC6;
+    --white:#FFFFFF;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:#d9d2c2; height:100%; }
+
+  .stage{
+    width:1200px; height:100vh; position:relative; overflow:hidden;
+    display:flex; background:var(--cream);
+    font-family:'Manrope',system-ui,sans-serif; color:var(--ink);
+  }
+
+  /* ---------------- LEFT ---------------- */
+  .left{ flex:0 0 700px; padding:60px 56px 56px 64px; display:flex; flex-direction:column; }
+
+  .brand{ display:flex; align-items:center; gap:14px; margin-bottom:auto; }
+  .mark{ width:54px; height:54px; flex:0 0 auto; }
+  .brandname{ font-family:'Manrope'; font-weight:800; font-size:25px; letter-spacing:-.4px; color:var(--ink); }
+  .brandname b{ color:var(--saffron-d); }
+
+  .kicker{ display:inline-flex; align-items:center; gap:8px; align-self:flex-start;
+    font-size:13px; font-weight:600; letter-spacing:.4px; text-transform:uppercase;
+    color:var(--saffron-d); background:rgba(232,128,26,.10);
+    border:1px solid rgba(232,128,26,.30); padding:6px 12px; border-radius:999px; margin-bottom:22px; }
+  .kicker .d{ width:6px; height:6px; border-radius:50%; background:var(--saffron); }
+
+  h1{ font-family:'Manrope'; font-weight:800; font-size:67px; line-height:.98;
+    letter-spacing:-2.2px; color:var(--ink); }
+  h1 .hl{ color:var(--saffron-d); }
+  .sub{ font-size:18.5px; line-height:1.5; color:var(--ink2); margin-top:18px; max-width:540px; }
+  .sub b{ color:var(--ink); font-weight:600; }
+
+  /* stepper */
+  .steps{ display:flex; align-items:center; gap:10px; margin-top:30px; }
+  .step{ display:flex; flex-direction:column; gap:2px; }
+  .step .t{ font-family:'Manrope'; font-weight:700; font-size:18px; color:var(--ink); }
+  .step .s{ font-size:13px; color:var(--muted); }
+  .sarrow{ color:var(--saffron); font-size:18px; font-weight:700; margin:0 4px; align-self:flex-start; padding-top:2px; }
+
+  /* trust */
+  .trust{ display:flex; flex-wrap:wrap; gap:8px; margin-top:34px; }
+  .chip{ display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; color:var(--ink2);
+    background:var(--white); border:1px solid var(--line); padding:7px 13px; border-radius:999px; }
+  .chip svg{ width:15px; height:15px; }
+
+  .footnote{ margin-top:auto; font-size:14px; color:var(--muted); font-weight:500; }
+  .footnote b{ color:var(--saffron-d); font-weight:700; }
+
+  /* ---------------- RIGHT ---------------- */
+  .right{ flex:1; position:relative; overflow:hidden;
+    background:linear-gradient(155deg, #F4A82C 0%, #E8801A 52%, #C75D08 100%); }
+  /* soft pattern */
+  .right::before{ content:""; position:absolute; inset:0;
+    background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.16) 1.4px, transparent 1.6px);
+    background-size:26px 26px; opacity:.55; }
+  .right::after{ content:""; position:absolute; width:360px; height:360px; border-radius:50%;
+    right:-120px; top:-120px; background:rgba(255,255,255,.12); }
+
+  .panel-glow{ position:absolute; width:320px; height:320px; border-radius:50%;
+    left:-90px; bottom:-110px; background:rgba(255,255,255,.10); }
+
+  /* product card */
+  .card{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:360px; background:var(--white); border-radius:22px;
+    box-shadow:0 30px 60px -18px rgba(80,40,0,.45), 0 4px 0 rgba(0,0,0,.02);
+    padding:24px 24px 22px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .card-head .ttl{ font-family:'Manrope'; font-weight:800; font-size:16px; color:var(--ink); }
+  .card-head .meta{ font-size:12.5px; color:var(--muted); }
+  .badge-mark{ width:30px; height:30px; }
+
+  .ring-wrap{ display:flex; align-items:center; gap:20px; padding:4px 2px 14px; border-bottom:1px solid var(--line); }
+  .ring{ width:108px; height:108px; flex:0 0 auto; position:relative; }
+  .ring .val{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring .num{ font-family:'Manrope'; font-weight:800; font-size:40px; line-height:1; color:var(--ink); }
+  .ring .of{ font-size:11px; color:var(--muted); margin-top:1px; }
+  .ring-side .label{ font-size:13px; color:var(--muted); font-weight:500; }
+  .ring-side .big{ font-family:'Manrope'; font-weight:800; font-size:21px; color:var(--ink); margin-top:2px; }
+  .ring-side .tag{ display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+    font-size:12.5px; font-weight:600; color:var(--green); background:rgba(47,158,91,.10);
+    border:1px solid rgba(47,158,91,.25); padding:4px 10px; border-radius:999px; }
+
+  .rows{ padding-top:13px; display:flex; flex-direction:column; gap:9px; }
+  .row{ display:flex; align-items:center; gap:11px; font-size:13.5px; color:var(--ink2); }
+  .row .ck{ width:19px; height:19px; flex:0 0 auto; }
+  .row .v{ margin-left:auto; font-size:12.5px; font-weight:700; color:var(--green); }
+  .row .v.muted{ color:var(--muted); }
+  .row .v.warn{ color:var(--saffron-d); }
+
+  /* ---------------- DARK VARIANT ---------------- */
+  body.dark .stage{ background:#14120E; }
+  body.dark{ --ink:#F7F1E6; --ink2:#D6CDBE; --muted:#988F80; --line:rgba(255,255,255,.13); }
+  /* keep the product card a true white card in dark mode */
+  body.dark .card{ --ink:#1C1A16; --ink2:#3A352D; --muted:#6E6557; --line:#E7DCC6; }
+  body.dark .chip{ background:rgba(255,255,255,.05); }
+  body.dark .brandname b,
+  body.dark h1 .hl,
+  body.dark .footnote b,
+  body.dark .sarrow{ color:#F6A638; }
+  body.dark .kicker{ color:#F6A638; background:rgba(246,166,56,.12); border-color:rgba(246,166,56,.32); }
+  body.dark .chip svg path,
+  body.dark .chip svg rect,
+  body.dark .chip svg circle{ stroke:#F6A638; }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- ===== LEFT ===== -->
+    <div class="left">
+      <div class="brand">
+        <!-- Ashoka chakra brand mark (same as the app icon / dashboard) -->
+        <svg class="mark" viewBox="0 0 256 256">
+          <defs>
+            <linearGradient id="akbg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#11161d"/><stop offset="100%" stop-color="#0a0c10"/>
+            </linearGradient>
+            <linearGradient id="akwheel" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f0b429"/><stop offset="100%" stop-color="#e3870a"/>
+            </linearGradient>
+          </defs>
+          <rect width="256" height="256" rx="56" fill="url(#akbg)"/>
+          <rect x="6" y="6" width="244" height="244" rx="52" fill="none" stroke="#f0b429" stroke-opacity="0.18" stroke-width="2"/>
+          <g stroke="url(#akwheel)" stroke-linecap="round">
+            <circle cx="128" cy="128" r="84" fill="none" stroke-width="7"/>
+            <g stroke-width="6">
+              <line x1="148" y1="128" x2="204" y2="128"/>
+              <line x1="145.3" y1="138" x2="193.8" y2="166"/>
+              <line x1="138" y1="145.3" x2="166" y2="193.8"/>
+              <line x1="128" y1="148" x2="128" y2="204"/>
+              <line x1="118" y1="145.3" x2="90" y2="193.8"/>
+              <line x1="110.7" y1="138" x2="62.2" y2="166"/>
+              <line x1="108" y1="128" x2="52" y2="128"/>
+              <line x1="110.7" y1="118" x2="62.2" y2="90"/>
+              <line x1="118" y1="110.7" x2="90" y2="62.2"/>
+              <line x1="128" y1="108" x2="128" y2="52"/>
+              <line x1="138" y1="110.7" x2="166" y2="62.2"/>
+              <line x1="145.3" y1="118" x2="193.8" y2="90"/>
+            </g>
+          </g>
+          <circle cx="128" cy="128" r="14" fill="url(#akwheel)"/>
+        </svg>
+        <div class="brandname">Agent <b>Karma</b></div>
+      </div>
+
+      <div class="kicker"><span class="d"></span> Local-first VS Code extension</div>
+
+      <h1>Make every agent<br>action <span class="hl">count.</span></h1>
+
+      <p class="sub">AI writes the code — but you decide what's safe to ship. Agent Karma tracks whether
+      you actually <b>tested and reviewed</b> it before you commit, so nothing goes out unchecked. All on your machine.</p>
+
+      <!-- Dharma -> Karma -> Phal -->
+      <div class="steps">
+        <div class="step"><span class="t">Dharma</span><span class="s">Intent</span></div>
+        <span class="sarrow">→</span>
+        <div class="step"><span class="t">Karma</span><span class="s">Action</span></div>
+        <span class="sarrow">→</span>
+        <div class="step"><span class="t">Phal</span><span class="s">Outcome</span></div>
+      </div>
+
+      <div class="trust">
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 2.5V12c0 4.5-3.4 7.4-7 8.5-3.6-1.1-7-4-7-8.5V5.5z" stroke="#C75D08" stroke-width="1.8" stroke-linejoin="round"/></svg>No cloud</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="11" rx="1.6" stroke="#C75D08" stroke-width="1.8"/><path d="M9 19h6" stroke="#C75D08" stroke-width="1.8" stroke-linecap="round"/></svg>Local data</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v8M12 4a4 4 0 014 4M12 4a4 4 0 00-4 4" stroke="#C75D08" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.5" r="2.7" stroke="#C75D08" stroke-width="1.8"/></svg>No telemetry</span>
+        <span class="chip"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#C75D08" stroke-width="1.8"/><path d="M8.5 12l2.4 2.4L16 9.5" stroke="#C75D08" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Open source</span>
+      </div>
+
+      <div class="footnote">Works with <b>Claude Code</b>, Copilot, Cursor, ChatGPT — even browser &amp; copy-paste.</div>
+    </div>
+
+    <!-- ===== RIGHT ===== -->
+    <div class="right">
+      <div class="panel-glow"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="ttl">Karma Card</div>
+            <div class="meta">This session · validated</div>
+          </div>
+          <svg class="badge-mark" viewBox="0 0 44 44" aria-hidden="true">
+            <g stroke="#C75D08" stroke-linecap="round">
+              <circle cx="22" cy="22" r="19" fill="none" stroke-width="2"/>
+              <g stroke-width="1.4">
+                <line x1="25.2" y1="22" x2="39.5" y2="22"/><line x1="18.8" y1="22" x2="4.5" y2="22"/>
+                <line x1="22" y1="25.2" x2="22" y2="39.5"/><line x1="22" y1="18.8" x2="22" y2="4.5"/>
+                <line x1="24.77" y1="23.6" x2="37.16" y2="30.75"/><line x1="19.23" y1="20.4" x2="6.84" y2="13.25"/>
+                <line x1="23.6" y1="24.77" x2="30.75" y2="37.16"/><line x1="20.4" y1="19.23" x2="13.25" y2="6.84"/>
+                <line x1="20.4" y1="24.77" x2="13.25" y2="37.16"/><line x1="23.6" y1="19.23" x2="30.75" y2="6.84"/>
+                <line x1="19.23" y1="23.6" x2="6.84" y2="30.75"/><line x1="24.77" y1="20.4" x2="37.16" y2="13.25"/>
+              </g>
+            </g>
+            <circle cx="22" cy="22" r="3.2" fill="#C75D08"/>
+          </svg>
+        </div>
+
+        <div class="ring-wrap">
+          <div class="ring">
+            <svg viewBox="0 0 120 120" width="108" height="108">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#F0E7D6" stroke-width="11"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E8801A" stroke-width="11"
+                stroke-linecap="round" stroke-dasharray="273 314" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="val"><div class="num">87</div><div class="of">/ 100</div></div>
+          </div>
+          <div class="ring-side">
+            <div class="label">Karma Score</div>
+            <div class="big">Strong</div>
+            <span class="tag">● Ready to commit</span>
+          </div>
+        </div>
+
+        <div class="rows">
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#E8F5ED"/><path d="M6 10.2l2.5 2.5L14 7" stroke="#2F9E5B" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Tests run <span class="v">passed</span>
+          </div>
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#E8F5ED"/><path d="M6 10.2l2.5 2.5L14 7" stroke="#2F9E5B" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Build <span class="v">passed</span>
+          </div>
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#E8F5ED"/><path d="M6 10.2l2.5 2.5L14 7" stroke="#2F9E5B" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Lint <span class="v">clean</span>
+          </div>
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#E8F5ED"/><path d="M6 10.2l2.5 2.5L14 7" stroke="#2F9E5B" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Type check <span class="v">passed</span>
+          </div>
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><rect x="5" y="3.5" width="8" height="13" rx="1.4" fill="none" stroke="#9A8E78" stroke-width="1.5"/><path d="M7.4 7.5h3.2M7.4 10h3.2M7.4 12.5h2" stroke="#9A8E78" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Files changed <span class="v muted">8 files</span>
+          </div>
+          <div class="row">
+            <svg class="ck" viewBox="0 0 20 20"><path d="M10 3l6 2.2v4.3c0 3.4-2.6 5.6-6 6.5-3.4-.9-6-3.1-6-6.5V5.2z" fill="none" stroke="#2F9E5B" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.3 10l1.9 1.9L13 8" stroke="#2F9E5B" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Risk level <span class="v">low</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script>if(location.search.indexOf('dark')>-1)document.body.classList.add('dark');</script>
+</body>
+</html>
