@@ -5,6 +5,8 @@ import { sparkline, percentBar, outcomeBar, gauge } from "./charts";
 import { WeeklyReflection } from "../reflection/weeklyReflection";
 import { riskAlignment } from "../cards/riskAlignment";
 import { ValidationReadiness } from "../collectors/validationReadiness";
+import { KARMA_RULES } from "../scoring/karmaRules";
+import { KarmaMove, earnedRuleIds } from "../scoring/karmaExplain";
 
 export interface DashboardData {
   nonce: string;
@@ -22,6 +24,8 @@ export interface DashboardData {
   /** Most recent completed session (shows its Phal card + trace). */
   lastCompleted?: AgentKarmaSession;
   lastCompletedEvents?: AgentKarmaEvent[];
+  /** Explanation of the Karma change from the prior completed session, if any. */
+  karmaMove?: KarmaMove;
   recent: AgentKarmaSession[];
 }
 
@@ -286,6 +290,47 @@ function lastSessionSection(
     </div>`;
 }
 
+/** "Why did my Karma move?" — the delta from the prior session, in named rules. */
+function karmaMoveCard(move: KarmaMove | undefined): string {
+  if (!move || (move.gained.length === 0 && move.lost.length === 0 && move.delta === 0)) {
+    return "";
+  }
+  const dir = move.delta > 0 ? "move-up" : move.delta < 0 ? "move-down" : "move-flat";
+  const arrow = move.delta > 0 ? "↑" : move.delta < 0 ? "↓" : "→";
+  return `
+    <div class="karma-move ${dir}">
+      <div class="move-head">${arrow} Why did my Karma move?</div>
+      <div class="move-summary">${esc(move.summary)}</div>
+    </div>`;
+}
+
+/** Karma rules reference — every rule, its weight, and whether the last session earned it. */
+function karmaRulesSection(last: AgentKarmaSession | undefined): string {
+  const earned = last ? earnedRuleIds({ karmaReasons: last.karmaReasons }) : new Set<string>();
+  const rows = KARMA_RULES.map((r) => {
+    const got = earned.has(r.id);
+    return `
+      <div class="rule-row">
+        <span class="rule-mark ${got ? "rule-yes" : "rule-no"}">${got ? "✔" : "○"}</span>
+        <span class="rule-label">${esc(r.label)}</span>
+        <span class="rule-weight">${r.maxPoints}</span>
+        <span class="rule-desc muted">${esc(r.description)}</span>
+      </div>`;
+  }).join("");
+  const lead = last
+    ? "Every point your last session earned, traced to a rule (✔ = earned)."
+    : "The full, transparent rule table — every point of Karma traces to one of these.";
+  return `
+    <h2>Karma rules</h2>
+    <p class="muted">${lead} Validation rules sum to 90; the prompt-hygiene hint is capped at 10.</p>
+    <div class="rules">
+      <div class="rule-row rule-headrow">
+        <span></span><span class="rule-label">Rule</span><span class="rule-weight">Pts</span><span class="rule-desc">What it rewards</span>
+      </div>
+      ${rows}
+    </div>`;
+}
+
 function recentSection(recent: AgentKarmaSession[]): string {
   if (recent.length === 0) {
     return `<p class="muted">No completed sessions yet.</p>`;
@@ -409,6 +454,22 @@ export function renderDashboardHtml(data: DashboardData): string {
     .ready-detail { font-size: 0.84rem; }
     .ready-score { font-weight: 700; color: var(--vscode-foreground); }
     .ready-gap { margin-top: 0.5rem; font-size: 0.88rem; padding: 0.5rem 0.7rem; border-radius: 8px; background: color-mix(in srgb, var(--vscode-charts-yellow, #b89500) 12%, transparent); }
+    /* why did my Karma move */
+    .karma-move { margin: 0.6rem 0 0; padding: 0.55rem 0.85rem; border-radius: 8px; border-left: 3px solid var(--vscode-descriptionForeground); background: var(--vscode-textBlockQuote-background, transparent); }
+    .karma-move.move-up { border-left-color: var(--vscode-charts-green, #388a34); }
+    .karma-move.move-down { border-left-color: var(--vscode-charts-red, #e51400); }
+    .move-head { font-weight: 700; font-size: 0.85rem; }
+    .move-summary { font-size: 0.9rem; margin-top: 0.15rem; }
+    /* karma rules reference */
+    .rules { display: flex; flex-direction: column; gap: 0.25rem; }
+    .rule-row { display: grid; grid-template-columns: 1.2rem 12rem 2rem 1fr; align-items: baseline; gap: 0.5rem; font-size: 0.86rem; }
+    .rule-headrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--vscode-descriptionForeground); border-bottom: 1px solid var(--vscode-panel-border); padding-bottom: 0.2rem; }
+    .rule-mark { font-weight: 700; text-align: center; }
+    .rule-yes { color: var(--vscode-charts-green, #388a34); }
+    .rule-no { color: var(--vscode-descriptionForeground); }
+    .rule-label { font-weight: 600; }
+    .rule-weight { text-align: right; font-variant-numeric: tabular-nums; color: var(--vscode-descriptionForeground); }
+    .rule-desc { font-size: 0.82rem; }
     .risk-flag { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 999px; margin: 0.1rem 0 0.5rem; }
     .risk-warn { color: var(--vscode-charts-red, #e51400); background: color-mix(in srgb, var(--vscode-charts-red, #e51400) 16%, transparent); }
     .risk-ok { color: var(--vscode-charts-green, #388a34); background: color-mix(in srgb, var(--vscode-charts-green, #388a34) 14%, transparent); }
@@ -425,6 +486,7 @@ export function renderDashboardHtml(data: DashboardData): string {
 
   <h2>Last session</h2>
   ${lastSessionSection(data.lastCompleted, data.lastCompletedEvents ?? [])}
+  ${karmaMoveCard(data.karmaMove)}
 
   ${reflectionCard(data.reflection)}
 
@@ -434,6 +496,8 @@ export function renderDashboardHtml(data: DashboardData): string {
 
   <h2>At a glance</h2>
   ${glanceSection(data.stats ?? EMPTY_STATS)}
+
+  ${karmaRulesSection(data.lastCompleted)}
 
   <h2>Recent sessions</h2>
   ${recentSection(data.recent)}

@@ -176,10 +176,24 @@ export interface PromptHintResult {
 }
 
 /** Return shape of the pure objective Karma scorer (scoring-model.md §3). */
+/** Per-rule outcome for one session — makes every Karma point traceable. */
+export interface KarmaRuleResult {
+  id: string;
+  label: string;
+  /** Points earned this session (0 if not earned). */
+  points: number;
+  /** Nominal weight of the rule (what it's worth when fully earned). */
+  maxPoints: number;
+  earned: boolean;
+  description: string;
+}
+
 export interface ScoreResult {
   score: number; // 0–100, Math.round
   label: KarmaScoreLabel;
   reasons: string[];
+  /** Full per-rule breakdown (every rule, earned or not). Optional for back-compat. */
+  breakdown?: KarmaRuleResult[];
 }
 
 /**

@@ -3,6 +3,7 @@ import * as path from "path";
 import { renderDashboardHtml } from "../dashboard/dashboardHtml";
 import { computeStats } from "../dashboard/dashboardStats";
 import { assessReadiness } from "../collectors/validationReadiness";
+import { explainKarmaMove } from "../scoring/karmaExplain";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { AgentKarmaSession, AgentKarmaEvent, DharmaCard, PhalCard } from "../core/types";
 
@@ -67,6 +68,7 @@ const html = renderDashboardHtml({
   activeEvents: [],
   lastCompleted: last,
   lastCompletedEvents: events.filter((e) => e.sessionId === last.id),
+  karmaMove: explainKarmaMove(sessions[0], last),
   recent: sessions.slice().reverse(),
 });
 

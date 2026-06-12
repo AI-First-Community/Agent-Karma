@@ -15,6 +15,7 @@ import { generateWeeklyReflection } from "./reflection/weeklyReflection";
 import { ambientDayKey, ambientTitle, ambientShouldStart } from "./core/ambient";
 import { assessReadiness } from "./collectors/validationReadiness";
 import { scanReadinessSignals } from "./collectors/validationReadinessScan";
+import { explainKarmaMove } from "./scoring/karmaExplain";
 import { SessionMeta } from "./core/sessionManager";
 import { AI_TOOLS, TASK_TYPES, AgentKarmaSession, ValidationCommandType } from "./core/types";
 
@@ -347,6 +348,24 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     }
   };
 
+  const whyKarmaMovedFlow = (): void => {
+    const completed = store
+      .loadSessions()
+      .sessions.filter((s) => s.status === "completed" && s.karmaScore !== undefined);
+    if (completed.length < 2) {
+      void vscode.window.showInformationMessage(
+        "Agent Karma: complete at least two scored sessions to compare your Karma."
+      );
+      dashboard.show();
+      return;
+    }
+    const curr = completed[completed.length - 1];
+    const prev = completed[completed.length - 2];
+    const move = explainKarmaMove(prev, curr);
+    void vscode.window.showInformationMessage(`Agent Karma — ${move.summary}`);
+    dashboard.show();
+  };
+
   const weeklyReflectionFlow = (): void => {
     const reflection = generateWeeklyReflection(
       store.loadSessions().sessions,
@@ -373,6 +392,7 @@ export function activate(context: vscode.ExtensionContext): AgentKarmaApi {
     vscode.commands.registerCommand(TOGGLE_COMMAND, toggleFlow),
     vscode.commands.registerCommand("agentKarma.showDashboard", () => dashboard.show()),
     vscode.commands.registerCommand("agentKarma.weeklyReflection", weeklyReflectionFlow),
+    vscode.commands.registerCommand("agentKarma.whyKarmaMoved", whyKarmaMovedFlow),
     vscode.commands.registerCommand("agentKarma.addValidationCommand", addValidationFlow),
     vscode.commands.registerCommand("agentKarma.exportJson", () => exportFlow("json")),
     vscode.commands.registerCommand("agentKarma.exportMarkdown", () => exportFlow("markdown")),

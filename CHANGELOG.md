@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.22.0]
+- **Transparent Karma rules.** The score is now a **declared rule table** — every point traces to one named, documented rule. A new **Karma rules** dashboard panel lists every rule, its weight, and whether your last session earned it. No opaque engine: you can read exactly how Karma is computed.
+- **"Why did my Karma move?"** A new command and dashboard card explain the change from your previous session in plain language — *which rules you gained or dropped* — not just a number going up or down. Works on your existing history.
+
 ## [0.21.0]
 - **Validation Context Health — "Can you even validate?"** A new dashboard panel (and the **Check Validation Readiness** command) scans your workspace — config only, never your source — for the means to verify AI output: can tests / build / lint / type check run, is there a pre-commit net, CI, and does your agent guidance file (CLAUDE.md / AGENTS.md) ask the AI to validate. It names your single biggest gap and, when that gap is the pre-commit net, offers to install it in one click. A question no other coach asks.
 

@@ -2,18 +2,18 @@ import {
   AgentKarmaEvent,
   ScoreResult,
   KarmaScoreLabel,
-  ValidationCommandType,
+  KarmaRuleResult,
   KARMA_SCORE_BANDS,
   KARMA_EMA_ALPHA,
 } from "../core/types";
+import { KARMA_RULES, extractKarmaFacts, reasonText } from "./karmaRules";
 
 // Objective Karma Score (scoring-model.md §3). Built ONLY from validation actions
-// that were observed or logged — no feeling-based self-report. Validation rows = 90
+// that were observed or logged — no feeling-based self-report. Validation rules = 90
 // of 100; the prompt hygiene hint contributes at most 10.
 //
-// Vacuous-truth rule: a "ran clean" row scores points ONLY if the command actually
-// ran. Absence of a command is never treated as success.
-// Observed > logged: the "tests passed" bonus requires a REAL observed exit code.
+// The rules themselves live in karmaRules.ts as a declared, readable table; this
+// module just evaluates it so every point is traceable to a named rule.
 
 export interface KarmaInput {
   events: AgentKarmaEvent[];
@@ -21,77 +21,36 @@ export interface KarmaInput {
   promptHintScore: number;
 }
 
-interface V {
-  type: ValidationCommandType;
-  result: string;
-  source: string;
-}
-
 function labelFor(score: number): KarmaScoreLabel {
   return KARMA_SCORE_BANDS.find((b) => score >= b.min)!.label;
 }
 
 export function calculateKarmaScore(input: KarmaInput): ScoreResult {
-  const validations: V[] = input.events
-    .filter((e) => e.type === "validation.command")
-    .map((e) => ({
-      type: e.data.commandType as ValidationCommandType,
-      result: String(e.data.result),
-      source: String(e.data.source),
-    }));
-  const files = input.events.filter((e) => e.type === "file.saved");
-  const testFiles = files.filter((e) => e.data.isTestFile === true).length;
-  const nonTestFiles = files.filter((e) => e.data.isTestFile !== true).length;
+  const facts = extractKarmaFacts(input.events, input.gitCaptured, input.promptHintScore);
 
   let raw = 0;
   const reasons: string[] = [];
+  const breakdown: KarmaRuleResult[] = [];
 
-  if (validations.some((v) => v.type === "Test")) {
-    raw += 25;
-    reasons.push("Tests run (+25)");
-  }
-  if (
-    validations.some((v) => v.type === "Test" && v.result === "passed" && v.source === "observed")
-  ) {
-    raw += 10;
-    reasons.push("Tests passed — observed (+10)");
-  }
-
-  const buildRan = validations.some((v) => v.type === "Build" || v.type === "Type Check");
-  const buildFailed = validations.some(
-    (v) => (v.type === "Build" || v.type === "Type Check") && v.result === "failed"
-  );
-  if (buildRan && !buildFailed) {
-    raw += 20;
-    reasons.push("Build / type-check ran clean (+20)");
-  }
-
-  const lintRan = validations.some((v) => v.type === "Lint");
-  const lintFailed = validations.some((v) => v.type === "Lint" && v.result === "failed");
-  if (lintRan && !lintFailed) {
-    raw += 15;
-    reasons.push("Lint ran clean (+15)");
-  }
-
-  if (testFiles > 0 && nonTestFiles > 0) {
-    raw += 15;
-    reasons.push("Test added/updated alongside code (+15)");
-  }
-
-  if (input.gitCaptured) {
-    raw += 5;
-    reasons.push("Change measured (+5)");
-  }
-
-  const promptPoints = input.promptHintScore * 0.1;
-  if (promptPoints > 0) {
-    raw += promptPoints;
-    const shown = Number.isInteger(promptPoints) ? `${promptPoints}` : promptPoints.toFixed(1);
-    reasons.push(`Prompt hygiene hint (+${shown})`);
+  for (const rule of KARMA_RULES) {
+    const points = rule.award(facts);
+    const earned = points > 0;
+    breakdown.push({
+      id: rule.id,
+      label: rule.label,
+      points,
+      maxPoints: rule.maxPoints,
+      earned,
+      description: rule.description,
+    });
+    if (earned) {
+      raw += points;
+      reasons.push(reasonText(rule, points));
+    }
   }
 
   const score = Math.min(100, Math.round(raw));
-  return { score, label: labelFor(score), reasons };
+  return { score, label: labelFor(score), reasons, breakdown };
 }
 
 /** Update the self-comparative EMA (scoring-model §3.3). Seeds to the first score. */

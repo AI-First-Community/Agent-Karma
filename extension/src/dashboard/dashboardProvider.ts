@@ -7,6 +7,7 @@ import { computeStats, computeValidationHabits } from "./dashboardStats";
 import { generateWeeklyReflection } from "../reflection/weeklyReflection";
 import { assessReadiness } from "../collectors/validationReadiness";
 import { scanReadinessSignals } from "../collectors/validationReadinessScan";
+import { explainKarmaMove } from "../scoring/karmaExplain";
 
 /** A single read-only dashboard webview panel. */
 export class DashboardPanel {
@@ -67,6 +68,11 @@ export class DashboardPanel {
     const lastCompletedEvents = lastCompleted
       ? allEvents.filter((e) => e.sessionId === lastCompleted.id)
       : [];
+    const prevCompleted = recent[1];
+    const karmaMove =
+      lastCompleted?.karmaScore !== undefined && prevCompleted?.karmaScore !== undefined
+        ? explainKarmaMove(prevCompleted, lastCompleted)
+        : undefined;
     const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     const readiness = root ? assessReadiness(scanReadinessSignals(root)) : undefined;
     const fontUri = this.panel.webview
@@ -84,6 +90,7 @@ export class DashboardPanel {
       activeEvents,
       lastCompleted,
       lastCompletedEvents,
+      karmaMove,
       recent,
     });
   }
