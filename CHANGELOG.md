@@ -2,6 +2,9 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.35.0]
+- **Karma Card redesigned as a proper certificate.** A4-landscape proportions, an ornamental **double border with corner accents**, a centered formal layout ("This certifies that → *Your Name*"), a **chakra wax-seal** medallion, a gradient flourish under the name, larger refined typography, and a clean four-stat band (Karma · Validation · Best streak · Sessions). Mood-tinted, still fully local and dependency-free.
+
 ## [0.34.0]
 - **Karma Card is now personalised** — it shows the recipient's name ("Awarded to …"). The name is resolved **locally** from your git `user.name` (falling back to your OS username), or you can set **Agent Karma › Card Name** to override it. Never sent anywhere.
 

@@ -2,7 +2,7 @@
   "name": "agent-karma",
   "displayName": "Agent Karma",
   "description": "Local-first AI-coding validation & self-awareness coach. Did you verify what the AI produced before trusting it?",
-  "version": "0.34.0",
+  "version": "0.35.0",
   "publisher": "passion4architecture",
   "license": "Apache-2.0",
   "author": {
