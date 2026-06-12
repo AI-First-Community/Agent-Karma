@@ -2,6 +2,10 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.37.1]
+- **Fix: dashboard chart bars and heatmap render again.** A nonce in the webview CSP `style-src` was making the browser ignore `'unsafe-inline'`, which silently blocked every dynamic inline style — so percent-bar fills (Validation Habits, "Did you validate the risky work?") showed empty and the "Where you validate" heatmap lost its cell colours and column layout. The nonce is dropped from `style-src` (the nonced `<style>` block still validates), and `.bar` is back to `display:inline-block` so its fill width resolves correctly.
+- **Marketplace polish.** Rewrites the extension README as a full listing (features, quick start, commands, settings, privacy, FAQ) with screenshot placeholders; adds `pricing`, `galleryBanner`, `preview`, `qna`, and richer keywords/categories to `package.json`.
+
 ## [0.37.0]
 - **Brand icon.** Adds the Agent Karma marketplace icon — a 24-spoke dharmachakra in saffron on a dark rounded square (`media/icon.png`, with the source `media/icon.svg`).
 

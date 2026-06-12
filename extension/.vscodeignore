@@ -11,6 +11,9 @@ tsconfig.json
 tsconfig.test.json
 tsconfig.dev.json
 preview/**
+# README screenshots are served from GitHub by absolute URL — no need to ship them.
+media/screenshots/**
+media/icon.svg
 .eslintrc.json
 **/*.test.ts
 **/*.itest.ts

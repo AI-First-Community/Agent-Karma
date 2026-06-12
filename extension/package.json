@@ -22,15 +22,29 @@
   },
   "categories": [
     "Other",
-    "Education"
+    "Education",
+    "Visualization"
   ],
   "keywords": [
     "ai",
     "validation",
     "local-first",
     "privacy",
-    "coding-assistant"
+    "coding-assistant",
+    "claude code",
+    "copilot",
+    "cursor",
+    "code review",
+    "verification",
+    "karma"
   ],
+  "preview": true,
+  "pricing": "Free",
+  "galleryBanner": {
+    "color": "#1a1410",
+    "theme": "dark"
+  },
+  "qna": "marketplace",
   "main": "./dist/extension.js",
   "activationEvents": [
     "onStartupFinished"
