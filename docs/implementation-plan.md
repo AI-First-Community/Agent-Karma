@@ -24,7 +24,7 @@ Phase 0  Bootstrap ──► 0.1 Foundation ──► 0.2 Dharma ──► 0.3 F
 Goal: a runnable, empty extension with tooling and guardrails in place, so every later task has a home and the no-network invariant is enforced from day one.
 
 > **Maintainer inputs for Phase 0:**
-> - ✅ **GitHub repo:** `https://github.com/AI-First-Community/Agent-Karma-Public` — under the **AI-First-Community** org (account `subscribe.sanjeev@gmail.com`); goes **public at v1.0**. Independent, community-published project.
+> - ✅ **GitHub repo:** `https://github.com/AI-First-Community/Agent-Karma` — under the **AI-First-Community** org (account `subscribe.sanjeev@gmail.com`); goes **public at v1.0**. Independent, community-published project.
 > - ✅ **Maintainer identity:** Sanjeev Azad · `subscribe.sanjeev@gmail.com` — used for git author and `package.json` `author`; `LICENSE` copyright is name-only. Marketplace publisher `innovate-with-sanjeev` is under `sanjeev.azad@gmail.com` (publish with that account's PAT).
 > - ✅ **License:** Apache-2.0.
 > - ⏳ **VS Code Marketplace publisher ID/handle** (personal; created on the Marketplace, separate from GitHub) — needed only at publish time, not for early commits.

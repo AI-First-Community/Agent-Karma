@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/AI-First-Community/Agent-Karma-Public/main/extension/media/icon.png" alt="Agent Karma" width="120" />
+<img src="https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/icon.png" alt="Agent Karma" width="120" />
 
 # Agent Karma
 
@@ -11,12 +11,12 @@ A **local-first**, privacy-safe VS Code companion that turns *"did I actually ch
 [![Version](https://img.shields.io/visual-studio-marketplace/v/innovate-with-sanjeev.agent-karma?color=2d8a4e&label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/innovate-with-sanjeev.agent-karma?color=2d8a4e)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
 [![Rating](https://img.shields.io/visual-studio-marketplace/r/innovate-with-sanjeev.agent-karma?color=2d8a4e)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/AI-First-Community/Agent-Karma-Public/blob/main/LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/AI-First-Community/Agent-Karma/blob/main/LICENSE)
 
 </div>
 
 <!-- SHOT: hero.gif — a 10–15s loop: Start session → edit a file → run tests → End → dashboard opens. ~1000px wide. -->
-![Agent Karma in action](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma-Public/main/extension/media/screenshots/hero.gif)
+![Agent Karma in action](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/hero.gif)
 
 > ## Mind the verification gap: did you validate what the AI produced — before you trusted it?
 
@@ -51,7 +51,7 @@ Every other tool measures AI *usage* for managers (acceptance rates, lines, toke
 ## What it does
 
 <!-- SHOT: dashboard.png — the full insight dashboard, scrolled to top (karmic reflection + trend lines). Light or dark theme. -->
-![Insight dashboard](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma-Public/main/extension/media/screenshots/dashboard.png)
+![Insight dashboard](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/dashboard.png)
 
 For each AI-assisted coding session, Agent Karma produces:
 
@@ -75,7 +75,7 @@ Everything is stored as plain JSON on your machine.
 ## Quick start
 
 <!-- SHOT: start-session.png — the Start Session panel with title/AI tool/task type/intent filled in. -->
-![Start a session](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma-Public/main/extension/media/screenshots/start-session.png)
+![Start a session](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/start-session.png)
 
 1. Click **▶ Agent Karma: Start** in the status bar (or run **Agent Karma: Start Session**). Give it a title, the AI tool you're using, a task type, and your intent.
 2. Work normally with your AI tool — edit and **save** files, and **run your tests / build / lint** as you go.
@@ -123,10 +123,10 @@ Local-first. No source code captured. No terminal output captured.
 No cloud upload. No telemetry. No login. No surveillance.
 ```
 
-Agent Karma records *that* you validated — file-save events, the validation commands you ran, and a git **diff summary** (counts, not content). It does **not** capture your source code, your terminal output, or your keystrokes. Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma-Public/blob/main/PRIVACY.md).
+Agent Karma records *that* you validated — file-save events, the validation commands you ran, and a git **diff summary** (counts, not content). It does **not** capture your source code, your terminal output, or your keystrokes. Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md).
 
 <!-- SHOT: karma-card.png — a generated Karma Card certificate (the personalised SVG/PDF). Looks great as the closing visual. -->
-![Shareable Karma Card](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma-Public/main/extension/media/screenshots/karma-card.png)
+![Shareable Karma Card](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/karma-card.png)
 
 ---
 
@@ -148,10 +148,10 @@ No background surveillance, no leaderboards. The one optional interruption is th
 
 ## Links
 
-- 📖 [Full documentation & roadmap](https://github.com/AI-First-Community/Agent-Karma-Public#readme)
-- 🔒 [Privacy contract](https://github.com/AI-First-Community/Agent-Karma-Public/blob/main/PRIVACY.md)
-- 📝 [Changelog](https://github.com/AI-First-Community/Agent-Karma-Public/blob/main/CHANGELOG.md)
-- 🐛 [Report an issue](https://github.com/AI-First-Community/Agent-Karma-Public/issues)
+- 📖 [Full documentation & roadmap](https://github.com/AI-First-Community/Agent-Karma#readme)
+- 🔒 [Privacy contract](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md)
+- 📝 [Changelog](https://github.com/AI-First-Community/Agent-Karma/blob/main/CHANGELOG.md)
+- 🐛 [Report an issue](https://github.com/AI-First-Community/Agent-Karma/issues)
 
 ---
 

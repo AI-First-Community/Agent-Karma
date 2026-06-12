@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AI-First-Community/Agent-Karma-Public.git"
+    "url": "https://github.com/AI-First-Community/Agent-Karma.git"
   },
   "bugs": {
-    "url": "https://github.com/AI-First-Community/Agent-Karma-Public/issues"
+    "url": "https://github.com/AI-First-Community/Agent-Karma/issues"
   },
-  "homepage": "https://github.com/AI-First-Community/Agent-Karma-Public#readme",
+  "homepage": "https://github.com/AI-First-Community/Agent-Karma#readme",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -149,7 +149,7 @@
     "viewsWelcome": [
       {
         "view": "agentKarma.home",
-        "contents": "Track whether you validated what the AI produced — before you trusted it.\n\n[▶ Start Session](command:agentKarma.startSession)\n[■ End Session](command:agentKarma.endSession)\n[✅ Log a Validation](command:agentKarma.addValidationCommand)\n[📊 Open Dashboard](command:agentKarma.showDashboard)\n[🏅 Generate Karma Card](command:agentKarma.generateKarmaCard)\n[🩺 Check Validation Readiness](command:agentKarma.checkValidationReadiness)\n[📤 Export as JSON](command:agentKarma.exportJson)\n[📤 Export as Markdown](command:agentKarma.exportMarkdown)\n[⚙ Configure Settings](command:agentKarma.openSettings)\n[🗑 Reset Karma History](command:agentKarma.resetHistory)\n\nEverything stays on your machine. [Learn more](https://github.com/AI-First-Community/Agent-Karma-Public#readme)"
+        "contents": "Track whether you validated what the AI produced — before you trusted it.\n\n[▶ Start Session](command:agentKarma.startSession)\n[■ End Session](command:agentKarma.endSession)\n[✅ Log a Validation](command:agentKarma.addValidationCommand)\n[📊 Open Dashboard](command:agentKarma.showDashboard)\n[🏅 Generate Karma Card](command:agentKarma.generateKarmaCard)\n[🩺 Check Validation Readiness](command:agentKarma.checkValidationReadiness)\n[📤 Export as JSON](command:agentKarma.exportJson)\n[📤 Export as Markdown](command:agentKarma.exportMarkdown)\n[⚙ Configure Settings](command:agentKarma.openSettings)\n[🗑 Reset Karma History](command:agentKarma.resetHistory)\n\nEverything stays on your machine. [Learn more](https://github.com/AI-First-Community/Agent-Karma#readme)"
       }
     ],
     "menus": {
