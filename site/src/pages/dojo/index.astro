@@ -6,6 +6,7 @@ const order = { white: 0, green: 1, brown: 2, black: 3 };
 const scenarios = (await getCollection("dojo")).sort(
   (a, b) => order[a.data.difficulty] - order[b.data.difficulty]
 );
+const base = import.meta.env.BASE_URL;
 ---
 
 <Base title="Validation Dojo">
@@ -20,7 +21,7 @@ const scenarios = (await getCollection("dojo")).sort(
     {
       scenarios.map((s) => (
         <li style="border:1px solid var(--ak-border);border-radius:12px;padding:18px 20px;background:var(--ak-bg-2)">
-          <a href={`/dojo/${s.id}/`} style="font-weight:800;font-size:18px;text-decoration:none">
+          <a href={`${base}dojo/${s.id}/`} style="font-weight:800;font-size:18px;text-decoration:none">
             {s.data.title}
           </a>
           <span style="margin-left:10px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ak-faint)">

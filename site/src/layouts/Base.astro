@@ -1,6 +1,7 @@
 ---
 import "../styles/tokens.css";
 const { title } = Astro.props;
+const base = import.meta.env.BASE_URL; // "/Agent-Karma/" — trailing slash kept
 ---
 
 <html lang="en">
@@ -8,9 +9,9 @@ const { title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title} · Agent Karma</title>
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="manifest" href={`${base}manifest.webmanifest`} />
     <meta name="theme-color" content="#1a1410" />
-    <script src="/registerSW.js" defer></script>
+    <script src={`${base}registerSW.js`} defer></script>
     {/* Match the theme the user picked in the docs (Starlight stores it here). */}
     <script is:inline>
       (() => {
@@ -49,11 +50,11 @@ const { title } = Astro.props;
   </head>
   <body>
     <header>
-      <a class="brand" href="/">Agent <span>Karma</span></a>
+      <a class="brand" href={base}>Agent <span>Karma</span></a>
       <nav>
-        <a href="/start/introduction/">Docs</a>
-        <a href="/dojo/">Dojo</a>
-        <a href="/progress/">Progress</a>
+        <a href={`${base}start/introduction/`}>Docs</a>
+        <a href={`${base}dojo/`}>Dojo</a>
+        <a href={`${base}progress/`}>Progress</a>
         <a href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">Install</a>
         <button class="toggle" id="ak-theme" aria-label="Toggle theme">◐</button>
       </nav>

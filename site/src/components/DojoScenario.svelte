@@ -6,6 +6,8 @@
   import { calculateKarmaScore } from "../engine/karma";
   import { record } from "../state/progress";
 
+  const base = import.meta.env.BASE_URL; // project-site subpath, e.g. "/Agent-Karma/"
+
   let { scenario, id, codeHtml = "" } = $props();
 
   let intent = $state("");
@@ -92,7 +94,7 @@
       <p class="debrief">{scenario.debrief}</p>
       <div class="after">
         <button class="ship ghost" onclick={reset}>Try again</button>
-        <a class="prog" href="/progress/">See your rank & Karma Card →</a>
+        <a class="prog" href={`${base}progress/`}>See your rank & Karma Card →</a>
       </div>
     </div>
   {/if}

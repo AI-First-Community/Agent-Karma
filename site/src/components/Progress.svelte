@@ -3,6 +3,8 @@
   import { stats, reset } from "../state/progress";
   import { buildKarmaCardSvg } from "../state/card";
 
+  const base = import.meta.env.BASE_URL; // project-site subpath, e.g. "/Agent-Karma/"
+
   let s = $state(null);
   let name = $state("");
   let svg = $state("");
@@ -43,7 +45,7 @@
   <p class="muted">Loading…</p>
 {:else if s.completedCount === 0}
   <p class="muted">No Dojo runs yet. Play a scenario to earn your rank and a Karma Card.</p>
-  <p><a class="cta" href="/dojo/">Enter the Dojo →</a></p>
+  <p><a class="cta" href={`${base}dojo/`}>Enter the Dojo →</a></p>
 {:else}
   <div class="rank">{s.rank}</div>
   <div class="grid">
@@ -61,7 +63,7 @@
 
   <div class="actions">
     <button class="btn primary" onclick={download}>⤓ Download SVG</button>
-    <a class="btn" href="/dojo/">Play more →</a>
+    <a class="btn" href={`${base}dojo/`}>Play more →</a>
     <button class="btn ghost" onclick={doReset}>Reset progress</button>
   </div>
   <p class="note">100% local — your progress and card never leave this browser.</p>
