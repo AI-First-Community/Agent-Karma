@@ -1,0 +1,139 @@
+---
+import Base from "../layouts/Base.astro";
+import ScoringExplainer from "../components/ScoringExplainer.svelte";
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="Learn the idea">
+  <article class="learn">
+    <header class="hero">
+      <p class="eyebrow">The verification gap</p>
+      <h1>AI writes the code.<br />Did anyone <span>verify</span> it?</h1>
+      <p class="sub">
+        We measure how <em>much</em> AI writes — lines, percentages, hours saved. We've gone
+        quiet about the one question that decides whether it's safe to ship.
+      </p>
+      <p class="scroll-hint">scroll ↓</p>
+    </header>
+
+    <section class="beat">
+      <p class="big">
+        “It worked in the demo” is where a 2&nbsp;a.m. incident begins.
+      </p>
+      <p>
+        The model is confident whether it's right or wrong. The only thing that closes the gap
+        between <strong>looks done</strong> and <strong>is done</strong> is you — running the
+        tests, the build, the linter, and reading the diff before you trust it.
+      </p>
+    </section>
+
+    <section class="acts">
+      <h2>Three acts of every change</h2>
+      <p class="acts-intro">
+        Agent Karma borrows a frame from the Gita: <em>act with full effort, hold the outcome
+        lightly.</em> A coding session has the same three beats.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <span class="sanskrit">धर्म</span>
+          <h3>Dharma — intent</h3>
+          <p>Say what you're actually trying to do, clearly, before the AI starts. A clear intent is a check you can verify against.</p>
+        </div>
+        <div class="card">
+          <span class="sanskrit">कर्म</span>
+          <h3>Karma — the action</h3>
+          <p>The AI acts; you guide and <strong>validate</strong>. This is the work that counts — the tests you run, not the lines you accept.</p>
+        </div>
+        <div class="card">
+          <span class="sanskrit">फल</span>
+          <h3>Phal — the outcome</h3>
+          <p>The result is a reflection, not a grade. Did you verify before you trusted? The score is honest because it's built only from what you actually ran.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="verse">
+      <blockquote>
+        <p lang="sa">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।</p>
+        <p class="translit">karmaṇy-evādhikāras te mā phaleṣu kadācana</p>
+        <p class="meaning">
+          “You have a right to your <strong>actions</strong>, never to the fruits of action.”
+          <span>— Bhagavad Gita 2.47</span>
+        </p>
+      </blockquote>
+      <p class="verse-note">
+        You can't control whether the AI's code is correct. You <em>can</em> control whether you
+        checked. Agent Karma scores the part that's yours — the verifying.
+      </p>
+    </section>
+
+    <section class="play">
+      <h2>How the score works — try it</h2>
+      <p class="play-intro">
+        The Karma Score (0–100) is <strong>objective</strong>: every point maps to a real
+        validation you ran. Toggle the actions below — this is the <em>actual</em> engine from
+        the extension, scoring live.
+      </p>
+      <ScoringExplainer client:visible />
+      <p class="play-foot">
+        Notice: a test that <strong>ran but failed</strong> still earns “tests run” — you did the
+        verifying. It just doesn't earn the “passed” bonus. The engine never rewards a check you
+        skipped, so you can't score clean by never testing.
+      </p>
+    </section>
+
+    <section class="cta">
+      <h2>Now do it for real</h2>
+      <div class="cta-row">
+        <a class="primary" href={`${base}dojo/`}>Practice in the Dojo →</a>
+        <a class="ghost" href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">Install the extension</a>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .learn { max-width: 720px; margin: 0 auto; }
+  .learn section { padding: 64px 0; border-top: 1px solid var(--ak-border); }
+
+  .hero { padding: 32px 0 56px; border: 0; text-align: center; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 3px; font-size: 13px; color: var(--ak-saffron); font-weight: 700; margin: 0 0 18px; }
+  .hero h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.05; letter-spacing: -1.5px; margin: 0; }
+  .hero h1 span { color: var(--ak-accent); }
+  .sub { font-size: 19px; color: var(--ak-muted); line-height: 1.55; max-width: 560px; margin: 24px auto 0; }
+  .sub em { color: var(--ak-text); font-style: italic; }
+  .scroll-hint { margin-top: 48px; color: var(--ak-faint); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .beat .big { font-size: clamp(24px, 4vw, 32px); font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; margin: 0 0 20px; }
+  .beat p { font-size: 17px; color: var(--ak-muted); line-height: 1.6; }
+  .beat strong { color: var(--ak-text); }
+
+  .acts h2, .play h2, .cta h2 { font-size: 28px; letter-spacing: -0.5px; margin: 0 0 12px; }
+  .acts-intro, .play-intro { color: var(--ak-muted); font-size: 17px; line-height: 1.6; margin: 0 0 32px; }
+  .acts-intro em { color: var(--ak-text); }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--ak-border); border-radius: 14px; padding: 22px 18px; background: var(--ak-bg-2); }
+  .card .sanskrit { font-size: 30px; color: var(--ak-saffron); display: block; margin-bottom: 10px; }
+  .card h3 { font-size: 17px; margin: 0 0 8px; }
+  .card p { font-size: 14.5px; color: var(--ak-muted); line-height: 1.55; margin: 0; }
+  .card strong { color: var(--ak-text); }
+
+  .verse { text-align: center; }
+  .verse blockquote { margin: 0; }
+  .verse blockquote p[lang="sa"] { font-size: clamp(22px, 4vw, 30px); color: var(--ak-saffron-strong); margin: 0; line-height: 1.5; }
+  .translit { font-style: italic; color: var(--ak-faint); margin: 10px 0 0; font-size: 15px; }
+  .meaning { font-size: 20px; color: var(--ak-text); line-height: 1.5; max-width: 540px; margin: 22px auto 0; }
+  .meaning span { display: block; color: var(--ak-muted); font-size: 14px; margin-top: 10px; }
+  .verse-note { color: var(--ak-muted); font-size: 16px; line-height: 1.6; max-width: 560px; margin: 28px auto 0; }
+  .verse-note em { color: var(--ak-text); font-style: italic; }
+
+  .play-foot { color: var(--ak-muted); font-size: 15px; line-height: 1.6; margin: 24px 0 0; padding: 16px 18px; border-left: 3px solid var(--ak-saffron); background: var(--ak-bg-2); border-radius: 0 10px 10px 0; }
+  .play-foot strong { color: var(--ak-text); }
+
+  .cta { text-align: center; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .cta a { padding: 12px 22px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+  .cta .primary { background: var(--ak-accent); color: #1a1410; }
+  .cta .ghost { border: 1px solid var(--ak-border); color: var(--ak-text); }
+</style>
