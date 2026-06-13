@@ -17,6 +17,20 @@ It is **not** another AI coding assistant. It is **not** an enterprise analytics
 
 ---
 
+## ▶ Try it now — in your browser, no install
+
+The **[Agent Karma learning platform](https://ai-first-community.github.io/Agent-Karma/)** is live: read the docs, walk through the idea, and practice closing your verification gap in the **Validation Dojo** — scored by the real engine. It's also an installable **PWA** (works offline; add it to your phone's home screen).
+
+<p align="center">
+  <a href="https://ai-first-community.github.io/Agent-Karma/">
+    <img src="site/public/karma-pwa-qr.png" width="190" alt="QR code — scan to open the Agent Karma web app / PWA">
+  </a>
+  <br/>
+  <em>📱 Scan to open on your phone — or visit <a href="https://ai-first-community.github.io/Agent-Karma/">ai-first-community.github.io/Agent-Karma</a></em>
+</p>
+
+---
+
 ## Why Agent Karma exists
 
 The problem with AI code isn't *generating* it — it's *trusting* it. The industry now has a name and a number for this:

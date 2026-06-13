@@ -1,0 +1,47 @@
+---
+// "Scan to install" block. The QR encodes the site root, which is an installable
+// PWA — so a desktop visitor can hop to their phone and add it to the home screen.
+const base = import.meta.env.BASE_URL;
+---
+
+<aside class="qr-install">
+  <div class="qr-copy">
+    <h2 id="on-your-phone">On your phone? Use the web app</h2>
+    <p>
+      The Agent Karma learning platform — docs, the idea, and the Validation Dojo — is also an
+      installable <strong>PWA</strong>. Scan the code, open it on your phone, then
+      <strong>Add to Home Screen</strong> to run it offline. <em>(This installs the web app, not
+      the VS&nbsp;Code extension above.)</em>
+    </p>
+  </div>
+  <a class="qr-link" href={base} aria-label="Open the Agent Karma web app">
+    <img src={`${base}karma-pwa-qr.svg`} width="160" height="160" alt="QR code — scan to open the Agent Karma web app" />
+  </a>
+</aside>
+
+<style>
+  .qr-install {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    border: 1px solid var(--sl-color-gray-5, #d0d0d0);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-top: 1.5rem;
+    background: var(--sl-color-gray-7, transparent);
+  }
+  .qr-copy { flex: 1 1 280px; }
+  .qr-copy h2 { margin: 0 0 8px; font-size: 1.15rem; }
+  .qr-copy p { margin: 0; font-size: 0.95rem; line-height: 1.55; }
+  .qr-copy em { opacity: 0.75; }
+  .qr-link {
+    flex: 0 0 auto;
+    display: block;
+    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
+    line-height: 0;
+  }
+  .qr-link img { display: block; width: 160px; height: 160px; }
+</style>
