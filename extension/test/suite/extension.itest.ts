@@ -41,8 +41,13 @@ suite("Agent Karma — integration", () => {
   test("start → end writes a finalized session (with Phal + score) to local JSON", async () => {
     // Stub the end-flow prompts so they run unattended.
     const w = vscode.window as unknown as Record<string, unknown>;
-    w.showQuickPick = async (items: unknown) =>
-      Array.isArray(items) ? items[0] : items;
+    // The end flow shows two kinds of quick pick: the validation checklist
+    // (canPickMany → expects an array back) and the single-choice reflection
+    // (expects one item). Honour the option so neither path gets the wrong shape.
+    w.showQuickPick = async (items: unknown, opts?: { canPickMany?: boolean }) => {
+      if (opts?.canPickMany) return Array.isArray(items) ? items : [];
+      return Array.isArray(items) ? items[0] : items;
+    };
     w.showInformationMessage = async () => "Done";
     w.showWarningMessage = async () => undefined;
 
