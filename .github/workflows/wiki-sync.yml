@@ -46,19 +46,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.wiki.git"
 
-          # The wiki repo may be empty until its first page exists — clone if we
-          # can, otherwise start a fresh repo and point it at the wiki remote.
-          if git clone "$REMOTE" wiki-repo 2>/dev/null && [ -d wiki-repo/.git ]; then
-            echo "Cloned existing wiki."
-          else
-            echo "Wiki empty — initializing."
-            rm -rf wiki-repo
-            mkdir wiki-repo
-            git -C wiki-repo init -q
-            git -C wiki-repo remote add origin "$REMOTE"
+          # GitHub provisions <repo>.wiki.git only AFTER the first wiki page is
+          # created once via the web UI — there is no API for that initial page.
+          # Until then a clone/push returns "Repository not found". Treat that as
+          # a soft, non-blocking skip (this job is a mirror, never a gate).
+          if ! git clone "$REMOTE" wiki-repo 2>/dev/null; then
+            echo "::warning title=Wiki not initialized::The wiki repo isn't provisioned yet."
+            echo "One-time priming needed: open https://github.com/${REPO}/wiki, click"
+            echo "'Create the first page', save anything — then re-run this workflow."
+            echo "It will overwrite that page and sync all docs automatically thereafter."
+            exit 0
           fi
 
           # Replace the generated pages wholesale (drop stale ones), keep .git.
@@ -74,6 +74,5 @@ jobs:
             exit 0
           fi
           git commit -q -m "docs(wiki): sync from site/src/content/docs (${GITHUB_SHA::7})"
-          git branch -M master
-          git push -u origin master
+          git push origin HEAD
           echo "Wiki updated."
