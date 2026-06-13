@@ -1,0 +1,81 @@
+---
+title: "Your cards: Dharma, Karma & Phal"
+description: The artifacts Agent Karma generates around a session — what each one shows, when it appears, and the value it gives you.
+---
+
+Every session is bracketed by small, readable artifacts that turn raw events into something you
+can act on and share. They follow the arc the whole tool is built on — **Dharma** (the intent
+you set), **Karma** (the validation you did), **Phal** (the outcome you can trust).
+
+## Dharma Card — your intent, made explicit
+
+Generated the moment you start a session, the **Dharma Card** reflects *what you set out to do*
+and how risky it is — before any code is written.
+
+| It shows | Meaning |
+|---|---|
+| **Task & task type** | What you're working on (Bug Fix, Security Fix, Refactor…) |
+| **Intent clarity** | How clear your stated intent is (from the prompt-clarity hint) |
+| **Context provided** | None / Partial / Good — did you give the AI files, errors, specifics? |
+| **Expected validation** | Not Mentioned / Recommended / Explicit — does the task call for testing? |
+| **Risk level** | Low / Medium / High — derived from the task type |
+
+**Why it helps:** it makes the stakes visible *up front*. A High-risk task with "Not Mentioned"
+validation is a flag you see before you trust the output — not after.
+
+## Karma Card — your shareable credential
+
+The **Karma Card** is the one you show the world: a self-contained SVG that celebrates your
+**validation practice** — never usage volume, never a leaderboard rank. You generate it on
+demand; it renders locally with the font embedded, and nothing leaves your machine.
+
+It carries four honest numbers:
+
+- **Karma** — your rolling, self-comparative score (0–100)
+- **Validation** — the share of your sessions with a real validation
+- **Best streak** — your longest run of consecutive validated sessions
+- **Sessions** — how many you've completed
+
+…wrapped around a chakra wax-seal and a **credential tied to your mood**:
+
+| Mood | Credential | The line it carries |
+|---|---|---|
+| Luminous | **Luminous Validator** | "I write with AI — and I verify every line." |
+| Steady | **Steady Validator** | "I use AI — and I check its work." |
+| Forming | **Forming Validator** | "Building the habit: validate what the AI writes." |
+| Dim | **On the Path** | "Learning to verify my AI-assisted work." |
+
+**Why it helps:** it's proof of practice you can drop in a PR, a standup, or a profile —
+evidence that you're holding the last line of trust, without exposing a line of your code. Save
+it as an SVG or a printable PDF.
+
+## Phal Card — the outcome, ready or not
+
+Generated when you end a session, the **Phal Card** answers the only question that matters at the
+finish: *is this safe to ship?*
+
+| It shows | Meaning |
+|---|---|
+| **Outcome** | Ready for Review / Needs Review / High Risk / Informational |
+| **Files & test files changed** | The size and shape of the change |
+| **Validation detected** | Did any test/build/lint/type-check actually run? |
+| **Commands detected** | The validation *types* and their results (never raw strings) |
+| **Recommendations** | Concrete next steps ("no lint ran", "run your test command") |
+
+The verdict is earned, not flattering: **Ready for Review** requires both that validation ran
+*and* that your Karma Score cleared 75. A change with no validation reads as **High Risk** — not
+because you did something wrong, but because the question is still open.
+
+## Two quieter signals
+
+- **Karma Trace** — a plain, chronological timeline of a session's events (`14:24 Validation:
+  Test (passed)`, `14:27 Commit abc1234`). Metadata only, perfect for exports and audits.
+- **Risk Alignment** — a coaching line that compares the task's risk to what you validated.
+  It congratulates a validated high-risk change and gently flags an unvalidated one — but stays
+  **silent** on low-risk work. It coaches; it never nags.
+
+---
+
+See these in motion in [Sessions & the Dharma Card](/features/sessions/) and on the
+[Dashboard & insights](/features/dashboard-and-cards/) — or earn your own Karma Card by practicing
+in the [Validation Dojo](/dojo/).

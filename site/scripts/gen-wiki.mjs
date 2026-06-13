@@ -25,9 +25,9 @@ const SITE_URL = (process.env.SITE_URL || "https://agentkarma.dev").replace(/\/$
 
 // Group display names + order, mirroring astro.config.mjs's sidebar.
 const GROUPS = [
-  { dir: "start", label: "Start here", order: ["introduction", "install"] },
-  { dir: "concepts", label: "Concepts", order: ["scoring", "validation-types"] },
-  { dir: "features", label: "Features", order: ["sessions", "dashboard-and-cards", "safety-nets"] },
+  { dir: "start", label: "Start here", order: ["introduction", "value", "install"] },
+  { dir: "concepts", label: "Concepts", order: ["scoring", "validation-types", "what-we-capture"] },
+  { dir: "features", label: "Features", order: ["overview", "sessions", "cards", "dashboard-and-cards", "safety-nets"] },
   { dir: "reference", label: "Reference", order: ["privacy", "settings", "commands"] },
   { dir: "guides", label: "Guides", order: ["faq"] },
 ];

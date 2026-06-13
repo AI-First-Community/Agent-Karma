@@ -1,0 +1,83 @@
+---
+title: Everything it does
+description: A scannable tour of every Agent Karma feature — what each one is, and why it helps you close your verification gap.
+---
+
+Agent Karma is small on the surface and deliberate underneath. Here's the whole surface in one
+place — grouped by what you'll actually reach for.
+
+## Run a session
+
+- **Start / End Session** — bracket a piece of work with an intent. At the end you get a Karma
+  Score and a [Phal Card](/features/cards/). *Why:* it turns "I used AI" into "I used AI and here's
+  whether I checked it."
+- **Status-bar toggle** — one click to start or end from anywhere. *Why:* zero friction means you
+  actually do it.
+- **Ambient mode** *(optional)* — keeps one rolling session per day and captures saves and
+  validations hands-free. *Why:* track the habit without remembering to press start.
+
+## Log what you validated
+
+- **Log a Validation** — record a check you ran when shell integration can't see it. *Why:* covers
+  browser AI, copy-paste, and work outside the IDE.
+- **`@agentkarma /verify`** — the same, from the chat box: "I ran the tests, they passed." *Why:*
+  log a validation without leaving your train of thought. (See [the chat participant](/features/safety-nets/).)
+
+## See your practice — the dashboard
+
+The dashboard turns your sessions into a picture you can read in seconds:
+
+- **At a glance** — rolling Karma + trend, validation rate, sessions, and a tally of Phal outcomes.
+- **Karma sparkline** — your recent scores at a glance.
+- **Consistency strip** — your last 24 sessions as green (validated) / red (unvalidated) / grey
+  (nothing to validate) cells. *Why:* streaks and slips become obvious.
+- **Risk × validation heatmap** — which checks you run for which kinds of task. *Why:* find the
+  blind spot ("I never lint my migrations").
+- **Validation habits & trend** — per-check rates (Test, Build, Lint, Type Check) and whether each
+  is rising, steady, or slipping.
+
+…plus derived **insights** that need no extra capture:
+
+- **High-risk watchlist** — high-risk sessions you never validated, as a to-do list.
+- **Score composition** — how much of your score is *real* verification vs. cheap points.
+- **Usage attribution** *(with Claude Code reading on)* — tokens spent on validated vs.
+  unvalidated work.
+- **Karmic message** — one human line that reflects your mood (luminous → on the path) and ties
+  back to your latest Dharma and Phal.
+
+## Know if you *can* validate — readiness
+
+- **Check Validation Readiness** — scans the repo for test/build/lint/type-check tooling, CI, a
+  pre-commit hook, and whether your agent guidance (CLAUDE.md / AGENTS.md) even mentions
+  validation. Gives you a 0–100 readiness score and the single biggest gap. *Why:* before it
+  coaches *whether* you validated, it checks whether you're *set up* to.
+- **Find Validation Gaps** — suggests the next validation skill to build from your own habits.
+
+## Safety nets
+
+- **Pre-commit nudge** *(opt-in)* — a **non-blocking** reminder at `git commit` if the files
+  you're committing were never validated. It's change-aware, and it won't clobber an existing
+  husky/lefthook setup. *Why:* a last, gentle check exactly when it counts. (See
+  [Readiness, nudge & chat](/features/safety-nets/).)
+- **`@agentkarma /summary`** — your latest Karma, this week's nudge, and your readiness status,
+  on demand in chat.
+
+## Reflect & share
+
+- **Generate Karma Card** — your shareable [validation credential](/features/cards/) as SVG or
+  printable PDF.
+- **Why did my Karma move?** — compares your last two scored sessions and explains the change.
+- **Weekly reflection** — the week's highest-leverage nudge.
+- **Export** — save any session as JSON or Markdown (timeline + summary).
+
+## Own your data
+
+- **Reset history** — clear sessions and your Karma trend, keep your settings.
+- **Delete all local data** — a full wipe, no trace.
+- **Settings** — every capture toggle in one place. *Why:* nothing is captured that you didn't
+  agree to. (See [Settings](/reference/settings/) and the full [command list](/reference/commands/).)
+
+---
+
+Want the *why* behind all of this? Read [How it brings value](/start/value/). Want to see exactly
+what each feature records? Read [What's captured — and what never is](/concepts/what-we-capture/).

@@ -1,0 +1,88 @@
+---
+title: What's captured — and what never is
+description: Exactly what Agent Karma records (metadata only), how it observes vs. what you log, and the lines it never crosses.
+---
+
+Agent Karma's entire value rests on trust, so it earns that trust the only honest way:
+by recording the **shape** of your work — never its **content**. It watches *that* you
+validated, not *what* you wrote. Everything below stays on your machine; there is no
+account, no telemetry, and a build-time guard that fails the release if a single network
+call sneaks into the bundle.
+
+## The one rule: metadata, never content
+
+| Agent Karma records | Agent Karma never touches |
+|---|---|
+| That a file changed — its **name, extension**, and whether it's a test file | Your **source code** — file contents are never read |
+| That a validation **ran** — its **type** (Test / Build / Lint / Type Check / Security) and **result** | The **raw command string** — it's classified, then discarded |
+| That a **commit** landed — its short **SHA** | The commit **message, diff, or file list** |
+| Git diff **counts** — files changed, lines added/removed | The **diff content** itself |
+| Your **intent text** — only if you leave `capturePromptText` on (default), so cards read back meaningfully | Terminal **output** — capture is hard-wired off, regardless of settings |
+
+If you turn `capturePromptText` off, your Karma Score and cards are still computed — the
+intent string is simply redacted.
+
+## Every event it records
+
+A session is just an ordered list of small, typed events. Here is the complete set:
+
+| Event | What it carries | Captured how |
+|---|---|---|
+| `session.started` / `session.ended` | nothing — just the boundary | automatic |
+| `intent.captured` | your intent text *(only if `capturePromptText` is on)* | you, at start |
+| `prompt.scored` | a prompt-clarity score (0–100) + reasons | derived |
+| `dharma.generated` | the Dharma Card (risk, context, expected validation) | derived at start |
+| `file.saved` | `fileName`, `extension`, `isTestFile` *(full path optional, off by default)* | observed |
+| `validation.command` | `commandType`, `result`, and `source` (observed \| logged) | observed **or** logged |
+| `git.commit` | short `sha` only | observed |
+| `git.diff.summary` | `filesChanged`, `linesAdded`, `linesDeleted` | observed at end |
+| `karma.score.generated` | the score + its rule breakdown | derived at end |
+| `phal.generated` | the Phal Card (outcome readiness) | derived at end |
+| `outcome.reported` | your optional reflection note | you, optional |
+
+Note what's missing: there is no event that stores code, a command, a prompt response, or
+a diff. The taxonomy itself is the privacy guarantee.
+
+## How it observes — the collectors
+
+Five small collectors watch your workflow and emit those events. None of them read content.
+
+- **Files** — a save in the editor (or, optionally, an external write by an AI agent or CLI)
+  emits one `file.saved`. The same file is de-duplicated per session, so it can't inflate counts.
+- **Validations** — with VS&nbsp;Code's shell integration, Agent Karma sees that a command
+  finished and its exit code. It **classifies** the command (is this a test? a build?) and keeps
+  only the *type* and *pass/fail* — the command text is thrown away immediately.
+- **Commits** — it watches git's reflog (not a hook), because commits made by an AI agent or
+  the CLI never fire VS&nbsp;Code's APIs. It keeps the short SHA and nothing else. Commits are
+  recorded for your timeline but **do not affect your Karma Score**.
+- **Ambient mode** *(optional)* — instead of one session per task, it keeps one rolling session
+  per day, capturing saves and validations hands-free.
+- **Claude Code usage** *(optional, off by default)* — reads only the `usage`, `model`, and
+  `timestamp` fields from Claude Code's *local* logs. Never your prompts, replies, or code, and
+  never over a network.
+
+## Observed vs. logged — and why it matters
+
+Every validation is tagged with how it was learned:
+
+- **Observed** — Agent Karma saw the command run and saw its exit code. This is the gold standard.
+- **Logged** — you told it ("I ran the tests, they passed") via the `@agentkarma /verify` chat
+  command or the *Log a Validation* action. Essential for browser AI, copy-paste, or work outside
+  the IDE.
+
+Both count toward validation. But only an **observed** passing test earns the *tests-passed*
+bonus — you can't award yourself a green check you didn't actually run. See
+[How the Karma Score works](/concepts/scoring/) for the full rule set.
+
+## The guarantees, enforced
+
+- **No network, ever.** A CI check (`check:no-network`) scans the shipped bundle for any HTTP
+  API and fails the build if one appears.
+- **Local-only data.** Sessions, events, and your Karma trend live in VS&nbsp;Code's storage on
+  your machine. Exports (JSON / Markdown) and the Karma Card are written wherever *you* choose.
+- **Your name stays yours.** The name on a Karma Card is resolved locally — a setting, else your
+  local `git config user.name`, else your OS user — and is never sent anywhere.
+
+This is the difference between a coach and a dashboard: a dashboard measures *you* for someone
+else; Agent Karma measures your validation habit, **for you**, and keeps it. See the full
+[Privacy & data](/reference/privacy/) contract.

@@ -64,6 +64,7 @@ export default defineConfig({
           label: "Start here",
           items: [
             { label: "The verification gap", slug: "start/introduction" },
+            { label: "How it brings value", slug: "start/value" },
             { label: "Install", slug: "start/install" },
           ],
         },
@@ -72,13 +73,16 @@ export default defineConfig({
           items: [
             { label: "How the Karma Score works", slug: "concepts/scoring" },
             { label: "Validation types", slug: "concepts/validation-types" },
+            { label: "What's captured — & what never is", slug: "concepts/what-we-capture" },
           ],
         },
         {
           label: "Features",
           items: [
+            { label: "Everything it does", slug: "features/overview" },
             { label: "Sessions & the Dharma Card", slug: "features/sessions" },
-            { label: "Dashboard & cards", slug: "features/dashboard-and-cards" },
+            { label: "Your cards: Dharma, Karma & Phal", slug: "features/cards" },
+            { label: "Dashboard & insights", slug: "features/dashboard-and-cards" },
             { label: "Readiness, nudge & chat", slug: "features/safety-nets" },
           ],
         },
