@@ -41,6 +41,7 @@
   font-size: 14px;
   line-height: 1.55;
 }
+@media (max-width: 700px) { .shiki { font-size: 12.5px; padding: 12px; } }
 :root[data-theme="light"] .shiki { color: var(--shiki-light) !important; background-color: var(--shiki-light-bg) !important; }
 :root[data-theme="light"] .shiki span { color: var(--shiki-light) !important; }
 :root[data-theme="dark"] .shiki { color: var(--shiki-dark) !important; background-color: var(--shiki-dark-bg) !important; }

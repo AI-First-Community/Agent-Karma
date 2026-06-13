@@ -73,7 +73,7 @@
   .muted { color: var(--ak-muted); }
   .cta { font-weight: 700; }
   .rank { font-size: 30px; font-weight: 800; color: var(--ak-accent); }
-  .grid { display: flex; gap: 28px; margin: 14px 0 24px; }
+  .grid { display: flex; flex-wrap: wrap; gap: clamp(18px, 6vw, 28px); margin: 14px 0 24px; }
   .grid div { display: flex; flex-direction: column; }
   .grid b { font-size: 28px; font-weight: 800; }
   .grid span { font-size: 13px; color: var(--ak-muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -87,4 +87,9 @@
   .btn.primary { background: var(--ak-accent); color: #1a1208; border: none; }
   .btn.ghost { color: var(--ak-muted); }
   .note { color: var(--ak-faint); font-size: 13px; margin-top: 10px; }
+  @media (max-width: 540px) {
+    .rank { font-size: 26px; }
+    .grid b { font-size: 24px; }
+    .actions .btn { flex: 1 1 auto; text-align: center; }
+  }
 </style>

@@ -128,4 +128,12 @@
   .breakdown { margin:16px 0; color:var(--ak-muted); }
   .breakdown li { color:var(--ak-faint); } .breakdown li.earned { color:var(--ak-text); }
   .debrief { background:var(--ak-panel); border-left:3px solid var(--ak-accent); padding:14px 16px; border-radius:6px; line-height:1.55; }
+  .code :global(pre) { max-width:100%; }
+  @media (max-width:540px) {
+    .task { font-size:17px; }
+    .ship { width:100%; }
+    .after { gap:14px; }
+    .after .ship.ghost { width:100%; }
+    .chip { padding:10px 15px; }
+  }
 </style>
