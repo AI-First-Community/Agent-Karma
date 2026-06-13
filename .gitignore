@@ -3,6 +3,7 @@ CLAUDE.md
 *.pdf
 Agent Karma — *.pdf
 karma-card.*
+launch-posts.md
 # generated at vsce:prepublish from the root CHANGELOG so it ships in the .vsix
 extension/CHANGELOG.md
 
