@@ -3,6 +3,10 @@ dist/
 node_modules/
 .astro/
 
+# generated GitHub Wiki mirror (built by scripts/gen-wiki.mjs in CI)
+wiki/
+.wiki-rules.mjs
+
 # astro / vite
 .vercel/
 .netlify/

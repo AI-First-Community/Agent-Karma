@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:no-node": "node scripts/check-no-node.mjs",
+    "gen:wiki": "node scripts/gen-wiki.mjs",
     "test": "vitest run"
   },
   "dependencies": {
