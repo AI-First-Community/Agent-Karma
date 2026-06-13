@@ -1,0 +1,31 @@
+---
+title: Validation types
+description: The four validations Agent Karma understands, and how it records them.
+---
+
+Agent Karma recognizes the validations that actually catch AI mistakes:
+
+| Type | Catches |
+|---|---|
+| **Test** | Logic bugs, broken behavior, regressions |
+| **Build** | Compile errors, broken imports |
+| **Lint** | Style/quality issues, common foot-guns |
+| **Type Check** | Type errors, wrong shapes, bad API usage |
+
+(It also understands **Security** scans and an **Other** bucket.)
+
+## How a validation gets recorded
+
+- **Automatic** — when you run a validation in VS Code's integrated terminal, shell
+  integration detects the command **type** and result. The raw command string is
+  classified, then discarded.
+- **Manual** — **Add Validation Command** (or the `@agentkarma /verify` chat command,
+  or the **✅ Log a Validation** button) records one when auto-detection can't see it
+  — e.g. AI run in a browser, or commands run in an external terminal.
+
+## Why "ran" matters more than "passed"
+
+A check only earns points if it **actually ran**. A *failed* test still earns the
+"tests run" credit (you looked) — but you don't get the "tests passed" bonus. You
+can't score well by simply never testing. That's the whole philosophy: validation
+discipline, honestly measured.

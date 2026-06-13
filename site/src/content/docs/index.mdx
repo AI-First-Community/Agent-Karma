@@ -1,0 +1,43 @@
+---
+title: Agent Karma
+description: A local-first AI-coding validation coach for VS Code. Did you verify what the AI produced before you trusted it?
+template: splash
+hero:
+  tagline: AI writes the code — you decide what's safe to ship. Agent Karma is your local-first coach that tracks whether you actually tested and reviewed it.
+  image:
+    file: ../../assets/chakra.svg
+  actions:
+    - text: Install for VS Code
+      link: https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma
+      icon: external
+      variant: primary
+    - text: Try the Dojo
+      link: /dojo/
+      icon: rocket
+      variant: minimal
+    - text: Learn the idea
+      link: /start/introduction/
+      icon: right-arrow
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="The verification gap" icon="warning">
+    Everyone measures how *much* AI writes your code. Nobody measures whether you **checked** it.
+  </Card>
+  <Card title="100% local" icon="approve-check">
+    No cloud, no telemetry, no login. It never reads your source code.
+  </Card>
+  <Card title="Dharma → Karma → Phal" icon="open-book">
+    Set your intent · the AI acts, you guide · validate the outcome.
+  </Card>
+  <Card title="Works with any AI tool" icon="puzzle">
+    Claude Code, Copilot, Cursor, ChatGPT — even browser & copy-paste.
+  </Card>
+</CardGrid>
+
+<p style="text-align:center;margin-top:2.5rem;color:var(--sl-color-gray-3)">
+  Free · open-source (Apache-2.0) · an Innovate With Sanjeev project
+</p>

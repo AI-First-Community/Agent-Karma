@@ -1,0 +1,34 @@
+---
+title: Sessions & the Dharma Card
+description: Start with intent, capture validation as you work, finish with an honest score.
+---
+
+A **session** is one unit of AI-assisted work — you start it with intent, code with
+your AI, and end it to get your reflection.
+
+## The lifecycle
+
+- **Start** — set your **intent**, the **AI tool**, and the **task type**. This
+  produces your **Dharma Card**: a quick read on intent clarity (a soft prompt-hygiene
+  hint), the context you gave, the validation the task *expects*, and a risk level
+  (Low / Medium / High).
+- **During** — Agent Karma quietly notes file-change events and any validations you
+  run — **metadata only**. The status bar shows you're recording.
+- **End** — it attaches a git **diff summary** (counts only), runs the validation
+  checklist, computes your **Karma Score**, and generates the **Phal Card** (outcome).
+
+## Safety nets
+
+Because sessions are manual, Agent Karma guards against forgetting:
+
+- A **forgot-to-start** nudge if you've been editing without a session.
+- **Survive-reload & crash recovery** — an active session is restored after a window
+  reload or a hard kill, with elapsed time recomputed.
+- A **stale-session** prompt if a recovered session has been idle past
+  `idleEndMinutes`.
+
+## Logging validations
+
+The most important habit: tell Agent Karma what you checked. Use **✅ Log a
+Validation**, `@agentkarma /verify`, or just run tests/build/lint in the integrated
+terminal and they're detected automatically. See [Validation types](/concepts/validation-types/).

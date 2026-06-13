@@ -1,0 +1,24 @@
+{
+  "title": "The confident off-by-one",
+  "difficulty": "white",
+  "summary": "The AI wrote a paginator. It looks right. Did you check the edges?",
+  "task": "Add a helper that returns the last page index (0-based) for a list, given a page size.",
+  "language": "typescript",
+  "fileName": "pagination.ts",
+  "code": "export function lastPageIndex(total: number, pageSize: number): number {\n  // pages are 0-indexed\n  return Math.floor(total / pageSize);\n}",
+  "hiddenIssues": [
+    {
+      "kind": "Test",
+      "severity": "high",
+      "title": "Off-by-one when total is an exact multiple of pageSize",
+      "explanation": "For total=20, pageSize=10 this returns 2, but the last valid 0-based page index is 1. A boundary test (exact multiple, and total=0) catches it. Fix: Math.max(0, Math.ceil(total / pageSize) - 1)."
+    }
+  ],
+  "availableValidations": [
+    { "commandType": "Test", "label": "Run the unit tests" },
+    { "commandType": "Lint", "label": "Run the linter" },
+    { "commandType": "Type Check", "label": "Run the type checker" },
+    { "commandType": "Build", "label": "Run the build" }
+  ],
+  "debrief": "Type-checking and linting both pass — the code is valid, just wrong. Only a test that probes the boundary (exact multiples, empty input) catches an off-by-one. This is the classic AI trap: confident, clean, and subtly incorrect. Running everything 'to be safe' wastes effort; the calibrated move is a boundary test."
+}

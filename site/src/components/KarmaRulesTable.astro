@@ -1,0 +1,33 @@
+---
+// The Karma Score rule table, rendered at build time from the REAL engine
+// (imported through the single barrel). Docs can never drift from the code.
+import { KARMA_RULES } from "../engine/karma";
+
+const total = KARMA_RULES.reduce((sum, r) => sum + r.maxPoints, 0);
+---
+
+<table>
+  <thead>
+    <tr>
+      <th>Rule</th>
+      <th style="text-align:right">Max points</th>
+      <th>What it rewards</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      KARMA_RULES.map((r) => (
+        <tr>
+          <td><strong>{r.label}</strong></td>
+          <td style="text-align:right">{r.maxPoints}</td>
+          <td>{r.description}</td>
+        </tr>
+      ))
+    }
+    <tr>
+      <td><strong>Total</strong></td>
+      <td style="text-align:right"><strong>{total}</strong> / 100</td>
+      <td>The remaining points are reserved; validation dominates by design.</td>
+    </tr>
+  </tbody>
+</table>

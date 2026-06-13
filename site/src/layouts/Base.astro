@@ -1,0 +1,73 @@
+---
+import "../styles/tokens.css";
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Agent Karma</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#1a1410" />
+    <script src="/registerSW.js" defer></script>
+    {/* Match the theme the user picked in the docs (Starlight stores it here). */}
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem("starlight-theme");
+        const dark =
+          saved === "dark" ||
+          ((saved === "auto" || !saved) &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
+    </script>
+    <style is:global>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--ak-bg);
+        color: var(--ak-text);
+        font-family: var(--ak-font);
+      }
+      a { color: var(--ak-accent); }
+      header {
+        padding: 16px 28px;
+        border-bottom: 1px solid var(--ak-border);
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      header .brand { font-weight: 800; color: var(--ak-text); text-decoration: none; font-size: 18px; }
+      header .brand span { color: var(--ak-accent); }
+      header nav { margin-left: auto; display: flex; gap: 20px; align-items: center; font-size: 14px; font-weight: 600; }
+      header .toggle { background: none; border: 1px solid var(--ak-border); color: var(--ak-muted); border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 15px; }
+      main { max-width: 860px; margin: 0 auto; padding: 44px 24px 90px; }
+      h1 { letter-spacing: -1px; }
+      code, pre { font-family: var(--ak-mono); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="/">Agent <span>Karma</span></a>
+      <nav>
+        <a href="/start/introduction/">Docs</a>
+        <a href="/dojo/">Dojo</a>
+        <a href="/progress/">Progress</a>
+        <a href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">Install</a>
+        <button class="toggle" id="ak-theme" aria-label="Toggle theme">◐</button>
+      </nav>
+    </header>
+    <main><slot /></main>
+
+    <script is:inline>
+      // Keep the toggle in sync with Starlight's stored preference, so flipping
+      // the theme here also flips the docs.
+      document.getElementById("ak-theme")?.addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem("starlight-theme", next);
+      });
+    </script>
+  </body>
+</html>

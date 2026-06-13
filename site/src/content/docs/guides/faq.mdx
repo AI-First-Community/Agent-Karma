@@ -1,0 +1,38 @@
+---
+title: FAQ
+description: Common questions about Agent Karma.
+---
+
+## Is it a usage tracker / surveillance tool?
+
+No. It's the opposite. It doesn't measure how much AI you use, and it captures no
+source code, terminal output, or keystrokes. It reflects *your* validation practice
+back to *you*, locally. A calm mirror, not a manager's dashboard.
+
+## Does it send anything to the cloud?
+
+Never. It makes **no network calls** — a Prime Directive enforced in CI. No account,
+no login, no telemetry. Everything is local JSON on your machine.
+
+## Does it work with my AI tool?
+
+Yes — it's tool-agnostic. Claude Code, GitHub Copilot, Cursor, ChatGPT, even a
+browser tab or copy-paste. It watches your *validation actions*, not where the code
+came from.
+
+## Why didn't my Karma Score change?
+
+The headline trend is **self-comparative** and stays a quiet "forming" note until you
+have ~5 sessions — it won't grade a sparse history. Also, work done by an AI agent or
+in an external terminal isn't auto-captured: log it with **✅ Log a Validation** or
+`@agentkarma /verify`, then end the session.
+
+## Uninstalling deleted my data — is that a bug?
+
+No. Updates preserve your data; an explicit uninstall (or **Delete All Local Data**)
+removes it. For a privacy-first tool, your local data leaving with the tool is the point.
+
+## Is it free / open-source?
+
+Yes — free on the VS Code Marketplace and open-source under Apache-2.0. An
+*Innovate With Sanjeev* project.

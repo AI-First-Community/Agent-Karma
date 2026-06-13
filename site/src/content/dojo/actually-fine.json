@@ -1,0 +1,17 @@
+{
+  "title": "Actually fine",
+  "difficulty": "white",
+  "summary": "Sometimes the AI just... gets it right. Can you tell — without over-checking?",
+  "task": "Add a pure helper that capitalizes the first letter of a string.",
+  "language": "typescript",
+  "fileName": "capitalize.ts",
+  "code": "export function capitalize(s: string): string {\n  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);\n}",
+  "hiddenIssues": [],
+  "availableValidations": [
+    { "commandType": "Type Check", "label": "Run the type checker" },
+    { "commandType": "Test", "label": "Run the unit tests" },
+    { "commandType": "Lint", "label": "Run the linter" },
+    { "commandType": "Build", "label": "Run the build" }
+  ],
+  "debrief": "This one is genuinely correct — empty-string guarded, pure, and typed. Validation discipline isn't about running everything on everything; it's calibration. A quick type-check or a small test is proportionate here. Over-validating trivial code is its own kind of waste."
+}

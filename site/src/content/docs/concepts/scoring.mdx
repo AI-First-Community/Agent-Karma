@@ -1,0 +1,36 @@
+---
+title: How the Karma Score works
+description: An objective, validation-weighted score — every point traceable to a named rule.
+---
+
+import KarmaRulesTable from '../../../components/KarmaRulesTable.astro';
+
+Your **Karma Score** (0–100) is **objective**. It's built only from validation
+actions that were observed or logged — never from feeling-based self-report. It
+answers one thing: *did you verify the AI's work before trusting it?*
+
+## Design principles
+
+- **Action-based.** Points come from real validations (tests, build, lint, type
+  check) you actually ran — not from how much AI you used.
+- **Validation-dominated.** ~90 of 100 points are validation; a soft prompt-clarity
+  hint contributes at most 10.
+- **Traceable.** Every point maps to a named rule, so the score is never a black box.
+- **Fair (no vacuous truth).** A check only earns points if it actually *ran* — you
+  can't score "clean" by simply never testing.
+
+## The rules
+
+The table below is rendered **directly from the extension's engine** — it is the
+exact rule set the extension uses, so these docs can't fall out of sync with the code.
+
+<KarmaRulesTable />
+
+## Self-comparative trend
+
+The headline number you see over time is a self-comparative **EMA** — you against
+*your own* rolling average, not a global leaderboard. With only a few sessions it
+stays a calm "forming" note rather than grading a sparse history.
+
+Want to feel it? Try the [Validation Dojo](/start/introduction/) — it scores your
+choices with this exact engine.

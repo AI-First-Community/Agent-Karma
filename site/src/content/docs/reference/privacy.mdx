@@ -1,0 +1,44 @@
+---
+title: Privacy & data
+description: The Agent Karma trust contract — what's captured, what never is, and your controls.
+---
+
+Agent Karma is **local-first by design**. Five promises, hardcoded into how it works:
+
+```
+Local-first. No source code captured. No terminal output captured.
+No cloud upload. No telemetry. No login. No surveillance.
+```
+
+## What it records — metadata only
+
+- **File-change events** — file **names** only (including edits made by AI agents
+  or the CLI, gated by `agentKarma.captureExternalFileChanges`). Never file contents.
+- **Validation command *types*** — that you ran a Test / Build / Lint / Type Check.
+  The raw command string is classified, then discarded.
+- **A git diff summary** — file and line **counts**, never the diff content.
+- **The short SHA** of commits — never the message, diff, author, or files.
+
+## What it never captures
+
+- Your **source code**.
+- Your **terminal output**.
+- Your **keystrokes**.
+- Your **prompt text** — unless you opt in (`agentKarma.capturePromptText`); even
+  then it stays local. The prompt-clarity score never reveals the text.
+
+## Where your data lives
+
+Local JSON under VS Code's per-extension storage, on your machine. No backend, no
+account, nothing leaves your computer. The extension makes **no network calls** —
+a Prime Directive enforced in CI.
+
+## Your controls
+
+- **Export** the current session as JSON or Markdown (metadata only).
+- **Reset Karma History** — clears sessions and the trend, keeps your settings.
+- **Delete All Local Data** — wipes everything, one command.
+- Per-setting granularity over what's captured at all.
+
+Uninstalling removes the tool; for a privacy-first coach, your local data going
+with it is the point.

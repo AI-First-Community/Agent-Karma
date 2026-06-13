@@ -1,0 +1,13 @@
+# build output & deps
+dist/
+node_modules/
+.astro/
+
+# astro / vite
+.vercel/
+.netlify/
+.wrangler/
+
+# misc
+.DS_Store
+*.log

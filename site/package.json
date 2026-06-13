@@ -1,0 +1,24 @@
+{
+  "name": "agent-karma-site",
+  "type": "module",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:no-node": "node scripts/check-no-node.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.40.0",
+    "@astrojs/svelte": "^8.1.2",
+    "astro": "^6.4.6",
+    "svelte": "^5.56.3"
+  },
+  "devDependencies": {
+    "@vite-pwa/astro": "^1.2.0",
+    "vitest": "^4.1.8"
+  }
+}

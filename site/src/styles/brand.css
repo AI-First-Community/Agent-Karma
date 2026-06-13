@@ -1,0 +1,35 @@
+/* Map Starlight's theme variables onto the shared brand tokens (tokens.css),
+   so docs match the custom pages exactly. tokens.css is loaded first. */
+
+:root {
+  --sl-font: var(--ak-font);
+  --sl-font-mono: var(--ak-mono);
+}
+
+:root,
+:root[data-theme="dark"] {
+  --sl-color-accent-low: #3a230c;
+  --sl-color-accent: var(--ak-saffron);
+  --sl-color-accent-high: #f4b16c;
+  --sl-color-bg: var(--ak-bg);
+  --sl-color-bg-nav: #0a0c10;
+  --sl-color-bg-sidebar: var(--ak-bg-2);
+}
+
+:root[data-theme="light"] {
+  --sl-color-accent-low: #f6e3cf;
+  --sl-color-accent: var(--ak-saffron-strong);
+  --sl-color-accent-high: #5a2a0a;
+  --sl-color-bg: var(--ak-bg);
+  --sl-color-bg-nav: var(--ak-bg-2);
+  --sl-color-bg-sidebar: #f7efdf;
+}
+
+/* Splash hero polish */
+.hero > img,
+.hero > .hero-html {
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.35));
+}
+.hero h1 {
+  letter-spacing: -1px;
+}

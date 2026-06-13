@@ -1,0 +1,39 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const order = { white: 0, green: 1, brown: 2, black: 3 };
+const scenarios = (await getCollection("dojo")).sort(
+  (a, b) => order[a.data.difficulty] - order[b.data.difficulty]
+);
+---
+
+<Base title="Validation Dojo">
+  <h1>The Validation Dojo</h1>
+  <p style="font-size:18px;color:var(--ak-muted);line-height:1.5;max-width:640px">
+    Practice the one thing the AI can't do for you: deciding what to check before you
+    trust the code. Every scenario is scored by the <strong style="color:var(--ak-text)">real
+    Agent Karma engine</strong> — the same one in the extension.
+  </p>
+
+  <ul style="list-style:none;padding:0;margin:32px 0;display:grid;gap:14px">
+    {
+      scenarios.map((s) => (
+        <li style="border:1px solid var(--ak-border);border-radius:12px;padding:18px 20px;background:var(--ak-bg-2)">
+          <a href={`/dojo/${s.id}/`} style="font-weight:800;font-size:18px;text-decoration:none">
+            {s.data.title}
+          </a>
+          <span style="margin-left:10px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ak-faint)">
+            {s.data.difficulty} belt
+          </span>
+          <p style="margin:6px 0 0;color:var(--ak-muted)">{s.data.summary}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p style="color:var(--ak-faint);font-size:14px">
+    More scenarios coming. When you're ready for the real thing,
+    <a href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">install the extension</a>.
+  </p>
+</Base>

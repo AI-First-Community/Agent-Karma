@@ -1,0 +1,24 @@
+{
+  "title": "The string-built query",
+  "difficulty": "brown",
+  "summary": "The AI wired up a DB lookup from user input. Anything jump out?",
+  "task": "Look up a user by the username from the request.",
+  "language": "typescript",
+  "fileName": "users.ts",
+  "code": "export async function findUser(db: DB, username: string) {\n  return db.query(\n    `SELECT * FROM users WHERE name = '${username}'`\n  );\n}",
+  "hiddenIssues": [
+    {
+      "kind": "Security",
+      "severity": "high",
+      "title": "SQL injection via string interpolation",
+      "explanation": "`username` is interpolated straight into the SQL, so an input like `' OR '1'='1` returns the whole table. Happy-path tests pass, types pass, and most linters stay quiet. A security review (or a SAST scan / raw-SQL lint rule) catches it. Fix: a parameterized query — db.query('SELECT * FROM users WHERE name = ?', [username])."
+    }
+  ],
+  "availableValidations": [
+    { "commandType": "Security", "label": "Security review / scan" },
+    { "commandType": "Test", "label": "Run the unit tests" },
+    { "commandType": "Type Check", "label": "Run the type checker" },
+    { "commandType": "Lint", "label": "Run the linter" }
+  ],
+  "debrief": "The dangerous ones don't fail tests or types — the happy path passes and the types are fine. Only thinking about security (a review, or a scanner for raw SQL) catches injection. AI loves building queries by string concatenation; this is the one to watch for."
+}

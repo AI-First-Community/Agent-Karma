@@ -1,0 +1,29 @@
+---
+import Base from "../../layouts/Base.astro";
+import DojoScenario from "../../components/DojoScenario.svelte";
+import { getCollection } from "astro:content";
+import { codeToHtml } from "shiki";
+
+export async function getStaticPaths() {
+  const scenarios = await getCollection("dojo");
+  return scenarios.map((s) => ({ params: { id: s.id }, props: { data: s.data, id: s.id } }));
+}
+
+const { data, id } = Astro.props;
+
+// Dual-theme highlight so the code block follows the site's light/dark toggle.
+const codeHtml = await codeToHtml(data.code, {
+  lang: data.language,
+  themes: { light: "github-light", dark: "github-dark" },
+  defaultColor: false,
+});
+---
+
+<Base title={data.title}>
+  <p style="margin:0 0 6px"><a href="/dojo/" style="font-size:14px">← Dojo</a></p>
+  <h1 style="margin-top:4px">{data.title}</h1>
+  <p style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ak-faint);margin-top:-8px">
+    {data.difficulty} belt
+  </p>
+  <DojoScenario scenario={data} id={id} codeHtml={codeHtml} client:load />
+</Base>

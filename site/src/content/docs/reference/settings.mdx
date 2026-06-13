@@ -1,0 +1,21 @@
+---
+title: Settings
+description: Every Agent Karma setting and what it controls.
+---
+
+Configure in VS Code Settings (search "Agent Karma") or `settings.json`. VS Code
+configuration is the source of truth.
+
+| Setting | Default | What it does |
+|---|---|---|
+| `agentKarma.enabled` | `true` | **Master switch.** Off = all passive capture stops and starting a session is blocked. |
+| `agentKarma.captureTerminalCommands` | `true` | Auto-detect validation commands in the integrated terminal (type + result only; raw command discarded). |
+| `agentKarma.captureExternalFileChanges` | `true` | Also capture file changes made **outside the editor** (AI agents, CLI, scripts) — file **names** only, deps/build folders ignored. |
+| `agentKarma.capturePromptText` | `true` | Store the intent/prompt text you enter. Off = session kept, intent blank (clarity score still computed). |
+| `agentKarma.enableGitDiffSummary` | `true` | Compute a git diff summary at session end — file/line **counts** only, never content. |
+| `agentKarma.storeFullFilePath` | `false` | Store the full workspace-relative path of saved files. Off = only the file name. |
+| `agentKarma.idleEndMinutes` | `30` | Idle minutes before a recovered session prompts to end (5–480). |
+| `agentKarma.readClaudeUsage` | `false` | Read Claude Code's **local** session logs for tokens/turns/cost. No network, no API key, metadata only. |
+| `agentKarma.cardName` | `""` | Name printed on your Karma Card. Blank = auto-resolve from git `user.name`. |
+
+Every setting is honored **before** anything is stored. See [Privacy & data](/reference/privacy/).

@@ -1,0 +1,39 @@
+---
+title: Readiness, nudge & chat
+description: Can you even validate? The pre-commit net, and the @agentkarma chat surface.
+---
+
+## Validation readiness — "can you even validate?"
+
+A question no usage tracker asks: before coaching you on *whether* you validated,
+does your workspace even let you? **Check Validation Readiness** scans (config only,
+never your source) for test/build/lint/type-check setup — plus the safety net (a
+pre-commit hook, CI, and whether your agent-guidance file tells the AI to validate)
+— and reports what's there and what's missing. **Find Validation Gaps** suggests the
+single highest-leverage next step. It's **monorepo-aware** (it checks nested package
+roots, not just the workspace root).
+
+## Pre-commit nudge (opt-in)
+
+**Install Pre-Commit Nudge** adds a local git hook that prints a **non-blocking**
+reminder when you're about to commit AI-assisted changes you never validated. It:
+
+- never blocks the commit (reminder only),
+- never reads your code (it reads the local on-disk metadata),
+- never clobbers an existing/foreign hook, and is cleanly removable.
+
+## `@agentkarma` chat
+
+If you use a chat provider (e.g. GitHub Copilot Chat), the **`@agentkarma`**
+participant gives you:
+
+- **`/verify`** — log a validation you ran (covers browser & copy-paste AI).
+- **`/summary`** — your latest Karma, this week's nudge, and whether you can validate.
+
+No chat provider? The **✅ Log a Validation** button does the same thing.
+
+## Export & delete
+
+**Export** the current session as JSON or Markdown (metadata only). **Reset Karma
+History** for a fresh start (keeps settings), or **Delete All Local Data** to wipe
+everything. Your data, your call — see [Privacy & data](/reference/privacy/).

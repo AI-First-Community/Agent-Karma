@@ -1,0 +1,61 @@
+/* Single source of brand tokens — fonts + palette — shared by Starlight pages
+   and the custom (Dojo) pages, so the whole site is consistent and theme-aware.
+   Keyed on the same `data-theme` attribute Starlight toggles. */
+
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ak-font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ak-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --ak-saffron: #e8801a;
+  --ak-saffron-strong: #c75d08;
+}
+
+/* Dark (default) */
+:root,
+:root[data-theme="dark"] {
+  --ak-bg: #0c0e12;
+  --ak-bg-2: #0e1014;
+  --ak-panel: #11141a;
+  --ak-border: #20242c;
+  --ak-text: #f4ecdb;
+  --ak-muted: #a9a293;
+  --ak-faint: #857d6e;
+  --ak-accent: var(--ak-saffron);
+  --ak-green: #2f9e5b;
+  --ak-red: #d05a3a;
+}
+
+/* Shiki dual-theme code blocks — follow the site's light/dark toggle */
+.shiki {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--ak-border);
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.55;
+}
+:root[data-theme="light"] .shiki { color: var(--shiki-light) !important; background-color: var(--shiki-light-bg) !important; }
+:root[data-theme="light"] .shiki span { color: var(--shiki-light) !important; }
+:root[data-theme="dark"] .shiki { color: var(--shiki-dark) !important; background-color: var(--shiki-dark-bg) !important; }
+:root[data-theme="dark"] .shiki span { color: var(--shiki-dark) !important; }
+
+/* Light = warm cream, not stark white */
+:root[data-theme="light"] {
+  --ak-bg: #fbf6ec;
+  --ak-bg-2: #f4ead3;
+  --ak-panel: #fffdf6;
+  --ak-border: #e7dcc6;
+  --ak-text: #1c1a16;
+  --ak-muted: #5a5147;
+  --ak-faint: #8a7f6a;
+  --ak-accent: var(--ak-saffron-strong);
+  --ak-green: #2f7d32;
+  --ak-red: #b8451f;
+}

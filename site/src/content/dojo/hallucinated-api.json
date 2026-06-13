@@ -1,0 +1,24 @@
+{
+  "title": "The API that doesn't exist",
+  "difficulty": "green",
+  "summary": "The AI called a tidy-looking method. Does it actually exist?",
+  "task": "Trim whitespace from both ends of every string in an array.",
+  "language": "typescript",
+  "fileName": "strings.ts",
+  "code": "export function trimAll(items: string[]): string[] {\n  return items.map((s) => s.trimBoth());\n}",
+  "hiddenIssues": [
+    {
+      "kind": "Type Check",
+      "severity": "high",
+      "title": "String.prototype.trimBoth is hallucinated",
+      "explanation": "There is no `trimBoth()` on strings — the AI invented a plausible-sounding name. `tsc` flags it instantly: \"Property 'trimBoth' does not exist on type 'string'\". The real method is `.trim()`."
+    }
+  ],
+  "availableValidations": [
+    { "commandType": "Type Check", "label": "Run the type checker (tsc)" },
+    { "commandType": "Test", "label": "Run the unit tests" },
+    { "commandType": "Lint", "label": "Run the linter" },
+    { "commandType": "Build", "label": "Run the build" }
+  ],
+  "debrief": "Hallucinated APIs are one of the most common AI failures — they look right because the *name* is plausible. A type check catches them instantly, which is exactly why 'did you even run tsc?' matters. (A build would catch it too, since it type-checks; a linter usually won't.)"
+}
