@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#11161d"/>
+      <stop offset="100%" stop-color="#0a0c10"/>
+    </linearGradient>
+    <linearGradient id="wheel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0b429"/>
+      <stop offset="100%" stop-color="#e3870a"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <rect x="6" y="6" width="244" height="244" rx="52" fill="none" stroke="#f0b429" stroke-opacity="0.18" stroke-width="2"/>
+  <!-- 12-spoke hub-to-rim chakra — same proportions as the dashboard chakra() (ring 0.10r, spokes 0.06r, hub 0.16r) -->
+  <g stroke="url(#wheel)" stroke-linecap="round">
+    <circle cx="128" cy="128" r="82" fill="none" stroke-width="8"/>
+    <g stroke-width="5">
+      <line x1="143" y1="128" x2="204" y2="128"/>
+      <line x1="140.99" y1="135.5" x2="193.82" y2="166"/>
+      <line x1="135.5" y1="140.99" x2="166" y2="193.82"/>
+      <line x1="128" y1="143" x2="128" y2="204"/>
+      <line x1="120.5" y1="140.99" x2="90" y2="193.82"/>
+      <line x1="115.01" y1="135.5" x2="62.18" y2="166"/>
+      <line x1="113" y1="128" x2="52" y2="128"/>
+      <line x1="115.01" y1="120.5" x2="62.18" y2="90"/>
+      <line x1="120.5" y1="115.01" x2="90" y2="62.18"/>
+      <line x1="128" y1="113" x2="128" y2="52"/>
+      <line x1="135.5" y1="115.01" x2="166" y2="62.18"/>
+      <line x1="140.99" y1="120.5" x2="193.82" y2="90"/>
+    </g>
+  </g>
+  <circle cx="128" cy="128" r="13" fill="url(#wheel)"/>
+</svg>

@@ -50,6 +50,8 @@ export default defineConfig({
       head: [
         { tag: "link", attrs: { rel: "manifest", href: `${base}manifest.webmanifest` } },
         { tag: "meta", attrs: { name: "theme-color", content: "#1a1410" } },
+        { tag: "meta", attrs: { property: "og:image", content: "https://ai-first-community.github.io/Agent-Karma/og-image.png" } },
+        { tag: "meta", attrs: { name: "twitter:image", content: "https://ai-first-community.github.io/Agent-Karma/og-image.png" } },
         { tag: "script", attrs: { src: `${base}registerSW.js`, defer: true } },
       ],
       social: [

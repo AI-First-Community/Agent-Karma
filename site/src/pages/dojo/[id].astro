@@ -20,7 +20,7 @@ const codeHtml = await codeToHtml(data.code, {
 });
 ---
 
-<Base title={data.title}>
+<Base title={data.title} description={data.summary}>
   <p style="margin:0 0 6px"><a href={`${base}dojo/`} style="font-size:14px">← Dojo</a></p>
   <h1 style="margin-top:4px">{data.title}</h1>
   <p style="font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--ak-faint);margin-top:-8px">

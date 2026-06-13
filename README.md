@@ -102,7 +102,7 @@ Local-first. No source code captured. No terminal output captured.
 No cloud upload. No telemetry. No login. No surveillance.
 ```
 
-What it *does* record is **metadata only**: file **names** (including edits made by AI agents or the CLI, gated by a setting), the validation command **types** you ran, git diff **counts**, and short commit **SHAs** — never file contents, terminal output, or (unless you opt in) prompt text.
+What it *does* record is **metadata only**: file **names** (including edits made by AI agents or the CLI, gated by a setting), the validation command **types** you ran, git diff **counts**, and short commit **SHAs** — never file contents or terminal output. Your typed **intent text** is recorded locally **by default** so your cards read back meaningfully; turn it off any time with `agentKarma.capturePromptText` (either way it never leaves your machine).
 
 Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 
@@ -130,6 +130,10 @@ Read the full contract in [`PRIVACY.md`](PRIVACY.md).
 ## License
 
 Apache-2.0 — see [`LICENSE`](LICENSE). A purely individual, community contribution. Not affiliated with any employer or vendor.
+
+Third-party components (including the Manrope font under the SIL Open Font License) are credited in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+
+**Disclaimer.** Agent Karma is provided **"AS IS"**, without warranty of any kind, express or implied. To the fullest extent permitted by law, the maintainer is not liable for any damages arising from its use (see Apache-2.0, Sections 7–8). It is a habit and awareness aid — **not** a guarantee of code correctness, security, or production-readiness. You remain responsible for validating and shipping your code.
 
 ---
 

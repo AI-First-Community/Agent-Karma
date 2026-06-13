@@ -240,7 +240,7 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run build -- --minify",
+    "vscode:prepublish": "node -e \"require('fs').copyFileSync('../CHANGELOG.md','CHANGELOG.md')\" && npm run build -- --minify",
     "build": "node esbuild.js",
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
@@ -249,8 +249,8 @@
     "compile-tests": "tsc -p tsconfig.test.json",
     "preview": "tsc -p tsconfig.dev.json && node out/dev/genPreview.js",
     "test:integration": "npm run build && npm run compile-tests && node ./out/test/runTest.js",
-    "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\"",
-    "package": "vsce package --no-dependencies -o agent-karma.vsix"
+    "check:no-network": "node -e \"const fs=require('fs');const b=fs.readFileSync('dist/extension.js','utf8');const hits=[/\\\\bfetch\\\\s*\\\\(/, /require\\\\(['\\\"](https?|net|http2|tls|dns|dgram|ws)['\\\"]\\\\)/, /from\\\\s+['\\\"](node:)?(https?|net|http2|tls|dns|dgram|ws)['\\\"]/].filter(r=>r.test(b));if(hits.length){console.error('Network API found in bundle:',hits.map(String));process.exit(1)}console.log('OK: no network APIs in bundle')\"",
+    "package": "vsce package --no-dependencies -o agent-karma-$npm_package_version.vsix"
   },
   "devDependencies": {
     "@fontsource-variable/manrope": "^5.2.8",

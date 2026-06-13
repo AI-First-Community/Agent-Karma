@@ -3,7 +3,7 @@ title: Privacy & data
 description: The Agent Karma trust contract — what's captured, what never is, and your controls.
 ---
 
-Agent Karma is **local-first by design**. Five promises, hardcoded into how it works:
+Agent Karma is **local-first by design**. Seven promises, hardcoded into how it works:
 
 ```
 Local-first. No source code captured. No terminal output captured.
@@ -18,14 +18,15 @@ No cloud upload. No telemetry. No login. No surveillance.
   The raw command string is classified, then discarded.
 - **A git diff summary** — file and line **counts**, never the diff content.
 - **The short SHA** of commits — never the message, diff, author, or files.
+- **Your typed intent text** — recorded locally **by default** (so your cards and
+  dashboard read back meaningfully). Turn it off with `agentKarma.capturePromptText`;
+  either way it never leaves your machine, and the prompt-clarity score never reveals it.
 
 ## What it never captures
 
 - Your **source code**.
 - Your **terminal output**.
 - Your **keystrokes**.
-- Your **prompt text** — unless you opt in (`agentKarma.capturePromptText`); even
-  then it stays local. The prompt-clarity score never reveals the text.
 
 ## Where your data lives
 

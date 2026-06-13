@@ -110,8 +110,13 @@ Everything is stored as plain JSON on your machine.
 
 | Setting | Default | What it does |
 |---|---|---|
+| `agentKarma.capturePromptText` | `true` | Store your typed **intent text** locally (so cards/dashboard read back meaningfully). Turn off to redact it; it never leaves your machine either way. |
+| `agentKarma.captureExternalFileChanges` | `true` | Count file changes made outside the editor (by AI agents or the CLI). File **names** only — never contents. |
+| `agentKarma.captureTerminalCommands` | `true` | Observe validation commands via VS Code shell integration. The command **type/result** is kept; the raw string is discarded. |
 | `agentKarma.readClaudeUsage` | `false` | Read Claude Code's **local** session logs to show token/turn cost. Fully local — metadata only; your prompts, the AI's replies, and your code are never read. |
 | `agentKarma.cardName` | *(blank)* | Name printed on your shareable Karma Card. Blank uses your local git `user.name` (or OS username). Resolved locally — never sent anywhere. |
+
+*Plus `agentKarma.enabled` (master switch), `enableGitDiffSummary`, `storeFullFilePath`, and `idleEndMinutes` — see **VS Code Settings → Agent Karma** for the full list and descriptions.*
 
 ---
 
@@ -122,7 +127,7 @@ Local-first. No source code captured. No terminal output captured.
 No cloud upload. No telemetry. No login. No surveillance.
 ```
 
-Agent Karma records *that* you validated — file-change events (file **names** only, including edits made by AI agents, the CLI, or other tools, gated by `agentKarma.captureExternalFileChanges`), the validation command **types** you ran, a git **diff summary** (counts, not content), and the short **SHA** of commits. It does **not** capture your source code, your terminal output, your keystrokes, or your prompt text (unless you opt in). Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md).
+Agent Karma records *that* you validated — file-change events (file **names** only, including edits made by AI agents, the CLI, or other tools, gated by `agentKarma.captureExternalFileChanges`), the validation command **types** you ran, a git **diff summary** (counts, not content), and the short **SHA** of commits. It does **not** capture your source code, your terminal output, or your keystrokes. Your typed **intent text** is recorded **locally by default** (so cards and the dashboard read back meaningfully) — turn it off with `agentKarma.capturePromptText`; it never leaves your machine regardless. Read the full contract in [PRIVACY.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md).
 
 <!-- SHOT: karma-card.png — a generated Karma Card certificate (the personalised SVG/PDF). Looks great as the closing visual. -->
 ![Shareable Karma Card](https://raw.githubusercontent.com/AI-First-Community/Agent-Karma/main/extension/media/screenshots/karma-card.png)
@@ -156,7 +161,9 @@ No background surveillance, no leaderboards. The one optional interruption is th
 
 <div align="center">
 
-Licensed under **Apache-2.0**. A purely individual, community contribution — not affiliated with any employer or vendor.
+Licensed under **Apache-2.0**. A purely individual, community contribution — not affiliated with any employer or vendor. Bundled third-party components (incl. the Manrope font under the SIL OFL) are credited in [THIRD-PARTY-NOTICES.md](https://github.com/AI-First-Community/Agent-Karma/blob/main/THIRD-PARTY-NOTICES.md).
+
+Provided **"AS IS"**, without warranty of any kind (Apache-2.0 §§7–8). Agent Karma is a habit and awareness aid — not a guarantee of code correctness, security, or production-readiness; you remain responsible for validating and shipping your code.
 
 *Use any AI coding tool. Agent Karma helps you use it better.*
 

@@ -64,11 +64,13 @@ It is plain JSON. You can open it, read it, back it up, or delete it yourself.
   "agentKarma.enabled": true,
   "agentKarma.storeFullFilePath": false,   // off by default — only file names are stored
   "agentKarma.captureTerminalCommands": true,  // command TYPE only, never output
-  "agentKarma.captureTerminalOutput": false,   // hardcoded off — cannot be enabled
-  "agentKarma.capturePromptText": true,    // your own typed intent only
+  "agentKarma.captureExternalFileChanges": true, // file names of AI/CLI edits — never contents
+  "agentKarma.capturePromptText": true,    // your own typed intent only; off to redact
   "agentKarma.enableGitDiffSummary": true,  // counts only, never diff content
-  "agentKarma.enablePreCommitNudge": false  // opt-in; installs a LOCAL git hook, no network
+  "agentKarma.readClaudeUsage": false      // opt-in; reads Claude Code's LOCAL logs, metadata only
 }
+// Terminal OUTPUT is never captured — it is hard-wired off, not a toggle.
+// The pre-commit nudge is opt-in via the "Install Pre-Commit Nudge" command (a local git hook, no network).
 ```
 
 > The optional **pre-commit nudge** (off by default) installs a local git hook that reminds you to validate AI-assisted changes before committing. It is entirely local, makes no network calls, never blocks your commit, and can be removed at any time with `Agent Karma: Remove Pre-Commit Nudge`. It never reads or transmits your code.
