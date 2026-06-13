@@ -2,6 +2,14 @@
 
 All notable changes to Agent Karma are documented here. Pre-1.0: building the MVP one release at a time, then expanding toward the vision (see `docs/vision.md`).
 
+## [0.46.1]
+- **Fix (Marketplace):** replaced the listing badges — shields.io **retired** its `visual-studio-marketplace` badge type, so the version/installs/rating badges were rendering as "retired". They are now static, allowlist-safe badges that can't break.
+- **Marketplace listing now ships the latest README + CHANGELOG.** A second, platform-wide public-readiness audit (15 agents, adversarially verified) returned **no blocker**; its remediations are bundled here:
+  - **Legal:** the **Manrope** font's SIL OFL 1.1 license text now ships alongside the font; added a repo `THIRD-PARTY-NOTICES.md` (font + build stack + trademark acknowledgements); added plain-language **AS-IS / no-correctness-guarantee** disclaimers to the README.
+  - **Privacy docs:** corrected `capturePromptText` wording to **"on by default (opt-out)"** to match shipped behavior; expanded the README settings table with the capture toggles.
+  - **Packaging:** `CHANGELOG.md` is now bundled into the `.vsix` (the Marketplace **Changelog** tab was empty); the no-network CI guard was broadened (tls/dns/dgram/ws).
+- No change to capture or scoring behavior in this release.
+
 ## [0.46.0]
 - **Post-audit hardening.** A multi-agent quality/security/privacy review (now that the repo is public) confirmed no security or privacy blocker — zero network calls, metadata-only capture, strict webview CSP, and a clean commit history. This release fixes the confirmed findings:
   - **Fix (correctness):** `@agentkarma /verify` now respects the master switch — a disabled extension no longer creates a session or writes to disk via the chat surface.

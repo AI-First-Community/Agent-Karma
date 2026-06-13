@@ -8,10 +8,9 @@
 
 A **local-first**, privacy-safe VS Code companion that turns *"did I actually check what the AI wrote before I trusted it?"* into a visible, objective habit.
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/innovate-with-sanjeev.agent-karma?color=2d8a4e&label=Marketplace)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/innovate-with-sanjeev.agent-karma?color=2d8a4e)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/innovate-with-sanjeev.agent-karma?color=2d8a4e)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
+[![VS Marketplace](https://img.shields.io/badge/VS_Marketplace-Install-2d8a4e?logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/AI-First-Community/Agent-Karma/blob/main/LICENSE)
+[![100% local](https://img.shields.io/badge/privacy-100%25_local-2d8a4e)](https://github.com/AI-First-Community/Agent-Karma/blob/main/PRIVACY.md)
 
 </div>
 
