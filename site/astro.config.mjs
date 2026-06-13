@@ -108,7 +108,9 @@ export default defineConfig({
         background_color: "#0c0e12",
         display: "standalone",
         id: base,
-        start_url: base,
+        // Launch the installed app straight into the learn-and-experiment flow,
+        // not the docs splash — that's the point of the web app.
+        start_url: `${base}learn/`,
         scope: base,
         icons: [
           { src: `${base}icons/icon-192.png`, sizes: "192x192", type: "image/png" },

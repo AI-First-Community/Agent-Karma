@@ -17,16 +17,16 @@ It is **not** another AI coding assistant. It is **not** an enterprise analytics
 
 ---
 
-## ▶ Try it now — in your browser, no install
+## ▶ Learn & experiment first — before you open VS Code
 
-The **[Agent Karma learning platform](https://ai-first-community.github.io/Agent-Karma/)** is live: read the docs, walk through the idea, and practice closing your verification gap in the **Validation Dojo** — scored by the real engine. It's also an installable **PWA** (works offline; add it to your phone's home screen).
+New to the idea? Start in the **[Agent Karma web app](https://ai-first-community.github.io/Agent-Karma/learn/)**: walk through the concept, then **practice in the Validation Dojo** — real scenarios scored by the same engine the extension uses. It's an installable **PWA** (add to your home screen, works offline). Build the verification habit in the app, then bring it into VS Code.
 
 <p align="center">
-  <a href="https://ai-first-community.github.io/Agent-Karma/">
-    <img src="site/public/karma-pwa-qr.png" width="190" alt="QR code — scan to open the Agent Karma web app / PWA">
+  <a href="https://ai-first-community.github.io/Agent-Karma/learn/">
+    <img src="site/public/karma-pwa-qr.png" width="190" alt="QR code — scan to open the Agent Karma web app">
   </a>
   <br/>
-  <em>📱 Scan to open on your phone — or visit <a href="https://ai-first-community.github.io/Agent-Karma/">ai-first-community.github.io/Agent-Karma</a></em>
+  <em>📱 Scan to learn &amp; experiment on your phone — or visit <a href="https://ai-first-community.github.io/Agent-Karma/learn/">ai-first-community.github.io/Agent-Karma/learn</a></em>
 </p>
 
 ---

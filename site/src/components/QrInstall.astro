@@ -1,21 +1,22 @@
 ---
-// "Scan to install" block. The QR encodes the site root, which is an installable
-// PWA — so a desktop visitor can hop to their phone and add it to the home screen.
+// "Learn & experiment first" block. The QR opens the installable web app (PWA)
+// straight into the Learn → Dojo flow, so people can build the habit before
+// committing to the VS Code extension.
 const base = import.meta.env.BASE_URL;
 ---
 
 <aside class="qr-install">
   <div class="qr-copy">
-    <h2 id="on-your-phone">On your phone? Use the web app</h2>
+    <h2 id="learn-and-experiment">New here? Learn &amp; experiment first</h2>
     <p>
-      The Agent Karma learning platform — docs, the idea, and the Validation Dojo — is also an
-      installable <strong>PWA</strong>. Scan the code, open it on your phone, then
-      <strong>Add to Home Screen</strong> to run it offline. <em>(This installs the web app, not
-      the VS&nbsp;Code extension above.)</em>
+      Before you install the extension, get the idea and <strong>practice in the Validation
+      Dojo</strong> — scored by the real engine — right in the <strong>web app</strong>. Install
+      it as an app (Add to Home Screen) and it runs offline. Then bring the habit into VS&nbsp;Code.
     </p>
   </div>
-  <a class="qr-link" href={base} aria-label="Open the Agent Karma web app">
+  <a class="qr-link" href={`${base}learn/`} aria-label="Open the Agent Karma web app to learn and experiment">
     <img src={`${base}karma-pwa-qr.svg`} width="160" height="160" alt="QR code — scan to open the Agent Karma web app" />
+    <span>Scan to open on your phone</span>
   </a>
 </aside>
 
@@ -37,11 +38,13 @@ const base = import.meta.env.BASE_URL;
   .qr-copy em { opacity: 0.75; }
   .qr-link {
     flex: 0 0 auto;
-    display: block;
-    padding: 10px;
-    background: #fff;
-    border-radius: 12px;
-    line-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
   }
-  .qr-link img { display: block; width: 160px; height: 160px; }
+  .qr-link img { display: block; width: 160px; height: 160px; padding: 10px; background: #fff; border-radius: 12px; }
+  .qr-link span { font-size: 0.8rem; opacity: 0.8; }
+  @media (max-width: 520px) { .qr-link { width: 100%; } }
 </style>

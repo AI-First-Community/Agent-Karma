@@ -25,27 +25,60 @@ const base = import.meta.env.BASE_URL; // "/Agent-Karma/" — trailing slash kep
     </script>
     <style is:global>
       * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
       body {
         margin: 0;
         background: var(--ak-bg);
         color: var(--ak-text);
         font-family: var(--ak-font);
+        overflow-x: hidden; /* no horizontal scroll — app, not portal */
       }
       a { color: var(--ak-accent); }
+
+      /* Sticky, blurred app bar — feels native when installed standalone. */
       header {
-        padding: 16px 28px;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        padding: 12px 24px;
+        padding-top: max(12px, env(safe-area-inset-top));
         border-bottom: 1px solid var(--ak-border);
+        background: color-mix(in srgb, var(--ak-bg) 88%, transparent);
+        backdrop-filter: saturate(140%) blur(10px);
+        -webkit-backdrop-filter: saturate(140%) blur(10px);
         display: flex;
         gap: 16px;
         align-items: center;
       }
-      header .brand { font-weight: 800; color: var(--ak-text); text-decoration: none; font-size: 18px; }
+      header .brand { font-weight: 800; color: var(--ak-text); text-decoration: none; font-size: 18px; white-space: nowrap; }
       header .brand span { color: var(--ak-accent); }
       header nav { margin-left: auto; display: flex; gap: 20px; align-items: center; font-size: 14px; font-weight: 600; }
-      header .toggle { background: none; border: 1px solid var(--ak-border); color: var(--ak-muted); border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 15px; }
-      main { max-width: 860px; margin: 0 auto; padding: 44px 24px 90px; }
+      header nav a { white-space: nowrap; text-decoration: none; color: var(--ak-muted); }
+      header nav a:hover { color: var(--ak-text); }
+      header nav a.cta { color: var(--ak-accent); }
+      header .toggle { background: none; border: 1px solid var(--ak-border); color: var(--ak-muted); border-radius: 8px; padding: 6px 11px; cursor: pointer; font-size: 15px; line-height: 1; }
+
+      main { max-width: 860px; margin: 0 auto; padding: clamp(28px, 6vw, 44px) clamp(16px, 5vw, 24px) 96px; }
       h1 { letter-spacing: -1px; }
       code, pre { font-family: var(--ak-mono); }
+
+      /* Phones: brand + toggle on top row, nav becomes a swipeable pill strip. */
+      @media (max-width: 700px) {
+        header { flex-wrap: wrap; gap: 10px 14px; padding-left: 16px; padding-right: 16px; }
+        header .brand { order: 1; margin-right: auto; }
+        header .toggle { order: 2; }
+        header nav {
+          order: 3;
+          width: 100%;
+          margin-left: 0;
+          gap: 22px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 2px;
+        }
+        header nav::-webkit-scrollbar { display: none; }
+      }
     </style>
   </head>
   <body>
@@ -53,12 +86,12 @@ const base = import.meta.env.BASE_URL; // "/Agent-Karma/" — trailing slash kep
       <a class="brand" href={base}>Agent <span>Karma</span></a>
       <nav>
         <a href={`${base}learn/`}>Learn</a>
-        <a href={`${base}start/introduction/`}>Docs</a>
         <a href={`${base}dojo/`}>Dojo</a>
         <a href={`${base}progress/`}>Progress</a>
-        <a href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">Install</a>
-        <button class="toggle" id="ak-theme" aria-label="Toggle theme">◐</button>
+        <a href={`${base}start/introduction/`}>Docs</a>
+        <a class="cta" href="https://marketplace.visualstudio.com/items?itemName=innovate-with-sanjeev.agent-karma">Get VS&nbsp;Code ext</a>
       </nav>
+      <button class="toggle" id="ak-theme" aria-label="Toggle theme">◐</button>
     </header>
     <main><slot /></main>
 
